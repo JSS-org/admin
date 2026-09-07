@@ -1,6 +1,6 @@
-# 数据库设计（PostgreSQL，待确认）
+# 数据库设计（PostgreSQL）
 
-本文件提供完整需求的表结构说明；确认后生成可执行 SQL 迁移。表中的“预留”指不开发该功能的其他端 API；第一版仍创建这些表和关联。跨模块表可同时支撑网页查询与未来端写入。
+本文件提供完整需求的表结构说明；原设计已确认，2026-09-08 补充门店优惠券张数额度与 Go 后端任务结构，可执行 SQL 迁移尚未生成。表中的“预留”指不开发该功能的其他端 API；第一版仍创建这些表和关联。跨模块表可同时支撑网页查询与未来端写入。
 
 ## 1. 全局约定
 
@@ -49,6 +49,10 @@ erDiagram
   devices ||--o{ access_events : reports
   members ||--o{ point_ledger : earns
   coupon_templates ||--o{ member_coupons : issues
+  coupon_templates ||--o{ coupon_store_quotas : allocates
+  stores ||--o{ coupon_store_quotas : receives
+  coupon_quota_batches ||--o{ coupon_quota_batch_items : targets
+  coupon_store_quotas ||--o{ coupon_quota_ledger : tracks
   salary_templates ||--o{ payroll_items : calculates
   payroll_runs ||--o{ payroll_items : contains
   settlement_rules ||--o{ settlements : calculates
@@ -182,20 +186,28 @@ erDiagram
 | point_redemptions 积分兑换（预留写入） | member_id→members, store_id→stores, product_id→point_products, quantity int, points_spent int, order_id?→orders, member_card_id?→member_cards, member_course_pack_id?→member_course_packs, status, delivery_snapshot jsonb?, source_key | source_key UQ；扣积分/库存/发权益同事务；周边留配送状态 |
 | invitations 邀请（预留） | inviter_id→members, invitee_id→members, code, registered_at, qualified_at?, reward_ledger_id?→point_ledger | invitee_id UQ；邀请人≠被邀请人 |
 | share_events 分享（预留） | member_id→members, channel, scene_type, scene_id uuid?, shared_at, source_key | source_key UQ |
-| coupon_templates 优惠券 | name, kind, discount_amount?, discount_rate?, minimum_spend, starts_at, expires_at, total_limit int?, per_member_limit int, applicable_product_type?, scope, status | 满减/折扣二选一；折扣0..1；起止合法；scope=all/selected |
+| coupon_templates 优惠券 | name, kind, discount_amount?, discount_rate?, minimum_spend, starts_at, expires_at, total_limit bigint?, allocated_count bigint=0, issued_count bigint=0, per_member_limit int, applicable_product_type?, scope, status | 满减/折扣二选一；折扣0..1；起止合法；scope=all/selected；0≤已发≤已分配≤总限额（有限时）；已分配含待落门店的额度预留 |
 | coupon_template_stores 券门店范围 | template_id→coupon_templates, store_id→stores | UQ(模板,门店)；模板另加 scope=all/selected，selected 必须有门店 |
-| coupon_batches 发券批次 | template_id→coupon_templates, store_id?→stores, created_by→admin_accounts, request_key, recipient_count int, status, completed_at? | UQ(created_by,request_key)；保存目标集合快照 |
-| coupon_batch_recipients 发券目标/结果 | batch_id→coupon_batches, member_id→members, status, failure_reason?, processed_at? | UQ(批次,会员)；持久化全部目标及失败结果，不能仅从成功发出的券反推批次 |
-| member_coupons 会员券 | template_id→coupon_templates, batch_id→coupon_batches, member_id→members, coupon_no, terms_snapshot jsonb, status, issued_at, expires_at, used_order_id?→orders, used_at? | coupon_no UQ；UQ(batch_id,member_id)；总量/个人上限在事务内检查 |
+| coupon_store_quotas 门店券额度 | template_id→coupon_templates, store_id→stores, allocated_count bigint=0, reserved_count bigint=0, issued_count bigint=0, status | UQ(模板,门店)；0≤已发+预占≤分配；可发=分配-已发-预占；额度单位为张 |
+| coupon_quota_batches 批量分配额度 | template_id→coupon_templates, created_by→admin_accounts, target_mode, selector_snapshot jsonb, quantity_per_store int, target_count int, total_quantity bigint, request_key, request_digest, status, completed_at? | UQ(操作者,request_key)；target_mode=selected/all_eligible；数量>0；总量=每店张数×目标店数；全部门店集合在提交时固定 |
+| coupon_quota_batch_items 门店分配明细 | batch_id→coupon_quota_batches, store_id→stores, quantity int, status, failure_reason?, processed_at? | UQ(批次,门店)；queued/succeeded/failed；失败项释放其已占总部总额，且只能释放一次 |
+| coupon_quota_ledger 额度流水 | quota_id→coupon_store_quotas, allocation_item_id?→coupon_quota_batch_items, recipient_id?→coupon_batch_recipients, action, allocated_delta bigint=0, reserved_delta bigint=0, issued_delta bigint=0, source_key, occurred_at | source_key UQ；action=allocate/reserve/issue/release；关联来源按动作校验；流水与额度变化同事务 |
+| coupon_batches 发券批次 | template_id→coupon_templates, created_by→admin_accounts, request_key, request_digest, recipient_count int, status, completed_at? | UQ(created_by,request_key)；门店归属在目标明细保存，允许总部跨店批量发放 |
+| coupon_batch_recipients 发券目标/结果 | batch_id→coupon_batches, member_id→members, store_id→stores, quota_id→coupon_store_quotas, status, failure_reason?, processed_at? | UQ(批次,会员)；每会员明确扣哪家店额度，重复会员去重但冲突门店不猜测；持久化失败结果 |
+| member_coupons 会员券 | template_id→coupon_templates, batch_id→coupon_batches, member_id→members, issued_store_id→stores, coupon_no, terms_snapshot jsonb, status, issued_at, expires_at, used_order_id?→orders, used_at? | coupon_no UQ；UQ(batch_id,member_id)；发行门店与可使用门店范围分开；发券消耗额度，核销不再次扣额度 |
 | gift_code_batches 礼品码批次 | name, reward_type, card_template_id?→card_templates, course_product_id?→course_products, point_amount int?, count int, expires_at, created_by→admin_accounts, request_key | UQ(created_by,request_key)；奖励按类型一选；批量限制 |
 | gift_codes 礼品码 | batch_id→gift_code_batches, code_digest, code_masked, status, redeemed_by?→members, redeemed_at? | code_digest UQ；安全随机生成，明文只在生成结果展示/下载 |
 | gift_redemptions 礼品兑换（预留） | gift_code_id→gift_codes, member_id→members, store_id→stores, member_card_id?→member_cards, member_course_pack_id?→member_course_packs, point_ledger_id?→point_ledger, redeemed_at | gift_code_id UQ；同事务锁码并发权益 |
-| maintenance_batches 一键维护 | store_id?→stores, created_by→admin_accounts, action, content text, request_key, status | UQ(操作者,request_key)；action 当前仅待确认的 message_followup |
-| maintenance_items 维护明细 | batch_id→maintenance_batches, member_id→members, message_batch_id?→message_batches, status, completed_at?, failure_reason? | UQ(批次,会员)；批量结果逐会员可见 |
 | message_batches 私信/批量通知 | store_id?→stores, created_by?→admin_accounts, kind, channel, title?, content text, scheduled_at?, status, request_key | kind=private/bulk/contract_reminder/maintenance/entry/expiry；请求键按操作者/系统来源去重 |
 | message_recipients 消息投递 | batch_id→message_batches, member_id?→members, employee_id?→employees, client_device_id?→client_devices, status, provider_message_id?, sent_at?, delivered_at?, read_at?, failure_reason?, attempt_count int=0, next_attempt_at? | 成员/员工二选一；按批次/接收者/渠道去重；sent 与 delivered 分开 |
 | notification_rules 入场推送规则（预留） | store_id→stores, event_type, audience, enabled boolean | UQ(门店,事件,受众)；audience=manager/responsible_coach；陌生访客仅店长 |
 | expiry_reminders 临期提醒（预留） | member_id→members, member_card_id?→member_cards, member_course_pack_id?→member_course_packs, days_before int, channel, scheduled_at, shown_at?, message_batch_id?→message_batches, status | 卡/课程包二选一；同权益/提醒日/渠道唯一 |
+
+一键维护是一种批量操作方式，不再建立仅面向会员维护消息的 maintenance_batches/items。按操作复用额度分配、发券、消息等业务批次，每项具备独立参数和权限。总部分配额度不生成会员券；发券后券过期/已使用均不自动归还发放额度。第一版只做追加额度，未要求的额度收回/转移不额外添加。
+
+分配批次建立时，锁券模板并一次预留整个批次的总张数；不足则整批409，不让后台随机争抢剩余额度。每店成功时把预留落实到门店额度，失败时释放总部预留。任意时刻：模板 allocated_count = 各店 allocated_count 之和 + 尚未落实的分配明细预留量。每项只允许一次成功或失败终结。
+
+发券批次建立时按门店锁额度、校验目标归属并预占，任一店额度不足则不创建整批。执行时锁定模板、门店额度、会员及目标明细，成功同事务减少预占、增加已发计数、创建会员券与流水；不符合个人上限/已过期/停用等失败项释放预占。统一按模板、门店、会员 ID 排序加锁，避免不同请求反向锁定。幂等重放返回原批次，不重新预占。
 
 ## 10. 内容、活动、加盟与反馈
 
@@ -226,7 +238,16 @@ erDiagram
 | payroll_items 员工工资 | run_id→payroll_runs, employee_id→employees, template_id→salary_templates, base_salary, card_commission, pt_commission, lesson_commission, allowances, deductions, gross_amount, net_amount, calculation_snapshot jsonb | UQ(批次,员工)；模板、期间、销售/消课口径保存快照 |
 | payroll_components 工资计算明细 | payroll_item_id→payroll_items, rule_id?→salary_rules, type, label, basis_amount?, basis_quantity?, rate?, amount, source_snapshot jsonb | 明细合计与主表一致；来源可追溯至业绩分配/上课记录 |
 
-## 12. 索引、关系一致性与事务
+## 12. 后端持久任务与迁移元数据
+
+| 表 | 主要字段 | 约束/用途 |
+| --- | --- | --- |
+| background_jobs 后台任务 | kind, resource_id uuid, status, available_at, attempt_count int=0, max_attempts int, lease_owner?, lease_token uuid?, lease_until?, last_error?, completed_at? | UQ(kind,resource_id)；只允许已注册的额度/发券/提醒/工资等类型；业务资源引用由对应服务校验；状态 queued/running/succeeded/failed/unknown |
+| schema_migrations SQL版本 | version bigint, name, applied_at | version UQ；仅启动迁移命令使用，无网页 CRUD；不存用户要求排除的额外校验材料 |
+
+任务与触发任务的业务批次在同一 PostgreSQL 事务提交。worker 通过 `FOR UPDATE SKIP LOCKED` 领取并记录租约；租约过期可重新领取，完成/续租必须匹配当前 lease_token。数据库变更任务在最终业务事务里验证租约并写结果，避免过期 worker 重复生效。外部渠道任务还依赖渠道幂等键或查询确认，无法确认是否执行时标为 unknown，不盲目重发开门指令。具体见 `04-backend-design.md`。
+
+## 13. 索引、关系一致性与事务
 
 1. 所有常用外键建索引；门店列表按 `(store_id, created_at DESC, id)`，签到按 `(store_id, entered_at DESC, id)`，订单按 `(store_id, paid_at DESC, id)`；按会员查持卡/体测/合同/课程包分别有 `(member_id, 时间)` 索引。
 2. 临期列表索引 `(status, expires_at)`；审批 `(store_id,status,submitted_at)` 与 `(approver_employee_id,status)`；任务 `(status,next_attempt_at)` 或 `(status,scheduled_at)`；工资唯一键 `(store_id,period_month)`。
@@ -238,6 +259,6 @@ erDiagram
 8. 黑名单禁止购买/入场应成为未来下单及门禁服务共享校验；第一版管理查询/设备命令按业务权限执行，明确记录管理者远程操作原因，不虚构自动硬件拦截已接入。
 9. 不对未来端数据开放通用表 CRUD；未知字段拒绝写入，尤其禁止用户指定 created_by、权限范围、余额、签名证据或渠道确认状态。
 
-## 13. 待确认事项
+## 14. 尚未定义的未来业务参数
 
-详见范围文档：一键维护含义、工资计算规则与平均业绩口径、通卡前缀格式。未来门禁的“带人次数”统计周期、夜间时间及异常逗留阈值只预留字段，第一版不擅自启用规则。表结构支持未来端，但不承诺尚未确定的第三方协议无需增加任何字段。
+一键维护与优惠券张数额度已明确，工资规则、平均业绩口径、通卡前缀按已审阅方案实施。未来门禁的“带人次数”统计周期、夜间时间及异常逗留阈值只预留字段，第一版不擅自启用规则。表结构支持未来端，但不承诺尚未确定的第三方协议无需增加任何字段。

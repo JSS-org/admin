@@ -1,6 +1,8 @@
-# 网页管理端 API 设计清单（待确认）
+# 网页管理端 API 设计清单
 
 范围：仅总部/门店网页管理端。第一版不创建 `/member`、`/miniapp`、`/app`、`/employee-client` 等其他端接口，也不通过通用数据接口暴露预留表。
+
+这是前后端共同遵守的 HTTP 契约，包含后端权限、校验和业务行为；Go 内部架构另见 `04-backend-design.md`。原方案已审阅，2026-09-08 根据用户确认补充按张数分配门店优惠券额度及批量管理语义。
 
 ## 1. 统一协议
 
@@ -13,7 +15,7 @@
 - 日期支持 `date=YYYY-MM-DD`、`month=YYYY-MM` 或 ISO `from/to`，互斥；时间范围 `[from,to)`，按 Asia/Shanghai 转换。注册筛选用 registered_at，签到用 entered_at，财务用实际交易发生时间，避免混淆。
 - uuid 校验、非空字符串去空白、长度/枚举/金额/范围限制；DTO 拒绝未知字段，路径/查询/body 均校验；数据库约束失败转换成可理解错误。SQL 参数化，不把排序或字段名直接拼入用户输入。
 - 金额/比例采用字符串，如 `"199.00"`；API 不返回数据库秘密字段。文件下载由鉴权接口提供。
-- 批量上限提案 500 人；礼品码单次最多 1000 个。批量操作保存目标快照，先校验全部目标权限再建任务，逐项返回执行结果；同请求重试使用 `Idempotency-Key`，变更正文复用同键返回409。
+- 单次显式发券目标上限 500 人；礼品码单次最多 1000 个。批量额度支持全部符合条件的门店，服务端按提交时快照分段执行，不要求浏览器遍历并逐店调用。批量操作先校验全部目标权限再建任务，逐项返回执行结果；同请求重试使用 `Idempotency-Key`，变更正文复用同键返回409。
 - 仅有模板/基础资料可更新；流水和签署证据没有任意修改接口。停用以 PATCH status 表达，已引用实体不硬删除。
 
 权限标记：H=总部角色且具备对应权限；S=门店角色且具备对应权限、只能授权门店。H/S 不代表所有员工默认有权限。H/S 接口的门店数据范围统一在服务端落实。总部可跨店筛选；门店传入未授权 storeId 或关联 ID 时拒绝。工资与远程命令另设独立权限。
@@ -195,21 +197,26 @@
 | GET | /coupon-templates | H/S coupons:read | 门店只能读取可在本店发放的模板 |
 | POST | /coupon-templates | H coupons:manage | name,kind,discountAmount?/discountRate?,minimumSpend,startsAt,expiresAt,totalLimit?,perMemberLimit,scope,storeIds,applicableProductType? |
 | PATCH | /coupon-templates/:id | H coupons:manage | 未发放模板内容/status；已发券条款不变 |
-| POST | /coupon-batches | H/S coupons:issue | templateId,storeId?,memberIds[]；检查范围、总限额和每人上限；返回202批次 |
+| GET | /coupon-store-quotas | H/S coupons:read | templateId,storeId?,status；返回 allocatedCount/reservedCount/issuedCount/availableCount，S仅授权门店 |
+| POST | /coupon-quota-batches | H coupons:allocate | templateId,targetMode=selected/allEligible,storeIds?[],quantityPerStore；数量为正整数张数；selected必须传门店集合，allEligible禁止同时传集合；预留总部总额后返回202批次及目标店数/总张数 |
+| GET | /coupon-quota-batches | H coupons:allocate | templateId,status,from/to；总部额度批次 |
+| GET | /coupon-quota-batches/:id | H coupons:allocate | 批次状态、目标/成功/失败店数、总张数、执行进度 |
+| GET | /coupon-quota-batches/:id/items | H coupons:allocate | page,pageSize,status；逐店结果，避免全量大响应 |
+| GET | /coupon-quota-ledger | H/S coupons:read | storeId,templateId,from/to；分配/预占/发券/释放流水 |
+| POST | /coupon-batches | H/S coupons:issue | templateId,targets[{storeId,memberId}]；检查范围、每店可发张数、总限额、个人上限；总部也须明确发行门店；事务预占各店额度后返回202批次 |
 | GET | /coupon-batches | H/S coupons:read | storeId,status,from/to |
 | GET | /coupon-batches/:id | H/S coupons:read | 每会员成功/失败原因、已发数量 |
 | GET | /member-coupons | H/S coupons:read | storeId,memberId,templateId,status；仅可见会员/本店发行关系范围 |
 | POST | /gift-code-batches | H gifts:manage | name,rewardType,cardTemplateId?/courseProductId?/pointAmount,count,expiresAt；返回批次与一次性明文码下载结果 |
 | GET | /gift-code-batches | H gifts:manage | status,from/to |
 | GET | /gift-code-batches/:id | H gifts:manage | 掩码、领取状态、数量；不返回已丢失明文，重复请求也不再暴露明文 |
-| POST | /maintenance-batches | H/S members:maintain | storeId?,memberIds[],action,content；一键维护语义确认后落实 |
-| GET | /maintenance-batches | H/S members:read | storeId,status,from/to |
-| GET | /maintenance-batches/:id | H/S members:read | 逐会员任务及消息结果 |
 | POST | /message-batches | H/S messages:send | kind=private/bulk,storeId?,memberIds[],channel,title?,content,scheduledAt?；private 仅1位接收人 |
 | GET | /message-batches | H/S messages:read | storeId,kind,status,from/to |
 | GET | /message-batches/:id | H/S messages:read | 逐人投递/阅读状态；渠道没返回阅读结果则为未知 |
 
-积分授予/兑换、礼品领取、会员收信/回信、邀请分享均只预留表，不新增其他端接口。会员维护操作不默认改卡期或余额。
+一键维护按用户选择的业务动作分别调用额度批次、发券批次或消息批次接口，不另建可任意修改数据的 maintenance 通用接口。`allEligible` 指提交时所有启用且属于该券适用范围的门店；后续新增店不自动加入已提交批次。示例“全部适用门店各追加100张”是每店100张，服务端返回实际店数和合计张数。分配成功只增加可发额度；发券成功才生成会员券并消耗该店额度，券核销不再次扣额度。
+
+积分授予/兑换、礼品领取、会员收信/回信、邀请分享均只预留表，不新增其他端接口。批量管理不默认改卡期或余额。
 
 ## 10. 小程序内容、活动、加盟、评价与反馈
 
@@ -253,10 +260,10 @@
 | POST | /employee-salary-assignments | H payroll:templates | employeeId,storeId,templateId,effectiveFrom,effectiveTo?；有效期不重叠 |
 | PATCH | /employee-salary-assignments/:id | H payroll:templates | effectiveTo；不能改已结算工资依据 |
 | GET | /payrolls | H/S payroll:read | storeId,month,status |
-| POST | /payrolls | H/S payroll:calculate | storeId,month；事务创建/计算月度工资，返回工资批次 |
+| POST | /payrolls | H/S payroll:calculate | storeId,month；事务创建工资批次和持久任务，返回202；按员工计算，页面查询结果 |
 | GET | /payrolls/:id | H/S payroll:read | 全店工资列表、每人工资组成、规则版本 |
 | GET | /payrolls/:id/items/:itemId | H/S payroll:read | 员工工资与计算来源明细 |
-| POST | /payrolls/:id/calculations | H/S payroll:calculate | 重算未确认批次；缺模板/冲突返回明确错误 |
+| POST | /payrolls/:id/calculations | H/S payroll:calculate | 重算未确认批次，返回202；缺模板/冲突返回明确错误；同批次同时只允许一轮计算 |
 | PATCH | /payrolls/:id | H/S payroll:confirm | status=confirmed；独立工资确认权限，确认后禁止覆盖 |
 
 不提供资金实际划拨、工资打款入口；分账绑定只在真实渠道确认后成功。
@@ -287,13 +294,28 @@ Content-Type: application/json
 
 {
   "templateId": "249958d7-644a-4773-a596-11734bca4d73",
-  "storeId": "63f2522e-d981-4cf8-8836-a8b37d663d96",
-  "memberIds": ["b4fd608a-eb1a-46aa-bff8-aefb6a5c639f"]
+  "targets": [{
+    "storeId": "63f2522e-d981-4cf8-8836-a8b37d663d96",
+    "memberId": "b4fd608a-eb1a-46aa-bff8-aefb6a5c639f"
+  }]
+}
+```
+
+```http
+POST /api/admin/v1/coupon-quota-batches
+Authorization: Bearer <accessToken>
+Idempotency-Key: 25389557-2e9f-47d9-919e-85d031c31ed6
+Content-Type: application/json
+
+{
+  "templateId": "249958d7-644a-4773-a596-11734bca4d73",
+  "targetMode": "allEligible",
+  "quantityPerStore": 100
 }
 ```
 
 前端业务代码放在 `apps/web-antd/src/api/<module>.ts`，由现有 requestClient 调用；页面放 `src/views/<module>/`，路由放 `src/router/routes/modules/<module>.ts`。业务列表/详情不另建重复的全局 Pinia store。按钮按权限码显示，后端仍独立验证每次请求。
 
-## 13. 第一版确认后才实施的事项
+## 13. 实施状态与边界
 
-本清单是管理端可调用接口的设计，不代表已经建好数据库或完成任何真实渠道接入。先确认范围和数据模型，再逐模块实现；对一键维护等尚不清晰的功能，确认语义后实现对应操作。无需为仅预留实体增设占位路由或返回模拟成功的接口。
+本清单是管理端可调用接口的设计，不代表已经建好数据库或完成任何真实渠道接入。原方案已获确认，一键维护语义已补齐，后续按模块实现。无需为仅预留实体增设占位路由或返回模拟成功的接口。
