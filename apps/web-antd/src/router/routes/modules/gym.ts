@@ -12,6 +12,17 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       ...[
+        ['payment-accounts', '收款账户'],
+        ['settlement-rules', '分账规则'],
+        ['settlements', '分账结算记录'],
+      ].map(([resource = '', title = '']) => ({
+        name: `Gym-${resource}`,
+        path: resource,
+        component: () => import('#/views/gym/settlement.vue'),
+        props: { resource },
+        meta: { title, authority: ['hq'], order: 70 },
+      })),
+      ...[
         ['client-settings', '展示配置', 'hq'],
         ['activities', '门店活动', 'hq'],
         ['franchise-brand', '加盟品牌与模型', 'hq'],

@@ -35,6 +35,7 @@ import { foundation } from '../utils/gym/foundation';
 import { governance } from '../utils/gym/governance';
 import { marketing } from '../utils/gym/marketing';
 import { sales } from '../utils/gym/sales';
+import { settlement } from '../utils/gym/settlement';
 import { training } from '../utils/gym/training';
 
 const success = (data: unknown) => ({
@@ -181,6 +182,7 @@ export default defineEventHandler(async (event) => {
       key: getHeader(event, 'Idempotency-Key'),
     };
     const result =
+      settlement(request) ??
       content(request) ??
       coupons(request) ??
       marketing(request) ??
