@@ -55,7 +55,7 @@ onMounted(async () => {
 });
 function edit(row?: Record<string, any>) {
   form.value = row
-    ? structuredClone(row)
+    ? JSON.parse(JSON.stringify(row))
     : {
         cycleUnit: 'day',
         cycleValue: 1,
@@ -123,8 +123,8 @@ function accountBody(values: Record<string, any>, row?: GymRow) {
         @change="loadRules"
       />
       <Button type="primary" :disabled="!storeId" @click="edit()">
-新增版本
-</Button>
+        新增版本
+      </Button>
     </Space>
     <Table
       row-key="id"
@@ -140,16 +140,14 @@ function accountBody(values: Record<string, any>, row?: GymRow) {
       ]"
     >
       <template #bodyCell="{ column, record }">
-<Space v-if="column.key === 'action'">
-<Button @click="edit(record)">
-{{
-            record.status === 'draft' ? '编辑' : '查看'
-          }}
+        <Space v-if="column.key === 'action'">
+          <Button @click="edit(record)">
+            {{ record.status === 'draft' ? '编辑' : '查看' }}
 </Button><Button v-if="record.status === 'draft'" @click="activate(record)">
-启用
-</Button>
-</Space>
-</template>
+            启用
+          </Button>
+        </Space>
+      </template>
     </Table>
     <Modal
       v-model:open="visible"
@@ -160,31 +158,31 @@ function accountBody(values: Record<string, any>, row?: GymRow) {
     >
       <Form layout="vertical">
         <FormItem label="周期">
-<Select
+          <Select
             v-model:value="form.cycleUnit"
             :options="[
               { label: '天', value: 'day' },
               { label: '周', value: 'week' },
               { label: '月', value: 'month' },
             ]"
-        />
-</FormItem>
+          />
+        </FormItem>
         <FormItem label="周期间隔">
-<InputNumber v-model:value="form.cycleValue" :min="1" :max="365" />
-</FormItem>
+          <InputNumber v-model:value="form.cycleValue" :min="1" :max="365" />
+        </FormItem>
         <FormItem label="生效日期">
-<Input v-model:value="form.effectiveFrom" type="date" />
-</FormItem>
+          <Input v-model:value="form.effectiveFrom" type="date" />
+        </FormItem>
         <FormItem label="失效日期（不含）">
-<Input v-model:value="form.effectiveTo" type="date" />
-</FormItem>
+          <Input v-model:value="form.effectiveTo" type="date" />
+        </FormItem>
         <FormItem
           v-for="(item, index) in form.items"
           :key="index"
           :label="`接收账户 ${Number(index) + 1} / 比例`"
         >
           <Space>
-<Select
+            <Select
               v-model:value="item.paymentAccountId"
               style="width: 250px"
               :options="
@@ -199,9 +197,9 @@ function accountBody(values: Record<string, any>, row?: GymRow) {
               :max="1"
               :step="0.01"
             /><Button @click="form.items.splice(Number(index), 1)">
-移除
-</Button>
-</Space>
+              移除
+            </Button>
+          </Space>
         </FormItem>
         <Button @click="form.items.push({ ratio: 0 })">添加接收账户</Button>
       </Form>
@@ -248,14 +246,14 @@ function accountBody(values: Record<string, any>, row?: GymRow) {
     ]"
   >
     <template #toolbar>
-<Alert
+      <Alert
         message="仅保存脱敏账号与凭据引用；真实支付渠道未配置。"
         type="info"
-    />
-</template>
+      />
+    </template>
     <template #actions="{ row }">
-<Button @click="bind(row)">渠道绑定</Button>
-</template>
+      <Button @click="bind(row)">渠道绑定</Button>
+    </template>
   </ResourcePage>
   <ResourcePage
     v-else

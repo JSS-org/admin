@@ -1,0 +1,9 @@
+-- Development salary examples; rates are illustrative, not production payroll policy.
+BEGIN;
+INSERT INTO salary_templates (id,template_key,version,name,base_salary,effective_from,effective_to,status) VALUES ('00000000-0000-4000-8000-000000000920','00000000-0000-4000-8000-000000000921',1,'开发示例月薪模板','4000.00','2026-01-01',NULL,'published') ON CONFLICT DO NOTHING;
+INSERT INTO salary_rules (id,template_id,component,calculation_type,rate,unit_amount,fixed_amount,lower_bound,upper_bound,sort_order) VALUES ('00000000-0000-4000-8000-000000000922','00000000-0000-4000-8000-000000000920','card_sales','rate','0.050000',NULL,NULL,NULL,NULL,0) ON CONFLICT DO NOTHING;
+INSERT INTO salary_rules (id,template_id,component,calculation_type,rate,unit_amount,fixed_amount,lower_bound,upper_bound,sort_order) VALUES ('00000000-0000-4000-8000-000000000923','00000000-0000-4000-8000-000000000920','pt_sales','rate','0.100000',NULL,NULL,NULL,NULL,1) ON CONFLICT DO NOTHING;
+INSERT INTO salary_rules (id,template_id,component,calculation_type,rate,unit_amount,fixed_amount,lower_bound,upper_bound,sort_order) VALUES ('00000000-0000-4000-8000-000000000924','00000000-0000-4000-8000-000000000920','lessons','per_unit',NULL,'50.00',NULL,NULL,NULL,2) ON CONFLICT DO NOTHING;
+INSERT INTO employee_salary_assignments (id,employee_id,store_id,template_id,effective_from,effective_to) VALUES ('00000000-0000-4000-8000-000000000925','00000000-0000-4000-8000-000000000021','00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000920','2026-01-01',NULL) ON CONFLICT DO NOTHING;
+INSERT INTO employee_salary_assignments (id,employee_id,store_id,template_id,effective_from,effective_to) VALUES ('00000000-0000-4000-8000-000000000926','00000000-0000-4000-8000-000000000022','00000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000920','2026-01-01',NULL) ON CONFLICT DO NOTHING;
+COMMIT;

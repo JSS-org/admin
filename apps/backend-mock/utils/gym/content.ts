@@ -231,7 +231,12 @@ export function content(req: Request): any {
         if (block.title) result.title = str(block.title, '标题', 120);
         if (block.body) result.body = str(block.body, '内容', 5000);
         if (block.fileId)
-          result.fileId = media(req, block.fileId, storeId ?? undefined);
+          result.fileId = media(
+            req,
+            block.fileId,
+            storeId ?? undefined,
+            block.blockType === 'video' ? ['video'] : ['image'],
+          );
         if (block.linkUrl) result.linkUrl = url(block.linkUrl, '跳转链接');
         if (['banner', 'video'].includes(result.blockType) && !result.fileId)
           fail('图片或视频区块必须上传文件');

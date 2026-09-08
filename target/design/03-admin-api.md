@@ -245,6 +245,7 @@
 | 方法 | 路径 | 权限 | 主要入参 / 功能 |
 | --- | --- | --- | --- |
 | GET | /payment-accounts | H settlement:manage | storeId?,provider,bindingStatus；脱敏资料 |
+| GET | /payment-accounts/:id | H settlement:manage | 编辑时读取脱敏账户资料，不返回凭据引用 |
 | POST | /payment-accounts | H settlement:manage | storeId?,provider,merchantId,accountName,accountDetails；账户敏感数据仅传渠道/安全保存引用 |
 | PATCH | /payment-accounts/:id | H settlement:manage | accountName,credentialRef?；渠道身份变更须新建账户 |
 | POST | /payment-accounts/:id/bindings | H settlement:manage | 渠道必需授权信息；返回 pending/真实绑定结果；未配置503 |
@@ -259,6 +260,7 @@
 | PATCH | /salary-templates/:id | H payroll:templates | 草稿字段/status |
 | POST | /salary-templates/:id/versions | H payroll:templates | 新版本规则 |
 | GET | /employee-salary-assignments | H/S payroll:read | storeId,employeeId,effectiveOn |
+| GET | /employee-salary-assignments/:id | H/S payroll:read | 读取本权限范围内员工薪资关联 |
 | POST | /employee-salary-assignments | H payroll:templates | employeeId,storeId,templateId,effectiveFrom,effectiveTo?；有效期不重叠 |
 | PATCH | /employee-salary-assignments/:id | H payroll:templates | effectiveTo；不能改已结算工资依据 |
 | GET | /payrolls | H/S payroll:read | storeId,month,status |
@@ -269,6 +271,8 @@
 | PATCH | /payrolls/:id | H/S payroll:confirm | status=confirmed；独立工资确认权限，确认后禁止覆盖 |
 
 不提供资金实际划拨、工资打款入口；分账绑定只在真实渠道确认后成功。
+
+第一阶段工资按唯一覆盖整月的已发布模板计算，不自动猜测月中换薪或入离职折算。销售规则类型为rate，消课为per_unit，固定加扣项为fixed；销售区间仅计算区间内净业绩，未配置区间时包含本月退款产生的负提成。提成金额按分截断。Mock同步完成模拟计算并返回202；Go阶段实现持久任务。
 
 ## 12. 关键业务调用示例
 

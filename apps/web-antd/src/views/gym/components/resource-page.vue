@@ -205,6 +205,7 @@ function fieldOptions(field: Field) {
           r.storeIds?.includes(form.storeId) ||
           r.registeredStoreId === form.storeId
         );
+      if (!r.storeId && !r.storeIds) return true;
       return r.storeId === form.storeId || r.storeIds?.includes(form.storeId);
     })
     .map((r) => ({ label: r.name ?? r.title ?? r.code, value: r.id }));

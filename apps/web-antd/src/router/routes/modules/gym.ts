@@ -12,6 +12,21 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       ...[
+        ['salary-templates', '薪资模板', 'hq'],
+        ['employee-salary-assignments', '员工薪资关联', 'store'],
+        ['payrolls', '门店工资表', 'store'],
+      ].map(([resource = '', title = '', scope]) => ({
+        name: `Gym-${resource}`,
+        path: resource,
+        component: () => import('#/views/gym/payroll.vue'),
+        props: { resource },
+        meta: {
+          title,
+          authority: scope === 'hq' ? ['hq'] : ['hq', 'store'],
+          order: 80,
+        },
+      })),
+      ...[
         ['payment-accounts', '收款账户'],
         ['settlement-rules', '分账规则'],
         ['settlements', '分账结算记录'],

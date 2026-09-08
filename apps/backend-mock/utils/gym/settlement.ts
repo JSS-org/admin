@@ -156,6 +156,7 @@ export function settlement(req: Request): any {
     }
     if (rid) {
       const row = find('paymentAccounts', uuid(rid));
+      if (!action && method === 'GET') return accountView(row);
       if (action === 'bindings' && !extra && method === 'POST') {
         only(body, []);
         fail('支付渠道尚未配置，未执行账户绑定', 503);

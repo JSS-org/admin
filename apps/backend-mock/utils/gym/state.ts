@@ -12,6 +12,7 @@ import {
 import { seedDevices } from './devices-state';
 import { seedGovernance } from './governance-state';
 import { seedMarketing } from './marketing-state';
+import { seedPayroll } from './payroll-state';
 import { seedSales } from './sales-state';
 import { seedSettlement } from './settlement-state';
 import { seedTraining } from './training-state';
@@ -239,6 +240,7 @@ export function reset() {
   seedMarketing();
   seedContent();
   seedSettlement();
+  seedPayroll();
 }
 if (rows('stores').length === 0) reset();
 

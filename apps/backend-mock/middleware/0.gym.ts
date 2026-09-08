@@ -31,9 +31,11 @@ import {
 } from '../utils/gym/core';
 import { coupons } from '../utils/gym/coupons';
 import { devices } from '../utils/gym/devices';
+import { fileAccess } from '../utils/gym/files';
 import { foundation } from '../utils/gym/foundation';
 import { governance } from '../utils/gym/governance';
 import { marketing } from '../utils/gym/marketing';
+import { payroll } from '../utils/gym/payroll';
 import { sales } from '../utils/gym/sales';
 import { settlement } from '../utils/gym/settlement';
 import { training } from '../utils/gym/training';
@@ -113,6 +115,7 @@ export default defineEventHandler(async (event) => {
       if (!file) fail('请选择文件');
       const category =
         parts?.find((p) => p.name === 'category')?.data.toString() ?? 'image';
+      fileAccess(actor, { id: '', storeId: storeId ?? null, category }, true);
       const data = file.data;
       const isPdf = data.subarray(0, 5).toString() === '%PDF-';
       const isPng = data
@@ -159,8 +162,7 @@ export default defineEventHandler(async (event) => {
     if (fileMatch && event.method === 'GET') {
       allowed(actor, 'files:read');
       const row = find('files', fileMatch[1] ?? '');
-      if (row.storeId) storeScope(actor, row.storeId);
-      else if (actor.scopeType !== 'hq') fail('文件不可访问', 404);
+      fileAccess(actor, row);
       if (fileMatch[2]) {
         const data = fileContents.get(row.id);
         if (!data) fail('模拟文件已重置，请重新上传', 404);
@@ -182,6 +184,7 @@ export default defineEventHandler(async (event) => {
       key: getHeader(event, 'Idempotency-Key'),
     };
     const result =
+      payroll(request) ??
       settlement(request) ??
       content(request) ??
       coupons(request) ??
@@ -195,7 +198,7 @@ export default defineEventHandler(async (event) => {
     if (event.method === 'POST')
       setResponseStatus(
         event,
-        /^\/(coupon-quota-batches|coupon-batches|message-batches)$/.test(
+        /^\/(coupon-quota-batches|coupon-batches|message-batches|payrolls(?:\/[^/]+\/calculations)?)$/.test(
           request.path,
         )
           ? 202
