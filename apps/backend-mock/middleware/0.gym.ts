@@ -28,6 +28,7 @@ import {
   rows,
   storeScope,
 } from '../utils/gym/core';
+import { devices } from '../utils/gym/devices';
 import { foundation } from '../utils/gym/foundation';
 import { governance } from '../utils/gym/governance';
 import { training } from '../utils/gym/training';
@@ -176,7 +177,10 @@ export default defineEventHandler(async (event) => {
       key: getHeader(event, 'Idempotency-Key'),
     };
     const result =
-      foundation(request) ?? training(request) ?? governance(request);
+      foundation(request) ??
+      training(request) ??
+      governance(request) ??
+      devices(request);
     if (result === undefined) fail('接口不存在', 404);
     if (event.method === 'POST') setResponseStatus(event, 201);
     return success(result);

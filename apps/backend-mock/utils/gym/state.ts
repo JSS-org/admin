@@ -8,6 +8,7 @@ import {
   seedId,
   tables,
 } from './core';
+import { seedDevices } from './devices-state';
 import { seedGovernance } from './governance-state';
 import { seedTraining } from './training-state';
 
@@ -229,6 +230,7 @@ export function reset() {
   }
   seedTraining();
   seedGovernance();
+  seedDevices();
 }
 if (rows('stores').length === 0) reset();
 

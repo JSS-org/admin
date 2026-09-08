@@ -116,6 +116,20 @@ export function choice(value: unknown, values: string[], label = '状态') {
   if (!values.includes(value as string)) fail(`${label}不合法`);
   return value as string;
 }
+export function boolean(value: unknown, label: string): boolean {
+  if (typeof value !== 'boolean') fail(`${label}必须为是或否`);
+  return value;
+}
+export function audit(req: Request, action: string, row: Row, summary = {}) {
+  insert('operationLogs', {
+    actorId: req.actor.id,
+    storeId: row.storeId ?? null,
+    action,
+    resourceId: row.id,
+    summary,
+    occurredAt: now(),
+  });
+}
 export function money(value: unknown, label = '金额'): string {
   const text = String(value ?? '');
   if (!/^\d{1,12}(\.\d{1,2})?$/.test(text))
