@@ -28,6 +28,7 @@ import {
   storeScope,
 } from '../utils/gym/core';
 import { foundation } from '../utils/gym/foundation';
+import { training } from '../utils/gym/training';
 
 const contents = new Map<string, Buffer>();
 const success = (data: unknown) => ({
@@ -173,7 +174,7 @@ export default defineEventHandler(async (event) => {
       body: body ?? {},
       key: getHeader(event, 'Idempotency-Key'),
     };
-    const result = foundation(request);
+    const result = foundation(request) ?? training(request);
     if (result === undefined) fail('接口不存在', 404);
     if (event.method === 'POST') setResponseStatus(event, 201);
     return success(result);

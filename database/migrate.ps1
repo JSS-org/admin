@@ -26,7 +26,9 @@ foreach ($migration in Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'migr
 & $Psql @connection -q -f (Join-Path $PSScriptRoot 'seeds/001-permissions.sql')
 if ($LASTEXITCODE -ne 0) { throw 'Permission initialization failed.' }
 if ($SeedDevelopment) {
-    & $Psql @connection -q -f (Join-Path $PSScriptRoot 'seeds/002-development.sql')
-    if ($LASTEXITCODE -ne 0) { throw 'Development seed failed.' }
+    foreach ($seed in Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'seeds') -Filter '*development.sql' | Sort-Object Name) {
+        & $Psql @connection -q -f $seed.FullName
+        if ($LASTEXITCODE -ne 0) { throw "Development seed failed: $($seed.Name)" }
+    }
 }
 Write-Output 'Database is ready.'

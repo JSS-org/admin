@@ -81,6 +81,7 @@ const visible = ref(false);
 const current = ref<GymRow>();
 const form = reactive<Record<string, any>>({});
 const options = reactive<Record<string, { label: string; value: any }[]>>({});
+const sourceRows = reactive<Record<string, GymRow[]>>({});
 const formRef = ref();
 const stores = ref<{ label: string; value: string }[]>([]);
 const writable = computed(() => !!props.writeCode && canGym(props.writeCode));
@@ -119,6 +120,20 @@ const statuses: Record<string, string> = {
   queued: '排队中',
   frozen: '冻结',
   expired: '已过期',
+  group: '操课',
+  personal: '私教',
+  scheduled: '待上课',
+  attended: '已上课',
+  missed: '未到课',
+  face: '刷脸',
+  qr: '扫码',
+  manual: '人工',
+  device: '设备',
+  guest: '访客',
+  unknown: '陌生访客',
+  miniapp: '小程序',
+  app: 'App',
+  course: '课程',
 };
 async function load() {
   loading.value = true;
@@ -155,6 +170,7 @@ async function loadOptions() {
         label: r.name ?? r.title ?? r.code,
         value: r.id,
       }));
+      sourceRows[source] = all;
       props.fields
         .filter((f) => f.source === source)
         .forEach((f) => {
@@ -163,6 +179,26 @@ async function loadOptions() {
       if (source === 'stores') stores.value = values;
     }),
   );
+}
+function fieldOptions(field: Field) {
+  if (field.options) return field.options;
+  if (!field.source || !form.storeId || field.source === 'stores')
+    return options[field.key] ?? [];
+  return (sourceRows[field.source] ?? [])
+    .filter((r) => {
+      if (
+        field.source === 'course-products' &&
+        (r.kind !== 'group' || r.status !== 'active')
+      )
+        return false;
+      if (field.source === 'members')
+        return (
+          r.storeIds?.includes(form.storeId) ||
+          r.registeredStoreId === form.storeId
+        );
+      return r.storeId === form.storeId || r.storeIds?.includes(form.storeId);
+    })
+    .map((r) => ({ label: r.name ?? r.title ?? r.code, value: r.id }));
 }
 async function open(row?: GymRow) {
   current.value = row;
@@ -344,7 +380,7 @@ defineExpose({ load, open, items });
           <Select
             v-if="field.type === 'select' || field.type === 'multi'"
             v-model:value="form[field.key]"
-            :options="field.options ?? options[field.key] ?? []"
+            :options="fieldOptions(field)"
             :mode="field.type === 'multi' ? 'multiple' : undefined"
             show-search
             option-filter-prop="label"

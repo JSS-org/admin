@@ -529,6 +529,9 @@ export function foundation(req: Request): unknown {
       return page(
         data.map((m) => ({
           ...m,
+          storeIds: links
+            .filter((l) => l.memberId === m.id)
+            .map((l) => l.storeId),
           storeNames: links
             .filter((l) => l.memberId === m.id)
             .map((l) => find('stores', l.storeId).name)

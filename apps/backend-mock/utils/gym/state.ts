@@ -1,4 +1,5 @@
 import { find, insert, now, passwordHash, rows, seedId, tables } from './core';
+import { seedTraining } from './training-state';
 
 export const modules = {
   stores: ['read', 'write'],
@@ -215,6 +216,7 @@ export function reset() {
         templateSnapshot: { ...find('cardTemplates', seedId(40)) },
       });
   }
+  seedTraining();
 }
 if (rows('stores').length === 0) reset();
 

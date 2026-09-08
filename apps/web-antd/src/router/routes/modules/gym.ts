@@ -11,6 +11,21 @@ const routes: RouteRecordRaw[] = [
       order: 1,
     },
     children: [
+      ...[
+        ['course-products', '课程产品'],
+        ['course-sessions', '课程安排'],
+        ['bookings', '预约管理'],
+        ['checkins', '签到记录'],
+        ['lesson-records', '上课记录'],
+        ['body-measurements', '体测记录'],
+        ['qr-codes', '小程序 / App 码'],
+      ].map(([resource = '', title = '']) => ({
+        name: `Gym-${resource}`,
+        path: resource ?? '',
+        component: () => import('#/views/gym/training.vue'),
+        props: { resource },
+        meta: { title, authority: ['hq', 'store'], order: 10 },
+      })),
       {
         name: 'GymStores',
         path: 'stores',
