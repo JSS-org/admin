@@ -626,11 +626,18 @@ export function foundation(req: Request): unknown {
   }
   if (resource === 'card-templates') {
     allowed(actor, method === 'GET' ? 'cards:read' : 'cards:write');
+    if (query.storeId) storeScope(actor, uuid(query.storeId));
     if (method !== 'GET') hq(req, 'cards:write');
     if (!rid && method === 'GET')
       return page(
-        rows('cardTemplates').filter((r) => cardVisible(r, req)),
-        query,
+        rows('cardTemplates').filter(
+          (r) =>
+            cardVisible(r, req) &&
+            (!query.storeId ||
+              r.accessScope === 'all' ||
+              r.storeIds.includes(query.storeId)),
+        ),
+        { ...query, storeId: undefined },
       );
     const row = rid ? find('cardTemplates', rid) : undefined;
     if (row && !cardVisible(row, req)) fail('卡种不可访问', 404);

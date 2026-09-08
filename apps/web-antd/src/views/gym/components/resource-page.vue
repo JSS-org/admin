@@ -77,6 +77,8 @@ const saving = ref(false);
 const page = ref(1);
 const pageSize = ref(20);
 const filters = reactive<Record<string, any>>({ keyword: '' });
+const timeMode = ref('date');
+const response = ref<Record<string, any>>({});
 const visible = ref(false);
 const current = ref<GymRow>();
 const form = reactive<Record<string, any>>({});
@@ -144,6 +146,7 @@ async function load() {
       pageSize: pageSize.value,
     });
     items.value = data.items;
+    response.value = data;
     total.value = data.total;
   } finally {
     loading.value = false;
@@ -263,6 +266,11 @@ function resetFilters() {
   Object.keys(filters).forEach((key) => Reflect.deleteProperty(filters, key));
   search();
 }
+function changeTimeMode() {
+  for (const key of ['date', 'month', 'from', 'to'])
+    Reflect.deleteProperty(filters, key);
+  search();
+}
 watch(
   () => props.endpoint,
   () => {
@@ -301,11 +309,40 @@ defineExpose({ load, open, items });
         @change="search"
       />
       <Input
-        v-if="timeFilter"
+        v-if="timeFilter && timeMode === 'date'"
         v-model:value="filters.date"
         type="date"
         @change="search"
       />
+      <Select
+        v-if="timeFilter"
+        v-model:value="timeMode"
+        :options="[
+          { label: '按天', value: 'date' },
+          { label: '按月', value: 'month' },
+          { label: '时间范围', value: 'range' },
+        ]"
+        style="min-width: 120px"
+        @change="changeTimeMode"
+      />
+      <Input
+        v-if="timeFilter && timeMode === 'month'"
+        v-model:value="filters.month"
+        type="month"
+        @change="search"
+      />
+      <template v-if="timeFilter && timeMode === 'range'">
+<Input
+          v-model:value="filters.from"
+          type="date"
+          placeholder="起始日期"
+/><Input
+          v-model:value="filters.to"
+          type="date"
+          placeholder="结束日期（不含）"
+      />
+</template>
+      <slot name="filters" :filters="filters" :search="search"></slot>
       <Button @click="search">查询</Button><Button @click="resetFilters"> 重置 </Button>
       <Button
         v-if="writable && create !== false"
@@ -316,6 +353,7 @@ defineExpose({ load, open, items });
       </Button>
       <slot name="toolbar" :reload="load"></slot>
     </Space>
+    <slot name="summary" :data="response"></slot>
     <Table
       :data-source="items"
       :columns="displayColumns"

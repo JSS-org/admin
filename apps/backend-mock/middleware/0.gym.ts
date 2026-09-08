@@ -31,6 +31,7 @@ import {
 import { devices } from '../utils/gym/devices';
 import { foundation } from '../utils/gym/foundation';
 import { governance } from '../utils/gym/governance';
+import { sales } from '../utils/gym/sales';
 import { training } from '../utils/gym/training';
 
 const success = (data: unknown) => ({
@@ -177,6 +178,7 @@ export default defineEventHandler(async (event) => {
       key: getHeader(event, 'Idempotency-Key'),
     };
     const result =
+      sales(request) ??
       foundation(request) ??
       training(request) ??
       governance(request) ??

@@ -155,7 +155,10 @@ export function date(value: unknown, label: string) {
     !Number.isFinite(Date.parse(text))
   )
     fail(`${label}格式错误`);
-  if (text.length === 10 && new Date(text).toISOString().slice(0, 10) !== text)
+  if (
+    new Date(`${text.slice(0, 10)}T00:00:00Z`).toISOString().slice(0, 10) !==
+    text.slice(0, 10)
+  )
     fail(`${label}不是有效日期`);
   return text;
 }
@@ -166,6 +169,7 @@ export function range(query: Record<string, any>): [number, number] {
   )
     fail('日期、月份与时间范围不能同时使用');
   if (query.date) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(query.date)) fail('日期格式错误');
     const start = Date.parse(`${date(query.date, '日期')}T00:00:00+08:00`);
     return [start, start + 86_400_000];
   }
@@ -175,11 +179,16 @@ export function range(query: Record<string, any>): [number, number] {
     return [Date.UTC(y, m - 1, 1) - 28_800_000, Date.UTC(y, m, 1) - 28_800_000];
   }
   const from = query.from
-    ? Date.parse(date(query.from, '开始时间'))
+    ? Date.parse(localBoundary(date(query.from, '开始时间')))
     : -Infinity;
-  const to = query.to ? Date.parse(date(query.to, '结束时间')) : Infinity;
+  const to = query.to
+    ? Date.parse(localBoundary(date(query.to, '结束时间')))
+    : Infinity;
   if (from >= to) fail('结束时间必须晚于开始时间');
   return [from, to];
+}
+function localBoundary(text: string) {
+  return text.length === 10 ? `${text}T00:00:00+08:00` : text;
 }
 export function page(
   data: Row[],

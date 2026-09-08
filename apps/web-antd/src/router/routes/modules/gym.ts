@@ -12,6 +12,25 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       ...[
+        ['settings', '售卡与核销设置', 'hq'],
+        ['self-service-card-orders', '自主办卡记录', 'store'],
+        ['subscriptions', '连续包月记录', 'store'],
+        ['verifications', '自助核销记录', 'store'],
+        ['reports/performance', '门店与员工业绩', 'store'],
+        ['reports/members', '会员汇总', 'store'],
+        ['reports/member-cards', '会员卡报表', 'store'],
+      ].map(([resource = '', title = '', scope]) => ({
+        name: `Gym-${resource}`,
+        path: resource,
+        component: () => import('#/views/gym/sales.vue'),
+        props: { resource },
+        meta: {
+          title,
+          authority: scope === 'hq' ? ['hq'] : ['hq', 'store'],
+          order: 40,
+        },
+      })),
+      ...[
         ['devices', '智能设备', 'store'],
         ['equipment', '器械教学', 'store'],
         ['blacklists', '全店黑名单', 'hq'],

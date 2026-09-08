@@ -10,6 +10,7 @@ import {
 } from './core';
 import { seedDevices } from './devices-state';
 import { seedGovernance } from './governance-state';
+import { seedSales } from './sales-state';
 import { seedTraining } from './training-state';
 
 export const modules = {
@@ -231,6 +232,7 @@ export function reset() {
   seedTraining();
   seedGovernance();
   seedDevices();
+  seedSales();
 }
 if (rows('stores').length === 0) reset();
 

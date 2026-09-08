@@ -10,6 +10,7 @@ import {
   Descriptions,
   DescriptionsItem,
   Modal,
+  Select,
   Table,
   TabPane,
   Tabs,
@@ -66,6 +67,38 @@ async function open(row: GymRow) {
     store-filter
     time-filter
   >
+    <template #filters="{ filters, search }">
+      <Select
+        v-model:value="filters.cardExpiresWithinDays"
+        placeholder="会员卡到期"
+        allow-clear
+        :options="[
+          { label: '7天内卡到期', value: 7 },
+          { label: '30天内卡到期', value: 30 },
+        ]"
+        style="min-width: 160px"
+        @change="search"
+      />
+      <Select
+        v-model:value="filters.courseExpiresWithinDays"
+        placeholder="私教到期"
+        allow-clear
+        :options="[
+          { label: '7天内课程到期', value: 7 },
+          { label: '30天内课程到期', value: 30 },
+        ]"
+        style="min-width: 160px"
+        @change="search"
+      />
+      <Select
+        v-model:value="filters.hasPersonalTraining"
+        placeholder="私教会员"
+        allow-clear
+        :options="[{ label: '持有私教课程', value: 'true' }]"
+        style="min-width: 160px"
+        @change="search"
+      />
+    </template>
     <template #actions="{ row }">
       <Button type="link" @click="open(row)">会员详情</Button>
     </template>
