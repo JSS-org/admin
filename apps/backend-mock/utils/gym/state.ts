@@ -10,6 +10,7 @@ import {
 } from './core';
 import { seedDevices } from './devices-state';
 import { seedGovernance } from './governance-state';
+import { seedMarketing } from './marketing-state';
 import { seedSales } from './sales-state';
 import { seedTraining } from './training-state';
 
@@ -233,6 +234,7 @@ export function reset() {
   seedGovernance();
   seedDevices();
   seedSales();
+  seedMarketing();
 }
 if (rows('stores').length === 0) reset();
 

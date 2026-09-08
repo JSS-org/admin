@@ -12,6 +12,30 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       ...[
+        ['coupon-templates', '优惠券模板', 'store'],
+        ['coupon-store-quotas', '门店优惠券额度', 'store'],
+        ['coupon-quota-batches', '一键维护：门店额度', 'hq'],
+        ['coupon-batches', '批量发券', 'store'],
+        ['coupon-quota-ledger', '券额度流水', 'store'],
+        ['member-coupons', '会员优惠券', 'store'],
+        ['gift-code-batches', '礼品码生成', 'hq'],
+        ['message-batches', '私信与批量通知', 'store'],
+        ['point-rules', '积分规则', 'hq'],
+        ['point-products', '积分兑换商品', 'hq'],
+        ['point-ledger', '积分流水', 'hq'],
+        ['point-redemptions', '积分兑换记录', 'hq'],
+      ].map(([resource = '', title = '', scope]) => ({
+        name: `Gym-${resource}`,
+        path: resource,
+        component: () => import('#/views/gym/marketing.vue'),
+        props: { resource },
+        meta: {
+          title,
+          authority: scope === 'hq' ? ['hq'] : ['hq', 'store'],
+          order: 50,
+        },
+      })),
+      ...[
         ['settings', '售卡与核销设置', 'hq'],
         ['self-service-card-orders', '自主办卡记录', 'store'],
         ['subscriptions', '连续包月记录', 'store'],

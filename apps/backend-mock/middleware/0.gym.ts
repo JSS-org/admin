@@ -28,9 +28,11 @@ import {
   rows,
   storeScope,
 } from '../utils/gym/core';
+import { coupons } from '../utils/gym/coupons';
 import { devices } from '../utils/gym/devices';
 import { foundation } from '../utils/gym/foundation';
 import { governance } from '../utils/gym/governance';
+import { marketing } from '../utils/gym/marketing';
 import { sales } from '../utils/gym/sales';
 import { training } from '../utils/gym/training';
 
@@ -178,13 +180,23 @@ export default defineEventHandler(async (event) => {
       key: getHeader(event, 'Idempotency-Key'),
     };
     const result =
+      coupons(request) ??
+      marketing(request) ??
       sales(request) ??
       foundation(request) ??
       training(request) ??
       governance(request) ??
       devices(request);
     if (result === undefined) fail('接口不存在', 404);
-    if (event.method === 'POST') setResponseStatus(event, 201);
+    if (event.method === 'POST')
+      setResponseStatus(
+        event,
+        /^\/(coupon-quota-batches|coupon-batches|message-batches)$/.test(
+          request.path,
+        )
+          ? 202
+          : 201,
+      );
     return success(result);
   } catch (error) {
     const status = error instanceof ApiError ? error.status : 500;

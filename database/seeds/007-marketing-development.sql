@@ -1,0 +1,10 @@
+-- Development marketing rules. No coupon was issued to a real member.
+BEGIN;
+INSERT INTO coupon_templates (id,name,kind,discount_amount,discount_rate,minimum_spend,starts_at,expires_at,total_limit,allocated_count,issued_count,per_member_limit,scope,status,applicable_product_type) VALUES ('00000000-0000-4000-8000-000000000800','新人满100减20元','amount','20.00',NULL,'100.00','2026-09-08T07:55:25.704Z','2026-12-07T07:55:25.704Z',10000,0,0,1,'all','active','all') ON CONFLICT DO NOTHING;
+INSERT INTO point_rules (id,rule_key,version,name,event_type,threshold_amount,points,daily_limit,effective_from,status) VALUES ('00000000-0000-4000-8000-000000000811','00000000-0000-4000-8000-000000000811',1,'运动打卡积分','checkin',NULL,10,100,'2026-09-08T07:55:25.704Z','active') ON CONFLICT DO NOTHING;
+INSERT INTO point_rules (id,rule_key,version,name,event_type,threshold_amount,points,daily_limit,effective_from,status) VALUES ('00000000-0000-4000-8000-000000000812','00000000-0000-4000-8000-000000000812',1,'消费积分','consumption','10.00',10,100,'2026-09-08T07:55:25.704Z','active') ON CONFLICT DO NOTHING;
+INSERT INTO point_rules (id,rule_key,version,name,event_type,threshold_amount,points,daily_limit,effective_from,status) VALUES ('00000000-0000-4000-8000-000000000813','00000000-0000-4000-8000-000000000813',1,'邀请积分','invitation',NULL,10,100,'2026-09-08T07:55:25.704Z','active') ON CONFLICT DO NOTHING;
+INSERT INTO point_products (id,name,kind,card_template_id,points_price,stock,status) VALUES ('00000000-0000-4000-8000-000000000820','积分兑换月卡','card','00000000-0000-4000-8000-000000000040',1000,100,'active') ON CONFLICT DO NOTHING;
+INSERT INTO point_accounts (id,member_id,balance) VALUES ('00000000-0000-4000-8000-000000000830','00000000-0000-4000-8000-000000000101',10) ON CONFLICT DO NOTHING;
+INSERT INTO point_ledger (id,member_id,store_id,rule_id,delta,balance_after,event_type,source_key,occurred_at) VALUES ('00000000-0000-4000-8000-000000000840','00000000-0000-4000-8000-000000000101','00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000811',10,10,'checkin','seed-points-1','2026-09-08T07:55:25.704Z') ON CONFLICT DO NOTHING;
+COMMIT;

@@ -53,6 +53,7 @@ const props = withDefaults(
     edit?: boolean;
     storeFilter?: boolean;
     timeFilter?: boolean;
+    idempotent?: boolean;
     prepare?: (
       values: Record<string, any>,
       row?: GymRow,
@@ -69,7 +70,12 @@ const props = withDefaults(
     editable: undefined,
   },
 );
-const emit = defineEmits<{ changed: []; detail: [row: GymRow] }>();
+const emit = defineEmits<{
+  changed: [];
+  detail: [row: GymRow];
+  saved: [row: GymRow];
+}>();
+let requestKey = '';
 const items = ref<GymRow[]>([]);
 const total = ref(0);
 const loading = ref(false);
@@ -204,6 +210,7 @@ function fieldOptions(field: Field) {
     .map((r) => ({ label: r.name ?? r.title ?? r.code, value: r.id }));
 }
 async function open(row?: GymRow) {
+  requestKey = crypto.randomUUID();
   current.value = row;
   for (const key of Object.keys(form)) Reflect.deleteProperty(form, key);
   const raw = row ? await gymApi.get(`${props.endpoint}/${row.id}`) : undefined;
@@ -225,13 +232,18 @@ async function save() {
     const data = props.prepare
       ? props.prepare(payload, current.value)
       : payload;
-    await (current.value
+    const saved = await (current.value
       ? gymApi.patch(`${props.endpoint}/${current.value.id}`, data)
-      : gymApi.post(props.endpoint, data));
+      : gymApi.post(
+          props.endpoint,
+          data,
+          props.idempotent ? requestKey : undefined,
+        ));
     message.success('已保存');
     visible.value = false;
     await load();
     emit('changed');
+    emit('saved', saved);
   } finally {
     saving.value = false;
   }
@@ -332,16 +344,16 @@ defineExpose({ load, open, items });
         @change="search"
       />
       <template v-if="timeFilter && timeMode === 'range'">
-<Input
+        <Input
           v-model:value="filters.from"
           type="date"
           placeholder="起始日期"
-/><Input
+        /><Input
           v-model:value="filters.to"
           type="date"
           placeholder="结束日期（不含）"
-      />
-</template>
+        />
+      </template>
       <slot name="filters" :filters="filters" :search="search"></slot>
       <Button @click="search">查询</Button><Button @click="resetFilters"> 重置 </Button>
       <Button
