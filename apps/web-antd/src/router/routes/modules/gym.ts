@@ -12,6 +12,24 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       ...[
+        ['client-settings', '展示配置', 'hq'],
+        ['activities', '门店活动', 'hq'],
+        ['franchise-brand', '加盟品牌与模型', 'hq'],
+        ['franchise-inquiries', '加盟咨询', 'hq'],
+        ['reviews', '门店评价', 'store'],
+        ['feedback', '匿名反馈', 'store'],
+      ].map(([resource = '', title = '', scope]) => ({
+        name: `Gym-${resource}`,
+        path: resource,
+        component: () => import('#/views/gym/content.vue'),
+        props: { resource },
+        meta: {
+          title,
+          authority: scope === 'hq' ? ['hq'] : ['hq', 'store'],
+          order: 60,
+        },
+      })),
+      ...[
         ['coupon-templates', '优惠券模板', 'store'],
         ['coupon-store-quotas', '门店优惠券额度', 'store'],
         ['coupon-quota-batches', '一键维护：门店额度', 'hq'],

@@ -1,3 +1,4 @@
+import { seedContent } from './content-state';
 import {
   fileContents,
   find,
@@ -235,6 +236,7 @@ export function reset() {
   seedDevices();
   seedSales();
   seedMarketing();
+  seedContent();
 }
 if (rows('stores').length === 0) reset();
 

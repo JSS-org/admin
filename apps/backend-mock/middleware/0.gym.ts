@@ -16,6 +16,7 @@ import {
   revoke,
   userInfo,
 } from '../utils/gym/auth';
+import { content } from '../utils/gym/content';
 import {
   allowed,
   ApiError,
@@ -180,6 +181,7 @@ export default defineEventHandler(async (event) => {
       key: getHeader(event, 'Idempotency-Key'),
     };
     const result =
+      content(request) ??
       coupons(request) ??
       marketing(request) ??
       sales(request) ??
