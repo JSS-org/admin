@@ -43,6 +43,7 @@ export const id = () => randomUUID();
 export const seedId = (n: number) =>
   `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 export const tables: Tables = {};
+export const fileContents = new Map<string, Buffer>();
 export const rows = (table: string) => (tables[table] ??= []);
 export const find = (table: string, value: string): Row =>
   rows(table).find((r) => r.id === value) ?? fail('记录不存在', 404);

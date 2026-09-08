@@ -12,6 +12,22 @@ const routes: RouteRecordRaw[] = [
     },
     children: [
       ...[
+        ['contract-templates', '合同模板', 'hq'],
+        ['contracts', '合同记录', 'store'],
+        ['approval-templates', '审批模板', 'hq'],
+        ['approvals', '审批记录', 'store'],
+      ].map(([resource = '', title = '', scope]) => ({
+        name: `Gym-${resource}`,
+        path: resource,
+        component: () => import('#/views/gym/governance.vue'),
+        props: { resource },
+        meta: {
+          title,
+          authority: scope === 'hq' ? ['hq'] : ['hq', 'store'],
+          order: 20,
+        },
+      })),
+      ...[
         ['course-products', '课程产品'],
         ['course-sessions', '课程安排'],
         ['bookings', '预约管理'],

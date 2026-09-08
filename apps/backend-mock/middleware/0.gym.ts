@@ -20,6 +20,7 @@ import {
   allowed,
   ApiError,
   fail,
+  fileContents,
   find,
   id,
   insert,
@@ -28,9 +29,9 @@ import {
   storeScope,
 } from '../utils/gym/core';
 import { foundation } from '../utils/gym/foundation';
+import { governance } from '../utils/gym/governance';
 import { training } from '../utils/gym/training';
 
-const contents = new Map<string, Buffer>();
 const success = (data: unknown) => ({
   code: 0,
   data,
@@ -142,7 +143,7 @@ export default defineEventHandler(async (event) => {
         status: 'active',
         storageKey: id(),
       });
-      contents.set(row.id, data);
+      fileContents.set(row.id, data);
       setResponseStatus(event, 201);
       return success(row);
     }
@@ -155,7 +156,7 @@ export default defineEventHandler(async (event) => {
       if (row.storeId) storeScope(actor, row.storeId);
       else if (actor.scopeType !== 'hq') fail('文件不可访问', 404);
       if (fileMatch[2]) {
-        const data = contents.get(row.id);
+        const data = fileContents.get(row.id);
         if (!data) fail('模拟文件已重置，请重新上传', 404);
         event.node.res.setHeader('Content-Type', row.mimeType);
         event.node.res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -174,7 +175,8 @@ export default defineEventHandler(async (event) => {
       body: body ?? {},
       key: getHeader(event, 'Idempotency-Key'),
     };
-    const result = foundation(request) ?? training(request);
+    const result =
+      foundation(request) ?? training(request) ?? governance(request);
     if (result === undefined) fail('接口不存在', 404);
     if (event.method === 'POST') setResponseStatus(event, 201);
     return success(result);

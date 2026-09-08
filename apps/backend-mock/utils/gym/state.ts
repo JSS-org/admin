@@ -1,4 +1,14 @@
-import { find, insert, now, passwordHash, rows, seedId, tables } from './core';
+import {
+  fileContents,
+  find,
+  insert,
+  now,
+  passwordHash,
+  rows,
+  seedId,
+  tables,
+} from './core';
+import { seedGovernance } from './governance-state';
 import { seedTraining } from './training-state';
 
 export const modules = {
@@ -70,6 +80,7 @@ export const storeCodes = [
 ];
 
 export function reset() {
+  fileContents.clear();
   for (const key of Object.keys(tables)) Reflect.deleteProperty(tables, key);
   permissionCodes.forEach((code, i) =>
     insert('permissions', {
@@ -217,6 +228,7 @@ export function reset() {
       });
   }
   seedTraining();
+  seedGovernance();
 }
 if (rows('stores').length === 0) reset();
 
