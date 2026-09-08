@@ -19,6 +19,8 @@ interface WebAntdPreferencesExtension {
 export const overridesPreferences = defineOverridesPreferences({
   // overrides
   app: {
+    accessMode: 'frontend',
+    defaultHomePath: '/gym/stores',
     name: import.meta.env.VITE_APP_TITLE,
   },
   copyright: appCopyrightPreferences,
