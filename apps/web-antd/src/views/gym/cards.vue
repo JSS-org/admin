@@ -60,48 +60,50 @@ const fields: Field[] = [
 ];
 </script>
 <template>
-  <ResourcePage
-    title="会员卡种"
-    endpoint="card-templates"
-    :fields="fields"
-    :columns="[
-      { title: '名称', dataIndex: 'name' },
-      { title: '版本', dataIndex: 'version' },
-      { title: '类型', dataIndex: 'kind' },
-      { title: '售价', dataIndex: 'price' },
-      { title: '范围', dataIndex: 'accessScope' },
-      { title: '状态', dataIndex: 'status' },
-    ]"
-    write-code="cards:write"
-    :editable="(row) => row.status === 'draft'"
-  >
-    <template #actions="{ row, reload }">
-      <template v-if="canGym('cards:write')">
-        <Button
-          type="link"
-          @click="
-            async () => {
-              await gymApi.post(`card-templates/${row.id}/versions`, {});
-              message.success('已复制为新版本草稿，可编辑');
-              await reload();
-            }
-          "
-        >
-          新版本
+  <div class="gym-view">
+    <ResourcePage
+      title="会员卡种"
+      endpoint="card-templates"
+      :fields="fields"
+      :columns="[
+        { title: '名称', dataIndex: 'name' },
+        { title: '版本', dataIndex: 'version' },
+        { title: '类型', dataIndex: 'kind' },
+        { title: '售价', dataIndex: 'price' },
+        { title: '范围', dataIndex: 'accessScope' },
+        { title: '状态', dataIndex: 'status' },
+      ]"
+      write-code="cards:write"
+      :editable="(row) => row.status === 'draft'"
+    >
+      <template #actions="{ row, reload }">
+        <template v-if="canGym('cards:write')">
+          <Button
+            type="link"
+            @click="
+              async () => {
+                await gymApi.post(`card-templates/${row.id}/versions`, {});
+                message.success('已复制为新版本草稿，可编辑');
+                await reload();
+              }
+            "
+          >
+            新版本
 </Button><Button
-          type="link"
-          @click="
-            async () => {
-              await gymApi.patch(`card-templates/${row.id}`, {
-                status: row.status === 'published' ? 'inactive' : 'published',
-              });
-              await reload();
-            }
-          "
-        >
-          {{ row.status === 'published' ? '停用' : '发布' }}
-        </Button>
+            type="link"
+            @click="
+              async () => {
+                await gymApi.patch(`card-templates/${row.id}`, {
+                  status: row.status === 'published' ? 'inactive' : 'published',
+                });
+                await reload();
+              }
+            "
+          >
+            {{ row.status === 'published' ? '停用' : '发布' }}
+          </Button>
+        </template>
       </template>
-    </template>
-  </ResourcePage>
+    </ResourcePage>
+  </div>
 </template>

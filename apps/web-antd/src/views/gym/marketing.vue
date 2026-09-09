@@ -480,220 +480,234 @@ async function newVersion(row: GymRow) {
 }
 </script>
 <template>
-  <ResourcePage
-    ref="page"
-    :key="resource"
-    :title="config.title"
-    :endpoint="resource"
-    :fields="config.fields"
-    :columns="
-      config.columns.map(([title = '', dataIndex = '']) => ({
-        title,
-        dataIndex,
-      }))
-    "
-    :write-code="config.code"
-    :create="!!config.code"
-    :edit="config.editable !== false"
-    :editable="editable"
-    :prepare="prepare"
-    :initial="initial"
-    :idempotent="resource === 'gift-code-batches'"
-    :store-filter="
-      [
-        'coupon-store-quotas',
-        'coupon-quota-ledger',
-        'member-coupons',
-        'message-batches',
-        'coupon-batches',
-        'point-ledger',
-        'point-redemptions',
-      ].includes(resource)
-    "
-    time-filter
-    @saved="saved"
-  >
-    <template #toolbar>
-<Button
-        v-if="canCreateBatch && canGym(canCreateBatch)"
-        type="primary"
-        @click="start"
-        >
-{{
-          resource === 'coupon-quota-batches' ? '批量分配门店额度' : '创建批次'
-        }}
-</Button>
-</template>
-    <template #actions="{ row, reload }">
-<Button
-        v-if="resource.endsWith('batches')"
-        type="link"
-        @click="details(row)"
-        >
-逐项结果
-</Button><Button
-        v-if="resource === 'point-rules' && canGym('points:manage')"
-        type="link"
-        @click="newVersion(row)"
-        >
-新版本
-</Button><Button
-        v-if="
-          ['point-rules', 'point-products', 'coupon-templates'].includes(
-            resource,
-          ) &&
-          config.code &&
-          canGym(config.code)
-        "
-        type="link"
-        @click="
-          async () => {
-            await gymApi.patch(`${resource}/${row.id}`, {
-              status: row.status === 'active' ? 'inactive' : 'active',
-            });
-            await reload();
-          }
-        "
-        >
-{{ row.status === 'active' ? '停用' : '启用' }}
-</Button>
-</template>
-  </ResourcePage>
-  <Modal
-    v-model:open="visible"
-    :title="
-      mode === 'create'
-        ? '批量操作'
-        : mode === 'codes'
-          ? '礼品码（仅本次显示）'
-          : '批次结果'
-    "
-    :width="900"
-    :footer="mode === 'create' ? undefined : null"
-    :confirm-loading="busy"
-    @ok="submit"
-  >
-    <template v-if="mode === 'codes'">
-<Alert
-        type="warning"
-        message="请现在下载或保存，关闭后仅可查询掩码，无法再次读取完整礼品码。"
-      /><Input.TextArea
-        :value="codes.join('\n')"
-        :rows="12"
-        readonly
-        class="my-3"
-      /><Button @click="downloadCodes">下载礼品码</Button>
-</template>
-    <Form v-else-if="mode === 'create'" layout="vertical">
-      <FormItem v-if="resource !== 'message-batches'" label="优惠券模板">
-<Select
-          v-model:value="templateId"
-          :options="templates.map((t) => ({ label: t.name, value: t.id }))"
-      />
-</FormItem>
-      <template v-if="resource === 'coupon-quota-batches'">
-<FormItem label="分配范围">
-<Select
-            v-model:value="targetMode"
-            :options="[
-              { label: '所有启用且适用的门店', value: 'allEligible' },
-              { label: '指定门店', value: 'selected' },
-            ]"
-/>
-</FormItem><FormItem v-if="targetMode === 'selected'" label="目标门店">
-<Select
-            v-model:value="storeIds"
-            mode="multiple"
-            :options="
-              stores.map((s) => ({ label: s.name, value: s.id }))
-            "
-/>
-</FormItem><FormItem label="每店追加可发张数">
-<InputNumber
-            v-model:value="quantity"
-            :min="1"
-            :max="1000000"
-/>
-</FormItem><Alert
-          type="info"
-          message="本操作只分配门店发券额度；实际发给会员时才消耗额度。"
-      />
-</template>
-      <template v-else>
-<div v-for="(target, index) in targets" :key="index">
-          <FormItem label="发行 / 发送门店">
-<Select
-              v-model:value="target.storeId"
-              :options="stores.map((s) => ({ label: s.name, value: s.id }))"
-              @change="target.memberIds = []"
-/>
-</FormItem><FormItem label="本店会员">
-<Select
-              v-model:value="target.memberIds"
-              mode="multiple"
-              show-search
-              option-filter-prop="label"
-              :options="
-                members
-                  .filter((m) => m.storeIds?.includes(target.storeId))
-                  .map((m) => ({ label: `${m.name} ${m.phone}`, value: m.id }))
-              "
-/>
-</FormItem><Button v-if="targets.length > 1" @click="targets.splice(index, 1)">
-移除此门店
-</Button>
-        </div>
+  <div class="gym-view">
+    <ResourcePage
+      ref="page"
+      :key="resource"
+      :title="config.title"
+      :endpoint="resource"
+      :fields="config.fields"
+      :columns="
+        config.columns.map(([title = '', dataIndex = '']) => ({
+          title,
+          dataIndex,
+        }))
+      "
+      :write-code="config.code"
+      :create="!!config.code"
+      :edit="config.editable !== false"
+      :editable="editable"
+      :prepare="prepare"
+      :initial="initial"
+      :idempotent="resource === 'gift-code-batches'"
+      :store-filter="
+        [
+          'coupon-store-quotas',
+          'coupon-quota-ledger',
+          'member-coupons',
+          'message-batches',
+          'coupon-batches',
+          'point-ledger',
+          'point-redemptions',
+        ].includes(resource)
+      "
+      time-filter
+      @saved="saved"
+    >
+      <template v-if="canCreateBatch && canGym(canCreateBatch)" #toolbar>
         <Button
-          v-if="resource === 'coupon-batches'"
-          @click="targets.push({ memberIds: [] })"
-          >
-增加发行门店
-</Button>
-</template>
-      <template v-if="resource === 'message-batches'">
-<FormItem label="消息类型">
-<Select
-            v-model:value="messageKind"
-            :options="[
-              { label: '私信（一位会员）', value: 'private' },
-              { label: '批量通知', value: 'bulk' },
-            ]"
-/>
-</FormItem><FormItem label="发送渠道">
-<Select
-            v-model:value="channel"
-            :options="[
-              { label: '小程序', value: 'miniapp' },
-              { label: 'App', value: 'app' },
-              { label: '短信', value: 'sms' },
-            ]"
-/>
-</FormItem><FormItem label="标题"><Input v-model:value="subject" /></FormItem><FormItem label="内容">
-<Input.TextArea v-model:value="content" :rows="4" />
+          v-if="canCreateBatch && canGym(canCreateBatch)"
+          type="primary"
+          @click="start"
+        >
+          {{
+            resource === 'coupon-quota-batches'
+              ? '批量分配门店额度'
+              : '创建批次'
+          }}
+        </Button>
+      </template>
+      <template
+        v-if="
+          resource.endsWith('batches') || (config.code && canGym(config.code))
+        "
+        #actions="{ row, reload }"
+      >
+        <Button
+          v-if="resource.endsWith('batches')"
+          type="link"
+          @click="details(row)"
+        >
+          逐项结果
+</Button><Button
+          v-if="resource === 'point-rules' && canGym('points:manage')"
+          type="link"
+          @click="newVersion(row)"
+        >
+          新版本
+</Button><Button
+          v-if="
+            ['point-rules', 'point-products', 'coupon-templates'].includes(
+              resource,
+            ) &&
+            config.code &&
+            canGym(config.code)
+          "
+          type="link"
+          @click="
+            async () => {
+              await gymApi.patch(`${resource}/${row.id}`, {
+                status: row.status === 'active' ? 'inactive' : 'active',
+              });
+              await reload();
+            }
+          "
+        >
+          {{ row.status === 'active' ? '停用' : '启用' }}
+        </Button>
+      </template>
+    </ResourcePage>
+    <Modal
+      wrap-class-name="gym-dialog"
+      v-model:open="visible"
+      :title="
+        mode === 'create'
+          ? '批量操作'
+          : mode === 'codes'
+            ? '礼品码（仅本次显示）'
+            : '批次结果'
+      "
+      :width="900"
+      :footer="mode === 'create' ? undefined : null"
+      :confirm-loading="busy"
+      @ok="submit"
+    >
+      <template v-if="mode === 'codes'">
+        <Alert
+          type="warning"
+          message="请现在下载或保存，关闭后仅可查询掩码，无法再次读取完整礼品码。"
+        /><Input.TextArea
+          :value="codes.join('\n')"
+          :rows="12"
+          readonly
+          class="my-3"
+        /><Button @click="downloadCodes">下载礼品码</Button>
+      </template>
+      <Form v-else-if="mode === 'create'" layout="vertical">
+        <FormItem v-if="resource !== 'message-batches'" label="优惠券模板">
+          <Select
+            v-model:value="templateId"
+            :options="templates.map((t) => ({ label: t.name, value: t.id }))"
+          />
+        </FormItem>
+        <template v-if="resource === 'coupon-quota-batches'">
+          <FormItem label="分配范围">
+            <Select
+              v-model:value="targetMode"
+              :options="[
+                { label: '所有启用且适用的门店', value: 'allEligible' },
+                { label: '指定门店', value: 'selected' },
+              ]"
+            />
+</FormItem><FormItem v-if="targetMode === 'selected'" label="目标门店">
+            <Select
+              v-model:value="storeIds"
+              mode="multiple"
+              :options="stores.map((s) => ({ label: s.name, value: s.id }))"
+            />
+</FormItem><FormItem label="每店追加可发张数">
+            <InputNumber
+              v-model:value="quantity"
+              :min="1"
+              :max="1000000"
+            />
 </FormItem><Alert
+            type="info"
+            message="本操作只分配门店发券额度；实际发给会员时才消耗额度。"
+          />
+        </template>
+        <template v-else>
+          <div v-for="(target, index) in targets" :key="index">
+            <FormItem label="发行 / 发送门店">
+              <Select
+                v-model:value="target.storeId"
+                :options="stores.map((s) => ({ label: s.name, value: s.id }))"
+                @change="target.memberIds = []"
+              />
+</FormItem><FormItem label="本店会员">
+              <Select
+                v-model:value="target.memberIds"
+                mode="multiple"
+                show-search
+                option-filter-prop="label"
+                :options="
+                  members
+                    .filter((m) => m.storeIds?.includes(target.storeId))
+                    .map((m) => ({
+                      label: `${m.name} ${m.phone}`,
+                      value: m.id,
+                    }))
+                "
+              />
+</FormItem><Button
+              v-if="targets.length > 1"
+              @click="targets.splice(index, 1)"
+            >
+              移除此门店
+            </Button>
+          </div>
+          <Button
+            v-if="resource === 'coupon-batches'"
+            @click="targets.push({ memberIds: [] })"
+          >
+            增加发行门店
+          </Button>
+        </template>
+        <template v-if="resource === 'message-batches'">
+          <FormItem label="消息类型">
+            <Select
+              v-model:value="messageKind"
+              :options="[
+                { label: '私信（一位会员）', value: 'private' },
+                { label: '批量通知', value: 'bulk' },
+              ]"
+            />
+</FormItem><FormItem label="发送渠道">
+            <Select
+              v-model:value="channel"
+              :options="[
+                { label: '小程序', value: 'miniapp' },
+                { label: 'App', value: 'app' },
+                { label: '短信', value: 'sms' },
+              ]"
+            />
+</FormItem><FormItem label="标题"><Input v-model:value="subject" /></FormItem><FormItem label="内容">
+            <Input.TextArea v-model:value="content" :rows="4" />
+</FormItem><Alert
+            type="info"
+            message="未配置真实渠道的消息会记录发送失败，不会发送到会员。"
+          />
+        </template>
+      </Form>
+      <template v-else>
+        <Alert
           type="info"
-          message="未配置真实渠道的消息会记录发送失败，不会发送到会员。"
-      />
-</template>
-    </Form>
-    <template v-else>
-<Alert
-        type="info"
-        :message="`批次状态：${current?.status ?? '—'}`"
-        class="mb-3"
-/><Table
-        :data-source="items"
-        row-key="id"
-        :columns="[
-          { title: '门店', dataIndex: 'storeName' },
-          { title: '会员', dataIndex: 'memberName' },
-          { title: '数量', dataIndex: 'quantity' },
-          { title: '礼品码掩码', dataIndex: 'codeMasked' },
-          { title: '结果', dataIndex: 'status' },
-          { title: '失败原因', dataIndex: 'failureReason' },
-          { title: '阅读结果', dataIndex: 'readStatus' },
-        ]"
-    />
-</template>
-  </Modal>
+          :message="`批次状态：${current?.status ?? '—'}`"
+          class="mb-3"
+        /><Table
+          :data-source="items"
+          row-key="id"
+          :columns="[
+            { title: '门店', dataIndex: 'storeName' },
+            { title: '会员', dataIndex: 'memberName' },
+            { title: '数量', dataIndex: 'quantity' },
+            { title: '礼品码掩码', dataIndex: 'codeMasked' },
+            { title: '结果', dataIndex: 'status' },
+            { title: '失败原因', dataIndex: 'failureReason' },
+            { title: '阅读结果', dataIndex: 'readStatus' },
+          ]"
+        />
+      </template>
+    </Modal>
+  </div>
 </template>

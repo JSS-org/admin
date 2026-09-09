@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import type { GymRow } from '#/api/gym';
 
-import { onMounted, ref } from 'vue';
-
-import { Page } from '@vben/common-ui';
+import { computed, onMounted, ref } from 'vue';
 
 import {
   Alert,
@@ -21,6 +19,8 @@ import {
 
 import { gymApi } from '#/api/gym';
 
+import Page from './components/admin-page.vue';
+import FilterBar from './components/filter-bar.vue';
 import ResourcePage from './components/resource-page.vue';
 
 const props = defineProps<{ resource: string }>();
@@ -106,192 +106,215 @@ function accountBody(values: Record<string, any>, row?: GymRow) {
   const { lastFour, credentialRef, ...rest } = values;
   return { ...rest, accountDetails: { lastFour, credentialRef } };
 }
+const scopeFilter = computed({
+  get: () => ({ storeId: storeId.value }),
+  set: (value: Record<string, any>) => {
+    storeId.value = value.storeId;
+  },
+});
 </script>
 
 <template>
-  <Page v-if="resource === 'settlement-rules'" title="分账规则">
-    <Alert
-      message="有效期含开始日、不含结束日。只有渠道已绑定账户可以启用；启用版本不可修改。"
-      type="info"
-    />
-    <Space class="my-4">
-      <Select
-        v-model:value="storeId"
-        aria-label="门店"
-        style="width: 220px"
-        :options="stores.map((s) => ({ label: s.name, value: s.id }))"
-        @change="loadRules"
-      />
-      <Button type="primary" :disabled="!storeId" @click="edit()">
-        新增版本
-      </Button>
-    </Space>
-    <Table
-      row-key="id"
-      :data-source="rules"
-      :columns="[
-        { title: '版本', dataIndex: 'version' },
-        { title: '周期', dataIndex: 'cycleUnit' },
-        { title: '间隔', dataIndex: 'cycleValue' },
-        { title: '生效', dataIndex: 'effectiveFrom' },
-        { title: '失效', dataIndex: 'effectiveTo' },
-        { title: '状态', dataIndex: 'status' },
-        { title: '操作', key: 'action' },
-      ]"
-    >
-      <template #bodyCell="{ column, record }">
-        <Space v-if="column.key === 'action'">
-          <Button @click="edit(record)">
-            {{ record.status === 'draft' ? '编辑' : '查看' }}
-</Button><Button v-if="record.status === 'draft'" @click="activate(record)">
-            启用
-          </Button>
-        </Space>
-      </template>
-    </Table>
-    <Modal
-      v-model:open="visible"
-      title="分账规则版本"
-      :confirm-loading="busy"
-      :ok-button-props="{ disabled: form.status === 'active' }"
-      @ok="save"
-    >
-      <Form layout="vertical">
-        <FormItem label="周期">
-          <Select
-            v-model:value="form.cycleUnit"
-            :options="[
-              { label: '天', value: 'day' },
-              { label: '周', value: 'week' },
-              { label: '月', value: 'month' },
-            ]"
-          />
-        </FormItem>
-        <FormItem label="周期间隔">
-          <InputNumber v-model:value="form.cycleValue" :min="1" :max="365" />
-        </FormItem>
-        <FormItem label="生效日期">
-          <Input v-model:value="form.effectiveFrom" type="date" />
-        </FormItem>
-        <FormItem label="失效日期（不含）">
-          <Input v-model:value="form.effectiveTo" type="date" />
-        </FormItem>
-        <FormItem
-          v-for="(item, index) in form.items"
-          :key="index"
-          :label="`接收账户 ${Number(index) + 1} / 比例`"
-        >
-          <Space>
-            <Select
-              v-model:value="item.paymentAccountId"
-              style="width: 250px"
-              :options="
-                accounts.map((a) => ({
-                  label: `${a.accountName} ${a.accountMasked} (${a.bindingStatus})`,
-                  value: a.id,
-                }))
-              "
-            /><InputNumber
-              v-model:value="item.ratio"
-              :min="0"
-              :max="1"
-              :step="0.01"
-            /><Button @click="form.items.splice(Number(index), 1)">
-              移除
-            </Button>
-          </Space>
-        </FormItem>
-        <Button @click="form.items.push({ ratio: 0 })">添加接收账户</Button>
-      </Form>
-    </Modal>
-  </Page>
-  <ResourcePage
-    v-else-if="resource === 'payment-accounts'"
-    title="收款账户"
-    endpoint="payment-accounts"
-    write-code="settlement:manage"
-    store-filter
-    :prepare="accountBody"
-    :fields="[
-      { key: 'accountName', label: '账户名称', required: true },
-      {
-        key: 'storeId',
-        label: '所属门店（留空为总部）',
-        source: 'stores',
-        immutable: true,
-      },
-      {
-        key: 'provider',
-        label: '渠道',
-        type: 'select',
-        required: true,
-        immutable: true,
-        options: [
-          { label: '微信', value: 'wechat' },
-          { label: '支付宝', value: 'alipay' },
-          { label: '银行', value: 'bank' },
-        ],
-      },
-      { key: 'merchantId', label: '商户号', required: true, immutable: true },
-      { key: 'lastFour', label: '账号末四位', required: true, immutable: true },
-      { key: 'credentialRef', label: '安全存储凭据引用' },
-    ]"
-    :columns="[
-      { title: '名称', dataIndex: 'accountName' },
-      { title: '门店', dataIndex: 'storeName' },
-      { title: '渠道', dataIndex: 'provider' },
-      { title: '商户号', dataIndex: 'merchantId' },
-      { title: '账号', dataIndex: 'accountMasked' },
-      { title: '绑定状态', dataIndex: 'bindingStatus' },
-    ]"
-  >
-    <template #toolbar>
+  <div class="gym-view">
+    <Page v-if="resource === 'settlement-rules'" title="分账规则">
       <Alert
-        message="仅保存脱敏账号与凭据引用；真实支付渠道未配置。"
+        message="有效期含开始日、不含结束日。只有渠道已绑定账户可以启用；启用版本不可修改。"
         type="info"
       />
-    </template>
-    <template #actions="{ row }">
-      <Button @click="bind(row)">渠道绑定</Button>
-    </template>
-  </ResourcePage>
-  <ResourcePage
-    v-else
-    title="分账结算记录"
-    endpoint="settlements"
-    :fields="[]"
-    :create="false"
-    :edit="false"
-    store-filter
-    time-filter
-    @detail="details"
-    :columns="[
-      { title: '门店', dataIndex: 'storeName' },
-      { title: '订单', dataIndex: 'orderNo' },
-      { title: '分账基数', dataIndex: 'baseAmount' },
-      { title: '应到账时间', dataIndex: 'dueAt' },
-      { title: '状态', dataIndex: 'status' },
-    ]"
-  />
-  <Modal
-    v-model:open="showDetail"
-    title="分账明细"
-    :footer="null"
-    width="800px"
-  >
-    <p>分账基数：{{ detail?.baseAmount }}；状态：{{ detail?.status }}</p>
-    <Table
-      row-key="id"
-      :data-source="detail?.items"
+      <FilterBar
+        v-model="scopeFilter"
+        :keyword="false"
+        immediate
+        :fields="[
+          {
+            key: 'storeId',
+            label: '配置门店',
+            type: 'select',
+            clearable: false,
+            options: stores.map((s) => ({ label: s.name, value: s.id })),
+          },
+        ]"
+        @search="loadRules"
+      />
+      <div class="gym-toolbar">
+        <Button type="primary" :disabled="!storeId" @click="edit()">
+          新增版本
+        </Button>
+      </div>
+      <Table
+        row-key="id"
+        :data-source="rules"
+        :columns="[
+          { title: '版本', dataIndex: 'version' },
+          { title: '周期', dataIndex: 'cycleUnit' },
+          { title: '间隔', dataIndex: 'cycleValue' },
+          { title: '生效', dataIndex: 'effectiveFrom' },
+          { title: '失效', dataIndex: 'effectiveTo' },
+          { title: '状态', dataIndex: 'status' },
+          { title: '操作', key: 'action' },
+        ]"
+      >
+        <template #bodyCell="{ column, record }">
+          <Space v-if="column.key === 'action'">
+            <Button @click="edit(record)">
+              {{ record.status === 'draft' ? '编辑' : '查看' }}
+</Button><Button v-if="record.status === 'draft'" @click="activate(record)">
+              启用
+            </Button>
+          </Space>
+        </template>
+      </Table>
+      <Modal
+        wrap-class-name="gym-dialog"
+        v-model:open="visible"
+        title="分账规则版本"
+        :confirm-loading="busy"
+        :ok-button-props="{ disabled: form.status === 'active' }"
+        @ok="save"
+      >
+        <Form layout="vertical">
+          <FormItem label="周期">
+            <Select
+              v-model:value="form.cycleUnit"
+              :options="[
+                { label: '天', value: 'day' },
+                { label: '周', value: 'week' },
+                { label: '月', value: 'month' },
+              ]"
+            />
+          </FormItem>
+          <FormItem label="周期间隔">
+            <InputNumber v-model:value="form.cycleValue" :min="1" :max="365" />
+          </FormItem>
+          <FormItem label="生效日期">
+            <Input v-model:value="form.effectiveFrom" type="date" />
+          </FormItem>
+          <FormItem label="失效日期（不含）">
+            <Input v-model:value="form.effectiveTo" type="date" />
+          </FormItem>
+          <FormItem
+            v-for="(item, index) in form.items"
+            :key="index"
+            :label="`接收账户 ${Number(index) + 1} / 比例`"
+          >
+            <Space>
+              <Select
+                v-model:value="item.paymentAccountId"
+                style="width: 250px"
+                :options="
+                  accounts.map((a) => ({
+                    label: `${a.accountName} ${a.accountMasked} (${a.bindingStatus})`,
+                    value: a.id,
+                  }))
+                "
+              /><InputNumber
+                v-model:value="item.ratio"
+                :min="0"
+                :max="1"
+                :step="0.01"
+              /><Button @click="form.items.splice(Number(index), 1)">
+                移除
+              </Button>
+            </Space>
+          </FormItem>
+          <Button @click="form.items.push({ ratio: 0 })">添加接收账户</Button>
+        </Form>
+      </Modal>
+    </Page>
+    <ResourcePage
+      v-else-if="resource === 'payment-accounts'"
+      title="收款账户"
+      endpoint="payment-accounts"
+      write-code="settlement:manage"
+      store-filter
+      :prepare="accountBody"
+      :fields="[
+        { key: 'accountName', label: '账户名称', required: true },
+        {
+          key: 'storeId',
+          label: '所属门店（留空为总部）',
+          source: 'stores',
+          immutable: true,
+        },
+        {
+          key: 'provider',
+          label: '渠道',
+          type: 'select',
+          required: true,
+          immutable: true,
+          options: [
+            { label: '微信', value: 'wechat' },
+            { label: '支付宝', value: 'alipay' },
+            { label: '银行', value: 'bank' },
+          ],
+        },
+        { key: 'merchantId', label: '商户号', required: true, immutable: true },
+        {
+          key: 'lastFour',
+          label: '账号末四位',
+          required: true,
+          immutable: true,
+        },
+        { key: 'credentialRef', label: '安全存储凭据引用' },
+      ]"
       :columns="[
-        { title: '账户', dataIndex: 'accountName' },
-        { title: '脱敏账号', dataIndex: 'accountMasked' },
-        { title: '比例', dataIndex: 'ratio' },
-        { title: '金额', dataIndex: 'amount' },
+        { title: '名称', dataIndex: 'accountName' },
+        { title: '门店', dataIndex: 'storeName' },
+        { title: '渠道', dataIndex: 'provider' },
+        { title: '商户号', dataIndex: 'merchantId' },
+        { title: '账号', dataIndex: 'accountMasked' },
+        { title: '绑定状态', dataIndex: 'bindingStatus' },
+      ]"
+    >
+      <template #toolbar>
+        <Alert
+          message="仅保存脱敏账号与凭据引用；真实支付渠道未配置。"
+          type="info"
+        />
+      </template>
+      <template #actions="{ row }">
+        <Button @click="bind(row)">渠道绑定</Button>
+      </template>
+    </ResourcePage>
+    <ResourcePage
+      v-else
+      title="分账结算记录"
+      endpoint="settlements"
+      :fields="[]"
+      :create="false"
+      :edit="false"
+      store-filter
+      time-filter
+      @detail="details"
+      :columns="[
+        { title: '门店', dataIndex: 'storeName' },
+        { title: '订单', dataIndex: 'orderNo' },
+        { title: '分账基数', dataIndex: 'baseAmount' },
+        { title: '应到账时间', dataIndex: 'dueAt' },
         { title: '状态', dataIndex: 'status' },
-        { title: '到账时间', dataIndex: 'settledAt' },
-        { title: '失败原因', dataIndex: 'failureReason' },
       ]"
     />
-  </Modal>
+    <Modal
+      wrap-class-name="gym-dialog"
+      v-model:open="showDetail"
+      title="分账明细"
+      :footer="null"
+      width="800px"
+    >
+      <p>分账基数：{{ detail?.baseAmount }}；状态：{{ detail?.status }}</p>
+      <Table
+        row-key="id"
+        :data-source="detail?.items"
+        :columns="[
+          { title: '账户', dataIndex: 'accountName' },
+          { title: '脱敏账号', dataIndex: 'accountMasked' },
+          { title: '比例', dataIndex: 'ratio' },
+          { title: '金额', dataIndex: 'amount' },
+          { title: '状态', dataIndex: 'status' },
+          { title: '到账时间', dataIndex: 'settledAt' },
+          { title: '失败原因', dataIndex: 'failureReason' },
+        ]"
+      />
+    </Modal>
+  </div>
 </template>

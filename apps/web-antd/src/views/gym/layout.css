@@ -1,0 +1,100 @@
+.gym-view {
+  min-width: 0;
+  min-height: 100%;
+}
+
+.gym-page {
+  min-width: 0;
+}
+
+.gym-page-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.gym-page-content > * {
+  min-width: 0;
+  margin-block: 0;
+}
+
+.gym-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.gym-toolbar > .ant-alert {
+  flex-basis: 100%;
+}
+
+.gym-page-content > .ant-form:not(.gym-filter) {
+  max-width: 1120px;
+  padding: 20px;
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+}
+
+.gym-page-content .ant-form-item,
+.gym-dialog .ant-form-item {
+  margin-bottom: 20px;
+}
+
+.gym-page-content .ant-form .ant-input-number,
+.gym-dialog .ant-form-item .ant-input-number {
+  width: 100%;
+}
+
+.gym-page-content .ant-form .ant-space-horizontal,
+.gym-dialog .ant-space-horizontal {
+  flex-wrap: wrap;
+  gap: 12px !important;
+  max-width: 100%;
+}
+
+.gym-page-content .ant-form .ant-space-item,
+.gym-dialog .ant-space-item {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.gym-page-content .ant-form .ant-space-item:has(> .ant-form-item) {
+  flex: 1 1 220px;
+}
+
+.gym-dialog .ant-space-item:has(> .ant-form-item) {
+  flex: 1 1 200px;
+}
+
+.gym-dialog .ant-modal-body > .ant-alert {
+  margin-bottom: 20px;
+}
+
+.gym-dialog .ant-modal-body > .ant-table-wrapper + .ant-form {
+  margin-top: 20px;
+}
+
+.gym-dialog .ant-modal-body > .ant-space {
+  margin-bottom: 16px;
+}
+
+.gym-dialog .ant-form-item .ant-select {
+  width: 100%;
+}
+
+.gym-dialog pre {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.gym-dialog .ant-table-wrapper,
+.gym-page-content .ant-table-wrapper {
+  overflow-x: auto;
+}
+
+.gym-page-content .ant-table-cell,
+.gym-dialog .ant-table-cell {
+  overflow-wrap: anywhere;
+}

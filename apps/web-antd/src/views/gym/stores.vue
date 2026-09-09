@@ -113,78 +113,83 @@ async function upload(file: File) {
 }
 </script>
 <template>
-  <ResourcePage
-    title="门店资料"
-    endpoint="stores"
-    :fields="fields"
-    :columns="[
-      { title: '编码', dataIndex: 'code' },
-      { title: '名称', dataIndex: 'name' },
-      { title: '面积', dataIndex: 'areaSqm' },
-      { title: '地址', dataIndex: 'address' },
-      { title: '客服', dataIndex: 'servicePhone' },
-      { title: '状态', dataIndex: 'status' },
-    ]"
-    write-code="stores:write"
-    :prepare="prepare"
-    :initial="initial"
-  >
-    <template #actions="{ row }">
-      <Button type="link" @click="showMedia(row)"> 环境照片/视频 </Button>
-    </template>
-  </ResourcePage>
-  <Modal
-    v-model:open="visible"
-    :title="`${selected?.name} 环境媒体`"
-    :footer="null"
-    :width="720"
-  >
-    <Upload
-      v-if="canGym('stores:write')"
-      :before-upload="upload"
-      :show-upload-list="false"
-      accept="image/png,image/jpeg,video/mp4"
-    >
-      <Button :loading="busy">上传图片或视频</Button>
-    </Upload>
-    <Table
-      :data-source="media"
-      row-key="fileId"
-      :pagination="false"
+  <div class="gym-view">
+    <ResourcePage
+      title="门店资料"
+      endpoint="stores"
+      :fields="fields"
       :columns="[
-        { title: '文件', dataIndex: 'name' },
-        { title: '封面', dataIndex: 'isCover' },
-        { title: '操作', dataIndex: '_actions' },
+        { title: '编码', dataIndex: 'code' },
+        { title: '名称', dataIndex: 'name' },
+        { title: '面积', dataIndex: 'areaSqm' },
+        { title: '地址', dataIndex: 'address' },
+        { title: '客服', dataIndex: 'servicePhone' },
+        { title: '状态', dataIndex: 'status' },
       ]"
+      write-code="stores:write"
+      :prepare="prepare"
+      :initial="initial"
     >
-      <template #bodyCell="{ column, record }">
-        <span v-if="column.dataIndex === 'isCover'">{{
-          record.isCover ? '是' : '否'
-        }}</span>
-        <Space v-if="column.dataIndex === '_actions'">
-          <Button type="link" @click="openGymFile(record.fileId)">查看</Button><Button
-            v-if="canGym('stores:write')"
-            type="link"
-            @click="
-              saveMedia(
-                media.map((m) => ({
-                  ...m,
-                  isCover: m.fileId === record.fileId,
-                })),
-              )
-            "
-          >
-            设为封面
-</Button><Button
-            v-if="canGym('stores:write')"
-            danger
-            type="link"
-            @click="saveMedia(media.filter((m) => m.fileId !== record.fileId))"
-          >
-            移除
-          </Button>
-        </Space>
+      <template #actions="{ row }">
+        <Button type="link" @click="showMedia(row)"> 环境照片/视频 </Button>
       </template>
-    </Table>
-  </Modal>
+    </ResourcePage>
+    <Modal
+      wrap-class-name="gym-dialog"
+      v-model:open="visible"
+      :title="`${selected?.name} 环境媒体`"
+      :footer="null"
+      :width="720"
+    >
+      <Upload
+        v-if="canGym('stores:write')"
+        :before-upload="upload"
+        :show-upload-list="false"
+        accept="image/png,image/jpeg,video/mp4"
+      >
+        <Button :loading="busy">上传图片或视频</Button>
+      </Upload>
+      <Table
+        :data-source="media"
+        row-key="fileId"
+        :pagination="false"
+        :columns="[
+          { title: '文件', dataIndex: 'name' },
+          { title: '封面', dataIndex: 'isCover' },
+          { title: '操作', dataIndex: '_actions' },
+        ]"
+      >
+        <template #bodyCell="{ column, record }">
+          <span v-if="column.dataIndex === 'isCover'">{{
+            record.isCover ? '是' : '否'
+          }}</span>
+          <Space v-if="column.dataIndex === '_actions'">
+            <Button type="link" @click="openGymFile(record.fileId)">查看</Button><Button
+              v-if="canGym('stores:write')"
+              type="link"
+              @click="
+                saveMedia(
+                  media.map((m) => ({
+                    ...m,
+                    isCover: m.fileId === record.fileId,
+                  })),
+                )
+              "
+            >
+              设为封面
+</Button><Button
+              v-if="canGym('stores:write')"
+              danger
+              type="link"
+              @click="
+                saveMedia(media.filter((m) => m.fileId !== record.fileId))
+              "
+            >
+              移除
+            </Button>
+          </Space>
+        </template>
+      </Table>
+    </Modal>
+  </div>
 </template>

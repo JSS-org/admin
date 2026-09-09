@@ -448,167 +448,184 @@ onDeactivated(stop);
 onUnmounted(stop);
 </script>
 <template>
-  <ResourcePage
-    ref="page"
-    :key="resource"
-    :title="config.title"
-    :endpoint="resource"
-    :fields="config.fields"
-    :columns="
-      config.columns.map(([title = '', dataIndex = '']) => ({
-        title,
-        dataIndex,
-      }))
-    "
-    :write-code="config.code"
-    :create="config.create !== false"
-    :edit="config.edit !== false"
-    :editable="editable"
-    :initial="initial"
-    :prepare="prepare"
-    store-filter
-    time-filter
-  >
-    <template #toolbar>
-      <Button
-        v-if="resource === 'bookings' && canGym('bookings:write')"
-        type="primary"
-        @click="openBooking"
-      >
-        代会员预约
-      </Button>
-      <span v-if="resource === 'checkins' && summary">今日授权门店：入场 {{ summary.entries }} 次，会员
-        {{ summary.members }} 人，陌生访客 {{ summary.visitors }} 次，昨日
-        {{ summary.yesterdayEntries }} 次（每15秒刷新）</span>
-    </template>
-    <template #actions="{ row, reload }">
-      <Button
+  <div class="gym-view">
+    <ResourcePage
+      ref="page"
+      :key="resource"
+      :title="config.title"
+      :endpoint="resource"
+      :fields="config.fields"
+      :columns="
+        config.columns.map(([title = '', dataIndex = '']) => ({
+          title,
+          dataIndex,
+        }))
+      "
+      :write-code="config.code"
+      :create="config.create !== false"
+      :edit="config.edit !== false"
+      :editable="editable"
+      :initial="initial"
+      :prepare="prepare"
+      store-filter
+      time-filter
+    >
+      <template
         v-if="
-          resource === 'course-products' &&
-          row.kind === 'group' &&
-          canGym('courses:write')
+          (resource === 'bookings' && canGym('bookings:write')) ||
+          (resource === 'checkins' && summary)
         "
-        type="link"
-        @click="
-          async () => {
-            await gymApi.patch(`course-products/${row.id}`, {
-              status: row.status === 'active' ? 'inactive' : 'active',
-            });
-            await reload();
-          }
-        "
+        #toolbar
       >
-        {{ row.status === 'active' ? '停用' : '启用' }}
-      </Button>
-      <Button
-        v-if="
-          (resource === 'bookings' &&
-            row.status === 'confirmed' &&
-            canGym('bookings:write')) ||
-          (resource === 'course-sessions' &&
-            row.status === 'scheduled' &&
-            canGym('courses:write'))
-        "
-        type="link"
-        danger
-        @click="cancel(row)"
-      >
-        取消{{ resource === 'bookings' ? '预约' : '排课' }}
-      </Button>
-      <Button
-        v-if="resource === 'body-measurements'"
-        type="link"
-        @click="detail(row)"
-      >
-        详情 / 报告
-      </Button>
-      <Button
-        v-if="resource === 'qr-codes' && row.providerCodeFileId"
-        type="link"
-        @click="openGymFile(row.providerCodeFileId)"
-      >
-        查看码
-      </Button>
-    </template>
-  </ResourcePage>
-  <Modal
-    v-model:open="visible"
-    :title="mode === 'booking' ? '代会员预约' : '体测详情'"
-    :confirm-loading="saving"
-    :footer="mode === 'booking' ? undefined : null"
-    @ok="saveBooking"
-  >
-    <Form v-if="mode === 'booking'" layout="vertical">
-      <FormItem label="课程">
-        <Select
-          v-model:value="sessionId"
-          :options="
-            sessions.map((s) => ({
-              label: `${s.storeName} ${s.courseName} ${new Date(s.startsAt).toLocaleString()}`,
-              value: s.id,
-            }))
-          "
-          @change="changeSession"
-        />
-      </FormItem>
-      <FormItem label="本店会员">
-        <Select
-          v-model:value="memberId"
-          show-search
-          option-filter-prop="label"
-          :options="
-            members.map((m) => ({ label: `${m.name} ${m.phone}`, value: m.id }))
-          "
-          @change="changeMember"
-        />
-      </FormItem>
-      <FormItem label="预约权益">
-        <Select v-model:value="rightId" :options="rights" />
-      </FormItem>
-      <FormItem label="备注"><Input.TextArea v-model:value="note" /></FormItem>
-    </Form>
-    <template v-else-if="current">
-      <Descriptions :column="1" bordered>
-        <DescriptionsItem
-          v-for="[title, key] in config.columns"
-          :key="key"
-          :label="title"
-        >
-          {{ current[key ?? ''] ?? '—' }}
-</DescriptionsItem><DescriptionsItem label="备注">
-          {{ current.note }}
-        </DescriptionsItem>
-      </Descriptions>
-      <Table
-        v-if="current.measurements?.length"
-        :data-source="current.measurements"
-        :pagination="false"
-        :columns="[
-          { title: '测量项', dataIndex: 'name' },
-          { title: '值', dataIndex: 'value' },
-          { title: '单位', dataIndex: 'unit' },
-        ]"
-      />
-      <Space class="mt-4">
         <Button
-          v-if="current.reportFileId"
-          @click="openGymFile(current.reportFileId)"
+          v-if="resource === 'bookings' && canGym('bookings:write')"
+          type="primary"
+          @click="openBooking"
         >
-          查看报告
+          代会员预约
+        </Button>
+        <span v-if="resource === 'checkins' && summary">今日授权门店：入场 {{ summary.entries }} 次，会员
+          {{ summary.members }} 人，陌生访客 {{ summary.visitors }} 次，昨日
+          {{ summary.yesterdayEntries }} 次（每15秒刷新）</span>
+      </template>
+      <template
+        v-if="!['checkins', 'lesson-records'].includes(resource)"
+        #actions="{ row, reload }"
+      >
+        <Button
+          v-if="
+            resource === 'course-products' &&
+            row.kind === 'group' &&
+            canGym('courses:write')
+          "
+          type="link"
+          @click="
+            async () => {
+              await gymApi.patch(`course-products/${row.id}`, {
+                status: row.status === 'active' ? 'inactive' : 'active',
+              });
+              await reload();
+            }
+          "
+        >
+          {{ row.status === 'active' ? '停用' : '启用' }}
+        </Button>
+        <Button
+          v-if="
+            (resource === 'bookings' &&
+              row.status === 'confirmed' &&
+              canGym('bookings:write')) ||
+            (resource === 'course-sessions' &&
+              row.status === 'scheduled' &&
+              canGym('courses:write'))
+          "
+          type="link"
+          danger
+          @click="cancel(row)"
+        >
+          取消{{ resource === 'bookings' ? '预约' : '排课' }}
+        </Button>
+        <Button
+          v-if="resource === 'body-measurements'"
+          type="link"
+          @click="detail(row)"
+        >
+          详情 / 报告
+        </Button>
+        <Button
+          v-if="resource === 'qr-codes' && row.providerCodeFileId"
+          type="link"
+          @click="openGymFile(row.providerCodeFileId)"
+        >
+          查看码
+        </Button>
+      </template>
+    </ResourcePage>
+    <Modal
+      wrap-class-name="gym-dialog"
+      v-model:open="visible"
+      :title="mode === 'booking' ? '代会员预约' : '体测详情'"
+      :confirm-loading="saving"
+      :footer="mode === 'booking' ? undefined : null"
+      @ok="saveBooking"
+    >
+      <Form v-if="mode === 'booking'" layout="vertical">
+        <FormItem label="课程">
+          <Select
+            v-model:value="sessionId"
+            :options="
+              sessions.map((s) => ({
+                label: `${s.storeName} ${s.courseName} ${new Date(s.startsAt).toLocaleString()}`,
+                value: s.id,
+              }))
+            "
+            @change="changeSession"
+          />
+        </FormItem>
+        <FormItem label="本店会员">
+          <Select
+            v-model:value="memberId"
+            show-search
+            option-filter-prop="label"
+            :options="
+              members.map((m) => ({
+                label: `${m.name} ${m.phone}`,
+                value: m.id,
+              }))
+            "
+            @change="changeMember"
+          />
+        </FormItem>
+        <FormItem label="预约权益">
+          <Select v-model:value="rightId" :options="rights" />
+        </FormItem>
+        <FormItem label="备注">
+          <Input.TextArea v-model:value="note" />
+        </FormItem>
+      </Form>
+      <template v-else-if="current">
+        <Descriptions :column="1" bordered>
+          <DescriptionsItem
+            v-for="[title, key] in config.columns"
+            :key="key"
+            :label="title"
+          >
+            {{ current[key ?? ''] ?? '—' }}
+</DescriptionsItem><DescriptionsItem label="备注">
+            {{ current.note }}
+          </DescriptionsItem>
+        </Descriptions>
+        <Table
+          v-if="current.measurements?.length"
+          :data-source="current.measurements"
+          :pagination="false"
+          :columns="[
+            { title: '测量项', dataIndex: 'name' },
+            { title: '值', dataIndex: 'value' },
+            { title: '单位', dataIndex: 'unit' },
+          ]"
+        />
+        <Space class="mt-4">
+          <Button
+            v-if="current.reportFileId"
+            @click="openGymFile(current.reportFileId)"
+          >
+            查看报告
 </Button><Upload
-          v-if="canGym('measurements:write')"
-          :before-upload="report"
-          :show-upload-list="false"
-          accept=".pdf,.png,.jpg,.jpeg"
-        >
-          <Button :loading="saving">上传 / 更新报告</Button>
-        </Upload>
-      </Space>
-    </template>
-  </Modal>
-  <Alert
-    v-if="resource === 'qr-codes'"
-    type="info"
-    message="生成二维码需要配置真实小程序/App渠道或落地链接，当前 Mock 未接入渠道。"
-  />
+            v-if="canGym('measurements:write')"
+            :before-upload="report"
+            :show-upload-list="false"
+            accept=".pdf,.png,.jpg,.jpeg"
+          >
+            <Button :loading="saving">上传 / 更新报告</Button>
+          </Upload>
+        </Space>
+      </template>
+    </Modal>
+    <Alert
+      v-if="resource === 'qr-codes'"
+      type="info"
+      message="生成二维码需要配置真实小程序/App渠道或落地链接，当前 Mock 未接入渠道。"
+    />
+  </div>
 </template>

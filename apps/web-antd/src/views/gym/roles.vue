@@ -65,32 +65,40 @@ async function save() {
 }
 </script>
 <template>
-  <ResourcePage
-    ref="view"
-    title="角色权限"
-    endpoint="roles"
-    :fields="fields"
-    :columns="[
-      { title: '编码', dataIndex: 'code' },
-      { title: '名称', dataIndex: 'name' },
-      { title: '范围', dataIndex: 'scopeType' },
-      { title: '状态', dataIndex: 'status' },
-    ]"
-    write-code="roles:write"
-    :prepare="prepare"
-  >
-    <template #actions="{ row }">
-      <Button type="link" @click="open(row)">配置权限</Button>
-    </template>
-  </ResourcePage>
-  <Modal v-model:open="visible" title="权限配置" :width="760" @ok="save">
-    <CheckboxGroup
-      v-model:value="codes"
-      :options="
-        permissions
-          .filter((p) => p.scopes.includes(current?.scopeType))
-          .map((p) => ({ label: p.name, value: p.code }))
-      "
-    />
-  </Modal>
+  <div class="gym-view">
+    <ResourcePage
+      ref="view"
+      title="角色权限"
+      endpoint="roles"
+      :fields="fields"
+      :columns="[
+        { title: '编码', dataIndex: 'code' },
+        { title: '名称', dataIndex: 'name' },
+        { title: '范围', dataIndex: 'scopeType' },
+        { title: '状态', dataIndex: 'status' },
+      ]"
+      write-code="roles:write"
+      :prepare="prepare"
+    >
+      <template #actions="{ row }">
+        <Button type="link" @click="open(row)">配置权限</Button>
+      </template>
+    </ResourcePage>
+    <Modal
+      wrap-class-name="gym-dialog"
+      v-model:open="visible"
+      title="权限配置"
+      :width="760"
+      @ok="save"
+    >
+      <CheckboxGroup
+        v-model:value="codes"
+        :options="
+          permissions
+            .filter((p) => p.scopes.includes(current?.scopeType))
+            .map((p) => ({ label: p.name, value: p.code }))
+        "
+      />
+    </Modal>
+  </div>
 </template>

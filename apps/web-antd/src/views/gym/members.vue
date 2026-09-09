@@ -10,7 +10,6 @@ import {
   Descriptions,
   DescriptionsItem,
   Modal,
-  Select,
   Table,
   TabPane,
   Tabs,
@@ -51,94 +50,91 @@ async function open(row: GymRow) {
 }
 </script>
 <template>
-  <ResourcePage
-    title="会员管理"
-    endpoint="members"
-    :fields="fields"
-    :columns="[
-      { title: '会员号', dataIndex: 'memberNo' },
-      { title: '姓名', dataIndex: 'name' },
-      { title: '手机号', dataIndex: 'phone' },
-      { title: '门店', dataIndex: 'storeNames' },
-      { title: '阶段', dataIndex: 'customerStage' },
-      { title: '建档时间', dataIndex: 'registeredAt' },
-    ]"
-    write-code="members:write"
-    store-filter
-    time-filter
-  >
-    <template #filters="{ filters, search }">
-      <Select
-        v-model:value="filters.cardExpiresWithinDays"
-        placeholder="会员卡到期"
-        allow-clear
-        :options="[
-          { label: '7天内卡到期', value: 7 },
-          { label: '30天内卡到期', value: 30 },
-        ]"
-        style="min-width: 160px"
-        @change="search"
-      />
-      <Select
-        v-model:value="filters.courseExpiresWithinDays"
-        placeholder="私教到期"
-        allow-clear
-        :options="[
-          { label: '7天内课程到期', value: 7 },
-          { label: '30天内课程到期', value: 30 },
-        ]"
-        style="min-width: 160px"
-        @change="search"
-      />
-      <Select
-        v-model:value="filters.hasPersonalTraining"
-        placeholder="私教会员"
-        allow-clear
-        :options="[{ label: '持有私教课程', value: 'true' }]"
-        style="min-width: 160px"
-        @change="search"
-      />
-    </template>
-    <template #actions="{ row }">
-      <Button type="link" @click="open(row)">会员详情</Button>
-    </template>
-  </ResourcePage>
-  <Modal
-    v-model:open="visible"
-    :title="detail?.name"
-    :footer="null"
-    :width="900"
-  >
-    <Descriptions bordered :column="2">
-      <DescriptionsItem label="手机号">{{ detail?.phone }}</DescriptionsItem><DescriptionsItem label="所属门店">
-        {{ detail?.stores?.map((s: GymRow) => s.name).join('、') }}
-      </DescriptionsItem>
-    </Descriptions>
-    <Tabs>
-      <TabPane key="cards" tab="会员卡">
-        <Table
-          :data-source="detail?.cards"
-          row-key="id"
-          :columns="[
-            { title: '卡号', dataIndex: 'cardNo' },
-            { title: '卡种', dataIndex: 'name' },
-            { title: '发卡前缀', dataIndex: 'displayPrefix' },
-            { title: '到期时间', dataIndex: 'expiresAt' },
-            { title: '剩余次数', dataIndex: 'remainingUses' },
-            { title: '状态', dataIndex: 'status' },
-          ]"
-        />
+  <div class="gym-view">
+    <ResourcePage
+      title="会员管理"
+      endpoint="members"
+      :fields="fields"
+      :columns="[
+        { title: '会员号', dataIndex: 'memberNo' },
+        { title: '姓名', dataIndex: 'name' },
+        { title: '手机号', dataIndex: 'phone' },
+        { title: '门店', dataIndex: 'storeNames' },
+        { title: '阶段', dataIndex: 'customerStage' },
+        { title: '建档时间', dataIndex: 'registeredAt' },
+      ]"
+      write-code="members:write"
+      store-filter
+      time-filter
+      :filter-fields="[
+        {
+          key: 'cardExpiresWithinDays',
+          label: '会员卡到期',
+          type: 'select',
+          options: [
+            { label: '7天内卡到期', value: 7 },
+            { label: '30天内卡到期', value: 30 },
+          ],
+        },
+        {
+          key: 'courseExpiresWithinDays',
+          label: '私教到期',
+          type: 'select',
+          options: [
+            { label: '7天内课程到期', value: 7 },
+            { label: '30天内课程到期', value: 30 },
+          ],
+        },
+        {
+          key: 'hasPersonalTraining',
+          label: '私教会员',
+          type: 'select',
+          options: [{ label: '持有私教课程', value: 'true' }],
+        },
+      ]"
+    >
+      <template #actions="{ row }">
+        <Button type="link" @click="open(row)">会员详情</Button>
+      </template>
+    </ResourcePage>
+    <Modal
+      wrap-class-name="gym-dialog"
+      v-model:open="visible"
+      :title="detail?.name"
+      :footer="null"
+      :width="900"
+    >
+      <Descriptions bordered :column="2">
+        <DescriptionsItem label="手机号">{{ detail?.phone }}</DescriptionsItem><DescriptionsItem label="所属门店">
+          {{ detail?.stores?.map((s: GymRow) => s.name).join('、') }}
+        </DescriptionsItem>
+      </Descriptions>
+      <Tabs>
+        <TabPane key="cards" tab="会员卡">
+          <Table
+            :data-source="detail?.cards"
+            row-key="id"
+            :columns="[
+              { title: '卡号', dataIndex: 'cardNo' },
+              { title: '卡种', dataIndex: 'name' },
+              { title: '发卡前缀', dataIndex: 'displayPrefix' },
+              { title: '到期时间', dataIndex: 'expiresAt' },
+              { title: '剩余次数', dataIndex: 'remainingUses' },
+              { title: '状态', dataIndex: 'status' },
+            ]"
+          />
 </TabPane><TabPane key="courses" tab="私教权益">
-        <Table
-          :data-source="detail?.coursePacks"
-          row-key="id"
-          :columns="[
-            { title: '产品', dataIndex: 'name' },
-            { title: '剩余课时', dataIndex: 'remainingSessions' },
-            { title: '到期时间', dataIndex: 'expiresAt' },
-          ]"
-        />
-      </TabPane>
-    </Tabs>
-  </Modal>
+          <Table
+            :data-source="detail?.coursePacks"
+            row-key="id"
+            :columns="[
+              { title: '产品', dataIndex: 'name' },
+              { title: '剩余课时', dataIndex: 'remainingSessions' },
+              { title: '到期时间', dataIndex: 'expiresAt' },
+            ]"
+          />
+        </TabPane>
+      </Tabs>
+    </Modal>
+  </div>
 </template>

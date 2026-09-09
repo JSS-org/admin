@@ -5,8 +5,6 @@ import type { GymRow } from '#/api/gym';
 
 import { computed, onMounted, ref } from 'vue';
 
-import { Page } from '@vben/common-ui';
-
 import {
   Alert,
   Button,
@@ -24,6 +22,8 @@ import {
 
 import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 
+import Page from './components/admin-page.vue';
+import FilterBar from './components/filter-bar.vue';
 import ResourcePage from './components/resource-page.vue';
 
 const props = defineProps<{ resource: string }>();
@@ -284,270 +284,295 @@ async function saveCover() {
     await page.value?.load();
   }
 }
+const scopeFilter = computed({
+  get: () => ({ storeId: storeId.value, platform: platform.value }),
+  set: (value: Record<string, any>) => {
+    storeId.value = value.storeId;
+    platform.value = value.platform;
+  },
+});
 </script>
 <template>
-  <Page v-if="isSettings" :title="title">
-    <Alert
-      type="info"
-      message="当前仅管理展示资料，尚未提供小程序/App前台服务。"
-      class="mb-4"
-    />
-    <Space v-if="resource === 'client-settings'" class="mb-4">
-      <Select
-        v-model:value="platform"
-        :options="[
-          { label: '小程序', value: 'miniapp' },
-          { label: 'App', value: 'app' },
-        ]"
-        style="min-width: 120px"
-        @change="load"
-      /><Select
-        v-model:value="storeId"
-        :options="stores.map((s) => ({ label: s.name, value: s.id }))"
-        placeholder="总部默认配置"
-        allow-clear
-        style="min-width: 220px"
-        @change="load"
+  <div class="gym-view">
+    <Page v-if="isSettings" :title="title">
+      <Alert
+        type="info"
+        message="当前仅管理展示资料，尚未提供小程序/App前台服务。"
+        class="mb-4"
       />
-    </Space>
-    <Form layout="vertical">
-      <template v-if="resource === 'client-settings'">
-        <FormItem label="展示名称">
-          <Input v-model:value="data.systemName" />
-</FormItem><FormItem label="应用ID"><Input v-model:value="data.appId" /></FormItem><FormItem label="欢迎文字">
-          <Input.TextArea v-model:value="data.welcomeText" />
+      <FilterBar
+        v-if="resource === 'client-settings'"
+        v-model="scopeFilter"
+        :keyword="false"
+        immediate
+        :fields="[
+          {
+            key: 'platform',
+            label: '展示平台',
+            type: 'select',
+            clearable: false,
+            options: [
+              { label: '小程序', value: 'miniapp' },
+              { label: 'App', value: 'app' },
+            ],
+          },
+          {
+            key: 'storeId',
+            label: '配置门店',
+            type: 'select',
+            placeholder: '总部默认配置',
+            options: stores.map((s) => ({ label: s.name, value: s.id })),
+          },
+        ]"
+        @search="load"
+      />
+      <Form layout="vertical">
+        <template v-if="resource === 'client-settings'">
+          <FormItem label="展示名称">
+            <Input v-model:value="data.systemName" />
+</FormItem><FormItem label="应用ID">
+            <Input v-model:value="data.appId" />
+</FormItem><FormItem label="欢迎文字">
+            <Input.TextArea v-model:value="data.welcomeText" />
 </FormItem><FormItem label="客服信息">
-          <Input v-model:value="data.customerService" />
+            <Input v-model:value="data.customerService" />
 </FormItem><FormItem label="App下载链接">
-          <Input v-model:value="data.appDownloadUrl" />
+            <Input v-model:value="data.appDownloadUrl" />
 </FormItem><FormItem label="封面">
-          <Upload
-            :before-upload="(file) => upload(file, data, 'coverFileId')"
-            :show-upload-list="false"
-            accept=".png,.jpg,.jpeg"
-          >
-            <Button>上传封面</Button>
-</Upload><Button
-            v-if="data.coverFileId"
-            type="link"
-            @click="openGymFile(data.coverFileId)"
-          >
-            查看封面
-          </Button>
-</FormItem><Checkbox v-model:checked="data.enabled">启用展示</Checkbox>
-        <div v-for="(block, index) in data.blocks" :key="index" class="my-4">
-          <Space wrap>
-            <Select
-              v-model:value="block.blockType"
-              :options="[
-                { label: '文字', value: 'text' },
-                { label: '图片', value: 'banner' },
-                { label: '视频', value: 'video' },
-                { label: '链接', value: 'link' },
-              ]"
-              style="min-width: 120px"
-            /><Input v-model:value="block.title" placeholder="标题" /><Checkbox
-              v-model:checked="block.enabled"
-            >
-              启用
-</Checkbox><Button @click="data.blocks.splice(index, 1)">
-              移除区块
-            </Button>
-</Space><Input.TextArea
-            v-model:value="block.body"
-            placeholder="内容"
-            class="my-2"
-          /><Input
-            v-model:value="block.linkUrl"
-            placeholder="跳转链接（链接区块必填）"
-          /><Space class="my-2">
             <Upload
-              :before-upload="(file) => upload(file, block, 'fileId')"
+              :before-upload="(file) => upload(file, data, 'coverFileId')"
+              :show-upload-list="false"
+              accept=".png,.jpg,.jpeg"
+            >
+              <Button>上传封面</Button>
+</Upload><Button
+              v-if="data.coverFileId"
+              type="link"
+              @click="openGymFile(data.coverFileId)"
+            >
+              查看封面
+            </Button>
+</FormItem><Checkbox v-model:checked="data.enabled">启用展示</Checkbox>
+          <div v-for="(block, index) in data.blocks" :key="index" class="my-4">
+            <Space wrap>
+              <Select
+                v-model:value="block.blockType"
+                :options="[
+                  { label: '文字', value: 'text' },
+                  { label: '图片', value: 'banner' },
+                  { label: '视频', value: 'video' },
+                  { label: '链接', value: 'link' },
+                ]"
+                style="min-width: 120px"
+              /><Input
+                v-model:value="block.title"
+                placeholder="标题"
+              /><Checkbox v-model:checked="block.enabled"> 启用 </Checkbox><Button @click="data.blocks.splice(index, 1)">
+                移除区块
+              </Button>
+</Space><Input.TextArea
+              v-model:value="block.body"
+              placeholder="内容"
+              class="my-2"
+            /><Input
+              v-model:value="block.linkUrl"
+              placeholder="跳转链接（链接区块必填）"
+            /><Space class="my-2">
+              <Upload
+                :before-upload="(file) => upload(file, block, 'fileId')"
+                :show-upload-list="false"
+                accept=".png,.jpg,.jpeg,.mp4"
+              >
+                <Button>上传图片/视频</Button>
+</Upload><Button v-if="block.fileId" @click="openGymFile(block.fileId)">
+                查看媒体
+              </Button>
+            </Space>
+          </div>
+          <Button
+            class="my-3"
+            @click="
+              data.blocks.push({
+                blockType: 'text',
+                title: '',
+                body: '',
+                enabled: true,
+              })
+            "
+          >
+            增加内容区块
+          </Button>
+        </template>
+        <template v-else>
+          <FormItem label="品牌名称">
+            <Input v-model:value="data.name" />
+</FormItem><FormItem label="品牌介绍">
+            <Input.TextArea v-model:value="data.introduction" />
+</FormItem><FormItem label="联系电话">
+            <Input v-model:value="data.contactPhone" />
+</FormItem><FormItem label="发布状态">
+            <Select
+              v-model:value="data.status"
+              :options="[
+                { label: '草稿', value: 'draft' },
+                { label: '发布（三种模型均需图片/视频）', value: 'published' },
+              ]"
+            />
+</FormItem><FormItem label="品牌标志">
+            <Upload
+              :before-upload="(file) => upload(file, data, 'logoFileId')"
+              :show-upload-list="false"
+              accept=".png,.jpg,.jpeg"
+            >
+              <Button>上传标志</Button>
+            </Upload>
+          </FormItem>
+          <div v-for="(model, index) in data.models" :key="index" class="my-4">
+            <Space wrap>
+              <FormItem label="模型编号">
+                <Input v-model:value="model.modelCode" />
+</FormItem><FormItem label="模型名称">
+                <Input v-model:value="model.name" />
+</FormItem><FormItem label="面积（㎡）">
+                <Input v-model:value="model.areaSqm" />
+</FormItem><Button @click="data.models.splice(index, 1)">
+                移除模型
+              </Button>
+</Space><FormItem label="模型说明">
+              <Input.TextArea v-model:value="model.description" />
+</FormItem><FormItem label="投资说明">
+              <Input.TextArea
+                v-model:value="model.investmentDescription"
+              />
+</FormItem><Upload
+              :before-upload="(file) => upload(file, model, 'fileIds', true)"
               :show-upload-list="false"
               accept=".png,.jpg,.jpeg,.mp4"
             >
-              <Button>上传图片/视频</Button>
-</Upload><Button v-if="block.fileId" @click="openGymFile(block.fileId)">
-              查看媒体
-            </Button>
-          </Space>
-        </div>
-        <Button
-          class="my-3"
-          @click="
-            data.blocks.push({
-              blockType: 'text',
-              title: '',
-              body: '',
-              enabled: true,
-            })
-          "
-        >
-          增加内容区块
-        </Button>
-      </template>
-      <template v-else>
-        <FormItem label="品牌名称"><Input v-model:value="data.name" /></FormItem><FormItem label="品牌介绍">
-          <Input.TextArea v-model:value="data.introduction" />
-</FormItem><FormItem label="联系电话">
-          <Input v-model:value="data.contactPhone" />
-</FormItem><FormItem label="发布状态">
-          <Select
-            v-model:value="data.status"
-            :options="[
-              { label: '草稿', value: 'draft' },
-              { label: '发布（三种模型均需图片/视频）', value: 'published' },
-            ]"
-          />
-</FormItem><FormItem label="品牌标志">
-          <Upload
-            :before-upload="(file) => upload(file, data, 'logoFileId')"
-            :show-upload-list="false"
-            accept=".png,.jpg,.jpeg"
-          >
-            <Button>上传标志</Button>
-          </Upload>
-        </FormItem>
-        <div v-for="(model, index) in data.models" :key="index" class="my-4">
-          <Space wrap>
-            <FormItem label="模型编号">
-              <Input v-model:value="model.modelCode" />
-</FormItem><FormItem label="模型名称">
-              <Input v-model:value="model.name" />
-</FormItem><FormItem label="面积（㎡）">
-              <Input v-model:value="model.areaSqm" />
-</FormItem><Button @click="data.models.splice(index, 1)">
-              移除模型
-            </Button>
-</Space><FormItem label="模型说明">
-            <Input.TextArea v-model:value="model.description" />
-</FormItem><FormItem label="投资说明">
-            <Input.TextArea
-              v-model:value="model.investmentDescription"
-            />
-</FormItem><Upload
-            :before-upload="(file) => upload(file, model, 'fileIds', true)"
-            :show-upload-list="false"
-            accept=".png,.jpg,.jpeg,.mp4"
-          >
-            <Button>上传立体图 / 视频</Button>
+              <Button>上传立体图 / 视频</Button>
 </Upload><Space
-            v-for="(fileId, fileIndex) in model.fileIds"
-            :key="fileId"
-            class="my-2"
+              v-for="(fileId, fileIndex) in model.fileIds"
+              :key="fileId"
+              class="my-2"
+            >
+              <Button type="link" @click="openGymFile(fileId)">
+                视图 {{ Number(fileIndex) + 1 }}
+</Button><Button @click="model.fileIds.splice(fileIndex, 1)">
+                移除
+              </Button>
+            </Space>
+          </div>
+          <Button
+            v-if="data.models.length < 3"
+            class="my-3"
+            @click="data.models.push({ modelCode: '', name: '', fileIds: [] })"
           >
-            <Button type="link" @click="openGymFile(fileId)">
-              视图 {{ Number(fileIndex) + 1 }}
-</Button><Button @click="model.fileIds.splice(fileIndex, 1)"> 移除 </Button>
-          </Space>
-        </div>
-        <Button
-          v-if="data.models.length < 3"
-          class="my-3"
-          @click="data.models.push({ modelCode: '', name: '', fileIds: [] })"
-        >
-          增加模型
-        </Button>
-      </template>
-      <FormItem>
-        <Button type="primary" :loading="busy" @click="save"> 保存配置 </Button>
-      </FormItem>
-    </Form>
-  </Page>
-  <ResourcePage
-    v-else
-    ref="page"
-    :key="resource"
-    :title="title"
-    :endpoint="resource"
-    :fields="fields"
-    :columns="columns"
-    :write-code="
-      resource === 'activities'
-        ? 'activities:manage'
-        : resource === 'franchise-inquiries'
-          ? 'franchise:manage'
-          : undefined
-    "
-    :create="resource === 'activities'"
-    :edit="['activities', 'franchise-inquiries'].includes(resource)"
-    :prepare="prepare"
-    :initial="initial"
-    :store-filter="resource !== 'franchise-inquiries'"
-    time-filter
-  >
-    <template #summary>
-      <Alert
-        v-if="summary"
-        type="info"
-        class="mb-4"
-        :message="`授权门店全部评价 ${summary.reviewCount} 条，平均 ${summary.averageRating} 分，匿名反馈 ${summary.feedbackCount} 条`"
-      />
-    </template>
-    <template #actions="{ row, reload }">
-      <template v-if="resource === 'activities'">
-        <Button type="link" @click="detail(row)">报名记录</Button><template v-if="canGym('activities:manage')">
-          <Button type="link" @click="cover(row)">封面</Button><Button
-            type="link"
-            @click="
-              async () => {
-                await gymApi.patch(`activities/${row.id}`, {
-                  status: 'published',
-                });
-                await reload();
-              }
-            "
-          >
-            发布
-</Button><Button
-            type="link"
-            @click="
-              async () => {
-                await gymApi.patch(`activities/${row.id}`, {
-                  status: 'cancelled',
-                });
-                await reload();
-              }
-            "
-          >
-            取消活动
+            增加模型
           </Button>
         </template>
-      </template>
-    </template>
-  </ResourcePage>
-  <Modal
-    v-model:open="visible"
-    title="活动资料"
-    :footer="mode === 'cover' ? undefined : null"
-    @ok="saveCover"
-  >
-    <template v-if="mode === 'cover' && current">
-      <Upload
-        :before-upload="
-          (file) => (current ? upload(file, current, 'coverFileId') : false)
-        "
-        :show-upload-list="false"
-        accept=".png,.jpg,.jpeg"
-      >
-        <Button>上传活动封面</Button>
-</Upload><Button
-        v-if="current.coverFileId"
-        type="link"
-        @click="openGymFile(current.coverFileId)"
-      >
-        查看封面
-      </Button>
-</template><Table
+        <FormItem>
+          <Button type="primary" :loading="busy" @click="save">
+            保存配置
+          </Button>
+        </FormItem>
+      </Form>
+    </Page>
+    <ResourcePage
       v-else
-      :data-source="registrations"
-      row-key="id"
-      :columns="[
-        { title: '会员', dataIndex: 'memberName' },
-        { title: '门店', dataIndex: 'storeName' },
-        { title: '状态', dataIndex: 'status' },
-        { title: '报名时间', dataIndex: 'registeredAt' },
-      ]"
-    />
-  </Modal>
+      ref="page"
+      :key="resource"
+      :title="title"
+      :endpoint="resource"
+      :fields="fields"
+      :columns="columns"
+      :write-code="
+        resource === 'activities'
+          ? 'activities:manage'
+          : resource === 'franchise-inquiries'
+            ? 'franchise:manage'
+            : undefined
+      "
+      :create="resource === 'activities'"
+      :edit="['activities', 'franchise-inquiries'].includes(resource)"
+      :prepare="prepare"
+      :initial="initial"
+      :store-filter="resource !== 'franchise-inquiries'"
+      time-filter
+    >
+      <template #summary>
+        <Alert
+          v-if="summary"
+          type="info"
+          class="mb-4"
+          :message="`授权门店全部评价 ${summary.reviewCount} 条，平均 ${summary.averageRating} 分，匿名反馈 ${summary.feedbackCount} 条`"
+        />
+      </template>
+      <template v-if="resource === 'activities'" #actions="{ row, reload }">
+        <template v-if="resource === 'activities'">
+          <Button type="link" @click="detail(row)">报名记录</Button><template v-if="canGym('activities:manage')">
+            <Button type="link" @click="cover(row)">封面</Button><Button
+              type="link"
+              @click="
+                async () => {
+                  await gymApi.patch(`activities/${row.id}`, {
+                    status: 'published',
+                  });
+                  await reload();
+                }
+              "
+            >
+              发布
+</Button><Button
+              type="link"
+              @click="
+                async () => {
+                  await gymApi.patch(`activities/${row.id}`, {
+                    status: 'cancelled',
+                  });
+                  await reload();
+                }
+              "
+            >
+              取消活动
+            </Button>
+          </template>
+        </template>
+      </template>
+    </ResourcePage>
+    <Modal
+      wrap-class-name="gym-dialog"
+      v-model:open="visible"
+      title="活动资料"
+      :footer="mode === 'cover' ? undefined : null"
+      @ok="saveCover"
+    >
+      <template v-if="mode === 'cover' && current">
+        <Upload
+          :before-upload="
+            (file) => (current ? upload(file, current, 'coverFileId') : false)
+          "
+          :show-upload-list="false"
+          accept=".png,.jpg,.jpeg"
+        >
+          <Button>上传活动封面</Button>
+</Upload><Button
+          v-if="current.coverFileId"
+          type="link"
+          @click="openGymFile(current.coverFileId)"
+        >
+          查看封面
+        </Button>
+</template><Table
+        v-else
+        :data-source="registrations"
+        row-key="id"
+        :columns="[
+          { title: '会员', dataIndex: 'memberName' },
+          { title: '门店', dataIndex: 'storeName' },
+          { title: '状态', dataIndex: 'status' },
+          { title: '报名时间', dataIndex: 'registeredAt' },
+        ]"
+      />
+    </Modal>
+  </div>
 </template>

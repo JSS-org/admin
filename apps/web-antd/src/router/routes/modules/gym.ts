@@ -177,4 +177,135 @@ const routes: RouteRecordRaw[] = [
     ],
   },
 ];
-export default routes;
+const pages = routes[0]?.children ?? [];
+const groups: [string, string, string, string[]][] = [
+  [
+    'organization',
+    '门店与员工',
+    'lucide:building-2',
+    ['stores', 'employees', 'roles'],
+  ],
+  [
+    'membership',
+    '会员与卡种',
+    'lucide:users',
+    ['members', 'cards', 'blacklists'],
+  ],
+  [
+    'training',
+    '课程与到店',
+    'lucide:calendar-days',
+    [
+      'course-products',
+      'course-sessions',
+      'bookings',
+      'checkins',
+      'lesson-records',
+      'body-measurements',
+      'qr-codes',
+    ],
+  ],
+  [
+    'governance',
+    '合同与审批',
+    'lucide:file-check',
+    ['contract-templates', 'contracts', 'approval-templates', 'approvals'],
+  ],
+  ['hardware', '设备管理', 'lucide:door-open', ['devices', 'equipment']],
+  [
+    'sales',
+    '售卡与报表',
+    'lucide:clipboard-list',
+    [
+      'settings',
+      'self-service-card-orders',
+      'subscriptions',
+      'verifications',
+      'reports/performance',
+      'reports/members',
+      'reports/member-cards',
+    ],
+  ],
+  [
+    'coupons',
+    '优惠券与通知',
+    'lucide:ticket',
+    [
+      'coupon-templates',
+      'coupon-store-quotas',
+      'coupon-quota-batches',
+      'coupon-batches',
+      'coupon-quota-ledger',
+      'member-coupons',
+      'gift-code-batches',
+      'message-batches',
+    ],
+  ],
+  [
+    'points',
+    '积分管理',
+    'lucide:coins',
+    ['point-rules', 'point-products', 'point-ledger', 'point-redemptions'],
+  ],
+  [
+    'content',
+    '内容与活动',
+    'lucide:megaphone',
+    [
+      'client-settings',
+      'activities',
+      'franchise-brand',
+      'franchise-inquiries',
+      'reviews',
+      'feedback',
+    ],
+  ],
+  [
+    'finance',
+    '财务与薪资',
+    'lucide:wallet',
+    [
+      'payment-accounts',
+      'settlement-rules',
+      'settlements',
+      'salary-templates',
+      'employee-salary-assignments',
+      'payrolls',
+    ],
+  ],
+];
+const groupedRoutes: RouteRecordRaw[] = groups.map(
+  ([key, title, icon, paths], order): RouteRecordRaw => ({
+    name: `GymGroup-${key}`,
+    path: `/gym/${key}`,
+    meta: {
+      title,
+      icon,
+      order,
+      authority: paths.some((path) =>
+        pages
+          .find((page) => page.path === path)
+          ?.meta?.authority?.includes('store'),
+      )
+        ? ['hq', 'store']
+        : ['hq'],
+    },
+    children: paths.flatMap<RouteRecordRaw>((path, index) => {
+      const page = pages.find((page) => page.path === path);
+      return page
+        ? [
+            {
+              ...page,
+              path: `/gym/${path}`,
+              meta: {
+                ...page.meta,
+                title: page.meta?.title ?? path,
+                order: index,
+              },
+            },
+          ]
+        : [];
+    }),
+  }),
+);
+export default groupedRoutes;

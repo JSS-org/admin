@@ -3,8 +3,6 @@ import type { GymRow } from '#/api/gym';
 
 import { computed, onMounted, ref } from 'vue';
 
-import { Page } from '@vben/common-ui';
-
 import {
   Alert,
   Button,
@@ -26,6 +24,8 @@ import {
 
 import { gymApi } from '#/api/gym';
 
+import Page from './components/admin-page.vue';
+import FilterBar from './components/filter-bar.vue';
 import ResourcePage from './components/resource-page.vue';
 
 const props = defineProps<{ resource: string }>();
@@ -224,228 +224,254 @@ async function saveSettings() {
     busy.value = false;
   }
 }
+const scopeFilter = computed({
+  get: () => ({ storeId: storeId.value }),
+  set: (value: Record<string, any>) => {
+    storeId.value = value.storeId;
+  },
+});
 </script>
 <template>
-  <Page v-if="resource === 'settings'" title="在线售卡与核销设置">
-    <Alert
-      type="info"
-      message="当前为Mock配置，不会向支付渠道发起扣款。"
-      class="mb-4"
-    />
-    <Select
-      v-model:value="storeId"
-      :options="stores.map((s) => ({ label: s.name, value: s.id }))"
-      style="min-width: 220px"
-      @change="loadSettings"
-    />
-    <Tabs v-model:active-key="tab" @change="loadSettings">
-<TabPane key="online-sales-settings" tab="在线售卡" /><TabPane
-        key="subscription-settings"
-        tab="连续包月"
-/><TabPane key="verification-settings" tab="自助核销" />
-</Tabs>
-    <Form v-if="storeId" layout="vertical">
-      <FormItem v-if="tab !== 'subscription-settings'" label="功能开关">
-<Checkbox v-model:checked="settings.enabled">启用</Checkbox>
-</FormItem>
-      <FormItem v-if="tab === 'online-sales-settings'" label="合同">
-<Checkbox v-model:checked="settings.contractRequired">
-要求签署合同
-</Checkbox>
-</FormItem>
-      <template v-if="tab === 'verification-settings'">
-<FormItem label="入场要求">
-<Checkbox v-model:checked="settings.requireCheckin">
-核销前须签到
-</Checkbox>
-</FormItem><FormItem label="支持渠道">
-<Select
-            v-model:value="settings.supportedChannels"
-            mode="multiple"
-            :options="[
-              { label: '小程序', value: 'miniapp' },
-              { label: 'App', value: 'app' },
-              { label: '美团', value: 'meituan' },
-              { label: '抖音', value: 'douyin' },
-            ]"
-/>
-</FormItem><Space>
-<FormItem label="允许开始时间">
-<Input
-              v-model:value="settings.allowedStart"
-              type="time"
-/>
-</FormItem><FormItem label="允许结束时间">
-<Input
-              v-model:value="settings.allowedEnd"
-              type="time"
-/>
-</FormItem>
-</Space>
-</template>
-      <template v-else>
-        <div
-          v-for="(item, index) in tab === 'online-sales-settings'
-            ? settings.offers
-            : settings.items"
-          :key="index"
-          class="mb-4"
-        >
-          <Space wrap>
-<FormItem label="卡种">
-<Select
-                v-model:value="item.cardTemplateId"
-                :options="cardOptions"
-                style="min-width: 220px"
-/>
-</FormItem><FormItem label="售价（元）">
-<Input
-                v-if="tab === 'online-sales-settings'"
-                v-model:value="item.salePrice"
-/><Input
-                v-else
-                v-model:value="item.price"
-/>
-</FormItem><Checkbox v-model:checked="item.enabled">启用</Checkbox><Button
-              danger
-              @click="
-                (tab === 'online-sales-settings'
-                  ? settings.offers
-                  : settings.items
-                ).splice(index, 1)
-              "
-              >
-移除
-</Button>
-</Space>
-          <Space v-if="tab === 'subscription-settings'" wrap>
-<FormItem label="每月扣款日（空为授权日）">
-<InputNumber
-                v-model:value="item.billingDay"
-                :min="1"
-                :max="28"
-/>
-</FormItem><FormItem label="提前通知天数">
-<InputNumber
-                v-model:value="item.renewalNoticeDays"
-                :min="0"
-                :max="30"
-/>
-</FormItem><FormItem label="宽限天数">
-<InputNumber
-                v-model:value="item.graceDays"
-                :min="0"
-                :max="30"
-/>
-</FormItem>
-</Space>
-        </div>
-        <Button class="mb-4" @click="addSetting">增加卡种配置</Button>
-      </template>
-      <FormItem>
-<Button type="primary" :loading="busy" @click="saveSettings">
-保存设置
-</Button>
-</FormItem>
-    </Form>
-  </Page>
-  <ResourcePage
-    v-else
-    :key="resource"
-    :title="config.title"
-    :endpoint="resource"
-    :fields="[]"
-    :columns="columns"
-    :create="false"
-    :edit="false"
-    store-filter
-    time-filter
-  >
-    <template #filters="{ filters, search }">
-<Select
-        v-if="resource === 'reports/performance'"
-        v-model:value="filters.groupBy"
-        :options="[
-          { label: '按门店', value: 'store' },
-          { label: '按员工', value: 'employee' },
-        ]"
-        placeholder="按门店"
-        style="min-width: 120px"
-        @change="search"
-    />
-</template>
-    <template #summary="{ data }">
-<Alert
-        v-if="resource === 'reports/performance' && data.summary"
-        class="mb-4"
+  <div class="gym-view">
+    <Page v-if="resource === 'settings'" title="在线售卡与核销设置">
+      <Alert
         type="info"
-        :message="`期间净实收 ${data.summary.netAmount} 元，收款订单 ${data.summary.orderCount} 笔。按支付与退款实际发生时间统计。`"
-    />
-</template>
-    <template #actions="{ row }">
-<Button
-        v-if="['self-service-card-orders', 'subscriptions'].includes(resource)"
-        type="link"
-        @click="details(row)"
-        >
-详情
-</Button>
-</template>
-  </ResourcePage>
-  <Modal v-model:open="visible" title="记录详情" :footer="null" :width="900">
-    <template v-if="current">
-      <Descriptions :column="2" bordered>
-<DescriptionsItem
-          v-for="column in columns"
-          :key="column.dataIndex"
-          :label="column.title"
-          >
-{{ current[column.dataIndex] ?? '—' }}
-</DescriptionsItem>
-</Descriptions>
-      <template v-if="resource === 'self-service-card-orders'">
-<Table
-          :data-source="current.items"
-          row-key="id"
-          :pagination="false"
-          :columns="[
-            { title: '商品', dataIndex: 'productNameSnapshot' },
-            { title: '数量', dataIndex: 'quantity' },
-            { title: '单价', dataIndex: 'unitPrice' },
-            { title: '应付', dataIndex: 'payableAmount' },
-          ]"
-/><Table
-          :data-source="current.payments"
-          row-key="id"
-          :pagination="false"
-          :columns="[
-            { title: '支付金额', dataIndex: 'amount' },
-            { title: '状态', dataIndex: 'status' },
-            { title: '支付时间', dataIndex: 'paidAt' },
-          ]"
-/><Table
-          :data-source="current.refunds"
-          row-key="id"
-          :pagination="false"
-          :columns="[
-            { title: '退款金额', dataIndex: 'amount' },
-            { title: '状态', dataIndex: 'status' },
-            { title: '退款时间', dataIndex: 'refundedAt' },
-          ]"
+        message="当前为Mock配置，不会向支付渠道发起扣款。"
+        class="mb-4"
       />
-</template>
-      <Table
-        v-else
-        :data-source="cycles"
-        row-key="id"
-        :columns="[
-          { title: '周期开始', dataIndex: 'periodStart' },
-          { title: '周期结束', dataIndex: 'periodEnd' },
-          { title: '应付', dataIndex: 'amount' },
-          { title: '结果', dataIndex: 'status' },
-          { title: '扣款时间', dataIndex: 'chargedAt' },
+      <FilterBar
+        v-model="scopeFilter"
+        :keyword="false"
+        immediate
+        :fields="[
+          {
+            key: 'storeId',
+            label: '配置门店',
+            type: 'select',
+            clearable: false,
+            options: stores.map((s) => ({ label: s.name, value: s.id })),
+          },
         ]"
+        @search="loadSettings"
       />
-    </template>
-  </Modal>
+      <Tabs v-model:active-key="tab" @change="loadSettings">
+        <TabPane key="online-sales-settings" tab="在线售卡" /><TabPane
+          key="subscription-settings"
+          tab="连续包月"
+        /><TabPane key="verification-settings" tab="自助核销" />
+      </Tabs>
+      <Form v-if="storeId" layout="vertical">
+        <FormItem v-if="tab !== 'subscription-settings'" label="功能开关">
+          <Checkbox v-model:checked="settings.enabled">启用</Checkbox>
+        </FormItem>
+        <FormItem v-if="tab === 'online-sales-settings'" label="合同">
+          <Checkbox v-model:checked="settings.contractRequired">
+            要求签署合同
+          </Checkbox>
+        </FormItem>
+        <template v-if="tab === 'verification-settings'">
+          <FormItem label="入场要求">
+            <Checkbox v-model:checked="settings.requireCheckin">
+              核销前须签到
+            </Checkbox>
+</FormItem><FormItem label="支持渠道">
+            <Select
+              v-model:value="settings.supportedChannels"
+              mode="multiple"
+              :options="[
+                { label: '小程序', value: 'miniapp' },
+                { label: 'App', value: 'app' },
+                { label: '美团', value: 'meituan' },
+                { label: '抖音', value: 'douyin' },
+              ]"
+            />
+</FormItem><Space>
+            <FormItem label="允许开始时间">
+              <Input
+                v-model:value="settings.allowedStart"
+                type="time"
+              />
+</FormItem><FormItem label="允许结束时间">
+              <Input v-model:value="settings.allowedEnd" type="time" />
+            </FormItem>
+          </Space>
+        </template>
+        <template v-else>
+          <div
+            v-for="(item, index) in tab === 'online-sales-settings'
+              ? settings.offers
+              : settings.items"
+            :key="index"
+            class="mb-4"
+          >
+            <Space wrap>
+              <FormItem label="卡种">
+                <Select
+                  v-model:value="item.cardTemplateId"
+                  :options="cardOptions"
+                  style="min-width: 220px"
+                />
+</FormItem><FormItem label="售价（元）">
+                <Input
+                  v-if="tab === 'online-sales-settings'"
+                  v-model:value="item.salePrice"
+                /><Input v-else v-model:value="item.price" />
+</FormItem><Checkbox v-model:checked="item.enabled">启用</Checkbox><Button
+                danger
+                @click="
+                  (tab === 'online-sales-settings'
+                    ? settings.offers
+                    : settings.items
+                  ).splice(index, 1)
+                "
+              >
+                移除
+              </Button>
+            </Space>
+            <Space v-if="tab === 'subscription-settings'" wrap>
+              <FormItem label="每月扣款日（空为授权日）">
+                <InputNumber
+                  v-model:value="item.billingDay"
+                  :min="1"
+                  :max="28"
+                />
+</FormItem><FormItem label="提前通知天数">
+                <InputNumber
+                  v-model:value="item.renewalNoticeDays"
+                  :min="0"
+                  :max="30"
+                />
+</FormItem><FormItem label="宽限天数">
+                <InputNumber
+                  v-model:value="item.graceDays"
+                  :min="0"
+                  :max="30"
+                />
+              </FormItem>
+            </Space>
+          </div>
+          <Button class="mb-4" @click="addSetting">增加卡种配置</Button>
+        </template>
+        <FormItem>
+          <Button type="primary" :loading="busy" @click="saveSettings">
+            保存设置
+          </Button>
+        </FormItem>
+      </Form>
+    </Page>
+    <ResourcePage
+      v-else
+      :key="resource"
+      :title="config.title"
+      :endpoint="resource"
+      :fields="[]"
+      :columns="columns"
+      :create="false"
+      :edit="false"
+      store-filter
+      time-filter
+      :keyword-filter="!resource.startsWith('reports/')"
+      :filter-fields="
+        resource === 'reports/performance'
+          ? [
+              {
+                key: 'groupBy',
+                label: '汇总方式',
+                type: 'select',
+                placeholder: '按门店',
+                options: [
+                  { label: '按门店', value: 'store' },
+                  { label: '按员工', value: 'employee' },
+                ],
+              },
+            ]
+          : []
+      "
+    >
+      <template #summary="{ data }">
+        <Alert
+          v-if="resource === 'reports/performance' && data.summary"
+          class="mb-4"
+          type="info"
+          :message="`期间净实收 ${data.summary.netAmount} 元，收款订单 ${data.summary.orderCount} 笔。按支付与退款实际发生时间统计。`"
+        />
+      </template>
+      <template
+        v-if="['self-service-card-orders', 'subscriptions'].includes(resource)"
+        #actions="{ row }"
+      >
+        <Button
+          v-if="
+            ['self-service-card-orders', 'subscriptions'].includes(resource)
+          "
+          type="link"
+          @click="details(row)"
+        >
+          详情
+        </Button>
+      </template>
+    </ResourcePage>
+    <Modal
+      wrap-class-name="gym-dialog"
+      v-model:open="visible"
+      title="记录详情"
+      :footer="null"
+      :width="900"
+    >
+      <template v-if="current">
+        <Descriptions :column="2" bordered>
+          <DescriptionsItem
+            v-for="column in columns"
+            :key="column.dataIndex"
+            :label="column.title"
+          >
+            {{ current[column.dataIndex] ?? '—' }}
+          </DescriptionsItem>
+        </Descriptions>
+        <template v-if="resource === 'self-service-card-orders'">
+          <Table
+            :data-source="current.items"
+            row-key="id"
+            :pagination="false"
+            :columns="[
+              { title: '商品', dataIndex: 'productNameSnapshot' },
+              { title: '数量', dataIndex: 'quantity' },
+              { title: '单价', dataIndex: 'unitPrice' },
+              { title: '应付', dataIndex: 'payableAmount' },
+            ]"
+          /><Table
+            :data-source="current.payments"
+            row-key="id"
+            :pagination="false"
+            :columns="[
+              { title: '支付金额', dataIndex: 'amount' },
+              { title: '状态', dataIndex: 'status' },
+              { title: '支付时间', dataIndex: 'paidAt' },
+            ]"
+          /><Table
+            :data-source="current.refunds"
+            row-key="id"
+            :pagination="false"
+            :columns="[
+              { title: '退款金额', dataIndex: 'amount' },
+              { title: '状态', dataIndex: 'status' },
+              { title: '退款时间', dataIndex: 'refundedAt' },
+            ]"
+          />
+        </template>
+        <Table
+          v-else
+          :data-source="cycles"
+          row-key="id"
+          :columns="[
+            { title: '周期开始', dataIndex: 'periodStart' },
+            { title: '周期结束', dataIndex: 'periodEnd' },
+            { title: '应付', dataIndex: 'amount' },
+            { title: '结果', dataIndex: 'status' },
+            { title: '扣款时间', dataIndex: 'chargedAt' },
+          ]"
+        />
+      </template>
+    </Modal>
+  </div>
 </template>

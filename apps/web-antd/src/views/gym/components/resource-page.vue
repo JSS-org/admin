@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import type { FilterField } from './filter-bar.vue';
+
 import type { GymRow } from '#/api/gym';
 
-import { computed, reactive, ref, watch } from 'vue';
-
-import { Page } from '@vben/common-ui';
+import {
+  computed,
+  getCurrentInstance,
+  reactive,
+  ref,
+  useSlots,
+  watch,
+} from 'vue';
 
 import {
   Alert,
@@ -21,6 +28,9 @@ import {
 } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
+
+import Page from './admin-page.vue';
+import FilterBar from './filter-bar.vue';
 
 export interface Field {
   key: string;
@@ -53,6 +63,8 @@ const props = withDefaults(
     edit?: boolean;
     storeFilter?: boolean;
     timeFilter?: boolean;
+    keywordFilter?: boolean;
+    filterFields?: FilterField[];
     idempotent?: boolean;
     prepare?: (
       values: Record<string, any>,
@@ -62,6 +74,8 @@ const props = withDefaults(
     editable?: (row: GymRow) => boolean;
   }>(),
   {
+    keywordFilter: true,
+    filterFields: () => [],
     create: true,
     edit: true,
     writeCode: undefined,
@@ -75,6 +89,8 @@ const emit = defineEmits<{
   detail: [row: GymRow];
   saved: [row: GymRow];
 }>();
+const slots = useSlots();
+const instance = getCurrentInstance();
 let requestKey = '';
 const items = ref<GymRow[]>([]);
 const total = ref(0);
@@ -83,7 +99,7 @@ const saving = ref(false);
 const page = ref(1);
 const pageSize = ref(20);
 const filters = reactive<Record<string, any>>({ keyword: '' });
-const timeMode = ref('date');
+const filterDraft = ref<Record<string, any>>({});
 const response = ref<Record<string, any>>({});
 const visible = ref(false);
 const current = ref<GymRow>();
@@ -98,7 +114,11 @@ const visibleFields = computed(() =>
 );
 const displayColumns = computed(() => [
   ...props.columns,
-  { title: '操作', dataIndex: '_actions', width: 180 },
+  ...((writable.value && props.edit) ||
+  slots.actions ||
+  instance?.vnode.props?.onDetail
+    ? [{ title: '操作', dataIndex: '_actions', width: 240 }]
+    : []),
 ]);
 const statuses: Record<string, string> = {
   active: '启用',
@@ -272,22 +292,16 @@ function display(value: any, key: string) {
   return value;
 }
 function search() {
+  for (const key of Object.keys(filters)) Reflect.deleteProperty(filters, key);
+  Object.assign(filters, filterDraft.value);
   page.value = 1;
   void load();
-}
-function resetFilters() {
-  Object.keys(filters).forEach((key) => Reflect.deleteProperty(filters, key));
-  search();
-}
-function changeTimeMode() {
-  for (const key of ['date', 'month', 'from', 'to'])
-    Reflect.deleteProperty(filters, key);
-  search();
 }
 watch(
   () => props.endpoint,
   () => {
     page.value = 1;
+    filterDraft.value = {};
     Object.keys(filters).forEach((key) => Reflect.deleteProperty(filters, key));
     void load();
     void loadOptions();
@@ -305,71 +319,27 @@ defineExpose({ load, open, items });
       show-icon
       class="mb-4"
     />
-    <Space wrap class="mb-4">
-      <Input
-        v-model:value="filters.keyword"
-        placeholder="名称 / 编号 / 手机号"
-        allow-clear
-        @press-enter="search"
-      />
-      <Select
-        v-if="storeFilter"
-        v-model:value="filters.storeId"
-        :options="stores"
-        placeholder="全部授权门店"
-        allow-clear
-        style="min-width: 180px"
-        @change="search"
-      />
-      <Input
-        v-if="timeFilter && timeMode === 'date'"
-        v-model:value="filters.date"
-        type="date"
-        @change="search"
-      />
-      <Select
-        v-if="timeFilter"
-        v-model:value="timeMode"
-        :options="[
-          { label: '按天', value: 'date' },
-          { label: '按月', value: 'month' },
-          { label: '时间范围', value: 'range' },
-        ]"
-        style="min-width: 120px"
-        @change="changeTimeMode"
-      />
-      <Input
-        v-if="timeFilter && timeMode === 'month'"
-        v-model:value="filters.month"
-        type="month"
-        @change="search"
-      />
-      <template v-if="timeFilter && timeMode === 'range'">
-        <Input
-          v-model:value="filters.from"
-          type="date"
-          placeholder="起始日期"
-        /><Input
-          v-model:value="filters.to"
-          type="date"
-          placeholder="结束日期（不含）"
-        />
-      </template>
-      <slot name="filters" :filters="filters" :search="search"></slot>
-      <Button @click="search">查询</Button><Button @click="resetFilters"> 重置 </Button>
-      <Button
-        v-if="writable && create !== false"
-        type="primary"
-        @click="open()"
-      >
+    <FilterBar
+      v-model="filterDraft"
+      :keyword="keywordFilter"
+      :store-options="storeFilter ? stores : undefined"
+      :time="timeFilter"
+      :fields="filterFields"
+      :loading="loading"
+      @search="search"
+      @reset="search"
+    />
+    <div v-if="(writable && create) || $slots.toolbar" class="gym-toolbar">
+      <Button v-if="writable && create" type="primary" @click="open()">
         新增
       </Button>
       <slot name="toolbar" :reload="load"></slot>
-    </Space>
+    </div>
     <slot name="summary" :data="response"></slot>
     <Table
       :data-source="items"
       :columns="displayColumns"
+      :scroll="{ x: 'max-content' }"
       :loading="loading"
       row-key="id"
       :pagination="{
@@ -400,6 +370,13 @@ defineExpose({ load, open, items });
           >
             编辑
           </Button>
+          <Button
+            v-if="instance?.vnode.props?.onDetail"
+            type="link"
+            @click="emit('detail', record as GymRow)"
+          >
+            详情
+          </Button>
           <slot name="actions" :row="record as GymRow" :reload="load"></slot>
         </Space>
         <Tag v-else-if="column.dataIndex === 'status'">
@@ -409,6 +386,7 @@ defineExpose({ load, open, items });
       </template>
     </Table>
     <Modal
+      wrap-class-name="gym-dialog"
       v-model:open="visible"
       :title="`${current ? '编辑' : '新增'}${title}`"
       :confirm-loading="saving"
@@ -429,7 +407,9 @@ defineExpose({ load, open, items });
           "
         >
           <Select
-            v-if="field.type === 'select' || field.type === 'multi'"
+            v-if="
+              field.source || field.type === 'select' || field.type === 'multi'
+            "
             v-model:value="form[field.key]"
             :options="fieldOptions(field)"
             :mode="field.type === 'multi' ? 'multiple' : undefined"

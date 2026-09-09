@@ -135,95 +135,104 @@ const titles: Record<string, string> = {
 };
 </script>
 <template>
-  <ResourcePage
-    ref="view"
-    title="员工管理"
-    endpoint="employees"
-    :fields="fields"
-    :columns="[
-      { title: '工号', dataIndex: 'employeeNo' },
-      { title: '姓名', dataIndex: 'name' },
-      { title: '手机号', dataIndex: 'phone' },
-      { title: '门店', dataIndex: 'storeIds' },
-      { title: '账号', dataIndex: 'username' },
-      { title: '状态', dataIndex: 'status' },
-    ]"
-    write-code="employees:write"
-    store-filter
-    :prepare="prepare"
-  >
-    <template #actions="{ row, reload }">
-      <Button
-        v-if="canGym('employees:write')"
-        type="link"
-        @click="open(row, 'stores')"
-      >
-        所属门店
-      </Button>
-      <template v-if="canGym('accounts:write')">
-        <Button v-if="!row.accountId" type="link" @click="open(row, 'account')">
-          创建账号
+  <div class="gym-view">
+    <ResourcePage
+      ref="view"
+      title="员工管理"
+      endpoint="employees"
+      :fields="fields"
+      :columns="[
+        { title: '工号', dataIndex: 'employeeNo' },
+        { title: '姓名', dataIndex: 'name' },
+        { title: '手机号', dataIndex: 'phone' },
+        { title: '门店', dataIndex: 'storeIds' },
+        { title: '账号', dataIndex: 'username' },
+        { title: '状态', dataIndex: 'status' },
+      ]"
+      write-code="employees:write"
+      store-filter
+      :prepare="prepare"
+    >
+      <template #actions="{ row, reload }">
+        <Button
+          v-if="canGym('employees:write')"
+          type="link"
+          @click="open(row, 'stores')"
+        >
+          所属门店
         </Button>
-        <template v-else>
-          <Button type="link" @click="open(row, 'roles')">授权</Button><Button type="link" @click="open(row, 'password')">密码</Button><Button
+        <template v-if="canGym('accounts:write')">
+          <Button
+            v-if="!row.accountId"
             type="link"
-            @click="
-              async () => {
-                await gymApi.patch(`accounts/${row.accountId}`, {
-                  status:
-                    row.accountStatus === 'active' ? 'inactive' : 'active',
-                });
-                await reload();
-              }
-            "
+            @click="open(row, 'account')"
           >
-            {{ row.accountStatus === 'active' ? '停用账号' : '启用账号' }}
+            创建账号
           </Button>
+          <template v-else>
+            <Button type="link" @click="open(row, 'roles')">授权</Button><Button type="link" @click="open(row, 'password')">密码</Button><Button
+              type="link"
+              @click="
+                async () => {
+                  await gymApi.patch(`accounts/${row.accountId}`, {
+                    status:
+                      row.accountStatus === 'active' ? 'inactive' : 'active',
+                  });
+                  await reload();
+                }
+              "
+            >
+              {{ row.accountStatus === 'active' ? '停用账号' : '启用账号' }}
+            </Button>
+          </template>
         </template>
       </template>
-    </template>
-  </ResourcePage>
-  <Modal
-    v-model:open="visible"
-    :title="titles[mode]"
-    :confirm-loading="saving"
-    @ok="save"
-  >
-    <template v-if="mode === 'roles'">
-      <Space v-for="(link, index) in links" :key="index" wrap class="mb-3">
-        <Select
-          v-model:value="link.roleId"
-          placeholder="角色"
-          :options="roles.map((r) => ({ label: r.name, value: r.id }))"
-          style="min-width: 150px"
-        />
-        <Select
-          v-if="roles.find((r) => r.id === link.roleId)?.scopeType === 'store'"
-          v-model:value="link.storeId"
-          placeholder="授权门店"
-          :options="
-            stores
-              .filter((s) => current?.storeIds.includes(s.id))
-              .map((s) => ({ label: s.name, value: s.id }))
-          "
-          style="min-width: 150px"
-        />
-        <Button danger @click="links.splice(index, 1)">移除</Button>
+    </ResourcePage>
+    <Modal
+      wrap-class-name="gym-dialog"
+      v-model:open="visible"
+      :title="titles[mode]"
+      :confirm-loading="saving"
+      @ok="save"
+    >
+      <template v-if="mode === 'roles'">
+        <Space v-for="(link, index) in links" :key="index" wrap class="mb-3">
+          <Select
+            v-model:value="link.roleId"
+            placeholder="角色"
+            :options="roles.map((r) => ({ label: r.name, value: r.id }))"
+            style="min-width: 150px"
+          />
+          <Select
+            v-if="
+              roles.find((r) => r.id === link.roleId)?.scopeType === 'store'
+            "
+            v-model:value="link.storeId"
+            placeholder="授权门店"
+            :options="
+              stores
+                .filter((s) => current?.storeIds.includes(s.id))
+                .map((s) => ({ label: s.name, value: s.id }))
+            "
+            style="min-width: 150px"
+          />
+          <Button danger @click="links.splice(index, 1)">移除</Button>
 </Space><Button @click="links.push({})">增加授权</Button>
-    </template>
-    <Select
-      v-else-if="mode === 'stores'"
-      v-model:value="selectedStores"
-      mode="multiple"
-      :options="stores.map((s) => ({ label: s.name, value: s.id }))"
-      style="width: 100%"
-    />
-    <Form v-else layout="vertical">
-      <FormItem v-if="mode === 'account'" label="用户名">
-        <Input v-model:value="username" />
+      </template>
+      <Select
+        v-else-if="mode === 'stores'"
+        v-model:value="selectedStores"
+        mode="multiple"
+        :options="stores.map((s) => ({ label: s.name, value: s.id }))"
+        style="width: 100%"
+      />
+      <Form v-else layout="vertical">
+        <FormItem v-if="mode === 'account'" label="用户名">
+          <Input v-model:value="username" />
 </FormItem><FormItem label="密码（至少6位）">
-        <Input.Password v-model:value="password" />
-      </FormItem>
-    </Form>
-  </Modal>
+          <Input.Password v-model:value="password" />
+        </FormItem>
+      </Form>
+    </Modal>
+  </div>
 </template>
