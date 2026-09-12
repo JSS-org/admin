@@ -19,6 +19,7 @@ import {
 
 import { canGym, gymApi } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import ResourcePage from './components/resource-page.vue';
 
 const props = defineProps<{ resource: string }>();
@@ -293,8 +294,7 @@ function confirm(row: GymRow) {
         </Space>
       </template>
     </ResourcePage>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       title="薪资模板规则"
       width="850px"
@@ -387,9 +387,8 @@ function confirm(row: GymRow) {
           添加规则
         </Button>
       </Form>
-    </Modal>
-    <Modal
-      wrap-class-name="gym-dialog"
+    </AdminDrawer>
+    <AdminDrawer
       v-model:open="calculateVisible"
       title="计算月工资"
       :confirm-loading="busy"
@@ -409,9 +408,8 @@ function confirm(row: GymRow) {
           <Input v-model:value="month" type="month" />
         </FormItem>
       </Form>
-    </Modal>
-    <Modal
-      wrap-class-name="gym-dialog"
+    </AdminDrawer>
+    <AdminDrawer
       v-model:open="showDetail"
       title="工资明细"
       width="1200px"
@@ -463,6 +461,6 @@ function confirm(row: GymRow) {
           <pre>{{ JSON.stringify(component.sourceSnapshot, null, 2) }}</pre>
         </details>
       </template>
-    </Modal>
+    </AdminDrawer>
   </div>
 </template>

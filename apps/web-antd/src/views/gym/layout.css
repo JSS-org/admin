@@ -34,7 +34,7 @@
   max-width: 1120px;
   padding: 20px;
   border: 1px solid hsl(var(--border));
-  border-radius: 6px;
+  border-radius: var(--radius);
 }
 
 .gym-page-content .ant-form-item,
@@ -68,15 +68,15 @@
   flex: 1 1 200px;
 }
 
-.gym-dialog .ant-modal-body > .ant-alert {
+.gym-dialog .ant-drawer-body > .ant-alert {
   margin-bottom: 20px;
 }
 
-.gym-dialog .ant-modal-body > .ant-table-wrapper + .ant-form {
+.gym-dialog .ant-drawer-body > .ant-table-wrapper + .ant-form {
   margin-top: 20px;
 }
 
-.gym-dialog .ant-modal-body > .ant-space {
+.gym-dialog .ant-drawer-body > .ant-space {
   margin-bottom: 16px;
 }
 
@@ -92,6 +92,18 @@
 .gym-dialog .ant-table-wrapper,
 .gym-page-content .ant-table-wrapper {
   overflow-x: auto;
+}
+
+.gym-dialog .ant-table {
+  min-width: 600px;
+}
+
+.gym-dialog .ant-descriptions-view {
+  overflow-x: auto;
+}
+
+.gym-dialog .ant-descriptions-view > table {
+  min-width: 480px;
 }
 
 .gym-page-content .ant-table-cell,

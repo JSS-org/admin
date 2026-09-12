@@ -14,7 +14,6 @@ import {
   Input,
   InputNumber,
   message,
-  Modal,
   Select,
   Space,
   Table,
@@ -24,6 +23,7 @@ import {
 
 import { gymApi } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import Page from './components/admin-page.vue';
 import FilterBar from './components/filter-bar.vue';
 import ResourcePage from './components/resource-page.vue';
@@ -411,8 +411,7 @@ const scopeFilter = computed({
         </Button>
       </template>
     </ResourcePage>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       title="记录详情"
       :footer="null"
@@ -472,6 +471,6 @@ const scopeFilter = computed({
           ]"
         />
       </template>
-    </Modal>
+    </AdminDrawer>
   </div>
 </template>

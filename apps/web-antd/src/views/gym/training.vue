@@ -21,7 +21,6 @@ import {
   FormItem,
   Input,
   message,
-  Modal,
   Select,
   Space,
   Table,
@@ -30,6 +29,7 @@ import {
 
 import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import ResourcePage from './components/resource-page.vue';
 
 const props = defineProps<{ resource: string }>();
@@ -541,8 +541,7 @@ onUnmounted(stop);
         </Button>
       </template>
     </ResourcePage>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       :title="mode === 'booking' ? '代会员预约' : '体测详情'"
       :confirm-loading="saving"
@@ -621,7 +620,7 @@ onUnmounted(stop);
           </Upload>
         </Space>
       </template>
-    </Modal>
+    </AdminDrawer>
     <Alert
       v-if="resource === 'qr-codes'"
       type="info"

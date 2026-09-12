@@ -12,7 +12,6 @@ import {
   FormItem,
   Input,
   message,
-  Modal,
   Select,
   Space,
   Table,
@@ -21,6 +20,7 @@ import {
 
 import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import ResourcePage from './components/resource-page.vue';
 
 const props = defineProps<{ resource: string }>();
@@ -346,8 +346,7 @@ async function upload(file: File) {
         </Button>
       </template>
     </ResourcePage>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       :title="current?.name"
       :width="850"
@@ -478,6 +477,6 @@ async function upload(file: File) {
           </template>
         </Table>
       </template>
-    </Modal>
+    </AdminDrawer>
   </div>
 </template>

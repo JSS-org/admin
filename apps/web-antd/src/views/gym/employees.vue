@@ -11,13 +11,13 @@ import {
   FormItem,
   Input,
   message,
-  Modal,
   Select,
   Space,
 } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import ResourcePage from './components/resource-page.vue';
 const view = ref();
 const current = ref<GymRow>();
@@ -188,8 +188,7 @@ const titles: Record<string, string> = {
         </template>
       </template>
     </ResourcePage>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       :title="titles[mode]"
       :confirm-loading="saving"
@@ -233,6 +232,6 @@ const titles: Record<string, string> = {
           <Input.Password v-model:value="password" />
         </FormItem>
       </Form>
-    </Modal>
+    </AdminDrawer>
   </div>
 </template>

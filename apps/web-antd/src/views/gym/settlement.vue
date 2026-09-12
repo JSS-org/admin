@@ -11,7 +11,6 @@ import {
   Input,
   InputNumber,
   message,
-  Modal,
   Select,
   Space,
   Table,
@@ -19,6 +18,7 @@ import {
 
 import { gymApi } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import Page from './components/admin-page.vue';
 import FilterBar from './components/filter-bar.vue';
 import ResourcePage from './components/resource-page.vue';
@@ -164,8 +164,7 @@ const scopeFilter = computed({
           </Space>
         </template>
       </Table>
-      <Modal
-        wrap-class-name="gym-dialog"
+      <AdminDrawer
         v-model:open="visible"
         title="分账规则版本"
         :confirm-loading="busy"
@@ -219,7 +218,7 @@ const scopeFilter = computed({
           </FormItem>
           <Button @click="form.items.push({ ratio: 0 })">添加接收账户</Button>
         </Form>
-      </Modal>
+      </AdminDrawer>
     </Page>
     <ResourcePage
       v-else-if="resource === 'payment-accounts'"
@@ -294,8 +293,7 @@ const scopeFilter = computed({
         { title: '状态', dataIndex: 'status' },
       ]"
     />
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="showDetail"
       title="分账明细"
       :footer="null"
@@ -315,6 +313,6 @@ const scopeFilter = computed({
           { title: '失败原因', dataIndex: 'failureReason' },
         ]"
       />
-    </Modal>
+    </AdminDrawer>
   </div>
 </template>

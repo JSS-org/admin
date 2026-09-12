@@ -13,7 +13,6 @@ import {
   FormItem,
   Input,
   message,
-  Modal,
   Select,
   Space,
   Table,
@@ -22,6 +21,7 @@ import {
 
 import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import Page from './components/admin-page.vue';
 import FilterBar from './components/filter-bar.vue';
 import ResourcePage from './components/resource-page.vue';
@@ -539,8 +539,7 @@ const scopeFilter = computed({
         </template>
       </template>
     </ResourcePage>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       title="活动资料"
       :footer="mode === 'cover' ? undefined : null"
@@ -573,6 +572,6 @@ const scopeFilter = computed({
           { title: '报名时间', dataIndex: 'registeredAt' },
         ]"
       />
-    </Modal>
+    </AdminDrawer>
   </div>
 </template>

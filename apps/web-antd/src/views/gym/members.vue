@@ -9,7 +9,6 @@ import {
   Button,
   Descriptions,
   DescriptionsItem,
-  Modal,
   Table,
   TabPane,
   Tabs,
@@ -17,6 +16,7 @@ import {
 
 import { gymApi } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import ResourcePage from './components/resource-page.vue';
 const detail = ref<GymRow>();
 const visible = ref(false);
@@ -97,8 +97,7 @@ async function open(row: GymRow) {
         <Button type="link" @click="open(row)">会员详情</Button>
       </template>
     </ResourcePage>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       :title="detail?.name"
       :footer="null"
@@ -135,6 +134,6 @@ async function open(row: GymRow) {
           />
         </TabPane>
       </Tabs>
-    </Modal>
+    </AdminDrawer>
   </div>
 </template>

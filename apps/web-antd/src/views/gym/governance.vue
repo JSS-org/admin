@@ -15,7 +15,6 @@ import {
   Input,
   InputNumber,
   message,
-  Modal,
   Select,
   Space,
   Table,
@@ -24,6 +23,7 @@ import {
 
 import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import ResourcePage from './components/resource-page.vue';
 
 const props = defineProps<{ resource: string }>();
@@ -333,8 +333,7 @@ async function save() {
         </Button>
       </template>
     </ResourcePage>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       :title="mode === 'detail' ? `${title}详情` : '管理操作'"
       :width="760"
@@ -474,6 +473,6 @@ async function save() {
           />
         </template>
       </template>
-    </Modal>
+    </AdminDrawer>
   </div>
 </template>

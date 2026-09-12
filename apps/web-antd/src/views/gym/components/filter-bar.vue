@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, useId } from 'vue';
+
+import { IconifyIcon } from '@vben/icons';
 
 import { Button, Form, FormItem, Input, Select } from 'ant-design-vue';
 
@@ -25,6 +27,8 @@ const props = withDefaults(
 const emit = defineEmits<{ search: []; reset: [] }>();
 const model = defineModel<Record<string, any>>({ required: true });
 const timeMode = ref<'date' | 'month' | 'range'>('date');
+const expanded = ref(false);
+const fieldsId = useId();
 const fields = computed<FilterField[]>(() => [
   ...(props.keyword
     ? [{ key: 'keyword', label: '关键词', placeholder: '名称 / 编号 / 手机号' }]
@@ -42,6 +46,18 @@ const fields = computed<FilterField[]>(() => [
     : []),
   ...props.fields,
 ]);
+const collapsible = computed(() => fields.value.length > 2 || props.time);
+const hiddenFilterCount = computed(() => {
+  if (expanded.value) return 0;
+  const keys = [
+    ...fields.value.slice(2).map((field) => field.key),
+    ...(props.time ? ['date', 'month', 'from', 'to'] : []),
+  ];
+  return keys.filter((key) => {
+    const value = model.value[key];
+    return value !== undefined && value !== null && value !== '';
+  }).length;
+});
 function setValue(key: string, value: any) {
   model.value = { ...model.value, [key]: value };
 }
@@ -66,9 +82,10 @@ function reset() {
     layout="vertical"
     @finish="emit('search')"
   >
-    <div class="gym-filter-fields">
+    <div :id="fieldsId" class="gym-filter-fields">
       <FormItem
-        v-for="field in fields"
+        v-for="(field, index) in fields"
+        v-show="expanded || index < 2"
         :key="field.key"
         :label="field.label"
         :html-for="`filter-${field.key}`"
@@ -94,7 +111,7 @@ function reset() {
           @change="changed"
         />
       </FormItem>
-      <template v-if="time">
+      <template v-if="time && expanded">
         <FormItem label="时间方式" html-for="filter-time-mode">
           <Select
             id="filter-time-mode"
@@ -128,9 +145,28 @@ function reset() {
         </template>
       </template>
     </div>
-    <div v-if="!immediate" class="gym-filter-actions">
-      <Button type="primary" html-type="submit" :loading="loading">查询</Button>
-      <Button :disabled="loading" @click="reset">重置</Button>
+    <div v-if="!immediate || collapsible" class="gym-filter-actions">
+      <template v-if="!immediate">
+        <Button type="primary" html-type="submit" :loading="loading">
+          查询
+        </Button>
+        <Button :disabled="loading" @click="reset">重置</Button>
+      </template>
+      <Button
+        v-if="collapsible"
+        type="link"
+        :aria-expanded="expanded"
+        :aria-controls="fieldsId"
+        @click="expanded = !expanded"
+      >
+        {{ expanded ? '收起' : '展开' }}
+        <span v-if="hiddenFilterCount">（{{ hiddenFilterCount }} 项已选）</span>
+        <IconifyIcon
+          :icon="expanded ? 'lucide:chevron-up' : 'lucide:chevron-down'"
+          class="ml-1 size-4"
+          aria-hidden="true"
+        />
+      </Button>
     </div>
   </Form>
 </template>
@@ -139,7 +175,7 @@ function reset() {
 .gym-filter {
   padding: 16px;
   border: 1px solid hsl(var(--border));
-  border-radius: 6px;
+  border-radius: var(--radius);
 }
 
 .gym-filter-fields {
@@ -164,6 +200,8 @@ function reset() {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
   margin-top: 16px;
 }
 </style>

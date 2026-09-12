@@ -13,14 +13,12 @@ import {
 } from 'vue';
 
 import {
-  Alert,
   Button,
   Form,
   FormItem,
   Input,
   InputNumber,
   message,
-  Modal,
   Select,
   Space,
   Table,
@@ -29,6 +27,7 @@ import {
 
 import { canGym, gymApi } from '#/api/gym';
 
+import AdminDrawer from './admin-drawer.vue';
 import Page from './admin-page.vue';
 import FilterBar from './filter-bar.vue';
 
@@ -313,12 +312,6 @@ defineExpose({ load, open, items });
 
 <template>
   <Page :title="title">
-    <Alert
-      type="info"
-      message="开发环境：当前数据由 Mock 服务模拟，重启服务会恢复示例数据。"
-      show-icon
-      class="mb-4"
-    />
     <FilterBar
       v-model="filterDraft"
       :keyword="keywordFilter"
@@ -385,8 +378,7 @@ defineExpose({ load, open, items });
         <span v-else>{{ display(text, String(column.dataIndex ?? '')) }}</span>
       </template>
     </Table>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       :title="`${current ? '编辑' : '新增'}${title}`"
       :confirm-loading="saving"
@@ -444,6 +436,6 @@ defineExpose({ load, open, items });
           />
         </FormItem>
       </Form>
-    </Modal>
+    </AdminDrawer>
   </Page>
 </template>

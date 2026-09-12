@@ -5,10 +5,11 @@ import type { GymRow } from '#/api/gym';
 
 import { onMounted, ref } from 'vue';
 
-import { Button, CheckboxGroup, message, Modal } from 'ant-design-vue';
+import { Button, CheckboxGroup, message } from 'ant-design-vue';
 
 import { gymApi } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import ResourcePage from './components/resource-page.vue';
 const permissions = ref<GymRow[]>([]);
 const current = ref<GymRow>();
@@ -84,8 +85,7 @@ async function save() {
         <Button type="link" @click="open(row)">配置权限</Button>
       </template>
     </ResourcePage>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       title="权限配置"
       :width="760"
@@ -99,6 +99,6 @@ async function save() {
             .map((p) => ({ label: p.name, value: p.code }))
         "
       />
-    </Modal>
+    </AdminDrawer>
   </div>
 </template>

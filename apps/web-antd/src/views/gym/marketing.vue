@@ -13,13 +13,13 @@ import {
   Input,
   InputNumber,
   message,
-  Modal,
   Select,
   Table,
 } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import ResourcePage from './components/resource-page.vue';
 
 const props = defineProps<{ resource: string }>();
@@ -567,8 +567,7 @@ async function newVersion(row: GymRow) {
         </Button>
       </template>
     </ResourcePage>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       :title="
         mode === 'create'
@@ -708,6 +707,6 @@ async function newVersion(row: GymRow) {
           ]"
         />
       </template>
-    </Modal>
+    </AdminDrawer>
   </div>
 </template>

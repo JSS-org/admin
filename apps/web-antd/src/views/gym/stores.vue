@@ -5,10 +5,11 @@ import type { GymRow } from '#/api/gym';
 
 import { ref } from 'vue';
 
-import { Button, message, Modal, Space, Table, Upload } from 'ant-design-vue';
+import { Button, message, Space, Table, Upload } from 'ant-design-vue';
 
 import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 
+import AdminDrawer from './components/admin-drawer.vue';
 import ResourcePage from './components/resource-page.vue';
 const fields: Field[] = [
   { key: 'code', label: '门店编码', required: true },
@@ -134,8 +135,7 @@ async function upload(file: File) {
         <Button type="link" @click="showMedia(row)"> 环境照片/视频 </Button>
       </template>
     </ResourcePage>
-    <Modal
-      wrap-class-name="gym-dialog"
+    <AdminDrawer
       v-model:open="visible"
       :title="`${selected?.name} 环境媒体`"
       :footer="null"
@@ -190,6 +190,6 @@ async function upload(file: File) {
           </Space>
         </template>
       </Table>
-    </Modal>
+    </AdminDrawer>
   </div>
 </template>

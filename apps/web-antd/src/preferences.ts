@@ -12,6 +12,7 @@ export const adminPreferences = {
   },
   copyright: { enable: false },
   logo: { source: '', sourceDark: '' },
+  navigation: { accordion: false },
   sidebar: {
     collapsed: false,
     collapsedButton: true,
@@ -27,6 +28,7 @@ export const adminPreferences = {
   },
   tabbar: { showMaximize: false },
   widget: {
+    sidebarToggle: false,
     globalSearch: false,
     languageToggle: false,
     timezone: false,
