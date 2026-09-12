@@ -38,9 +38,7 @@ const title = computed(
       approvals: '审批记录',
     })[props.resource] ?? '记录',
 );
-const writeCode = computed(
-  () => `${isContract.value ? 'contracts' : 'approvals'}:templates`,
-);
+const writeCode = computed(() => `${isContract.value ? 'contracts' : 'approvals'}:templates`);
 const fields = computed<Field[]>(() => {
   if (!isTemplate.value) return [];
   const common: Field[] = [{ key: 'name', label: '模板名称', required: true }];
@@ -129,8 +127,7 @@ function prepare(values: Record<string, any>) {
 function initial(row: GymRow) {
   return {
     ...row,
-    approverEmployeeIds:
-      row.steps?.map((s: GymRow) => s.approverEmployeeId).filter(Boolean) ?? [],
+    approverEmployeeIds: row.steps?.map((s: GymRow) => s.approverEmployeeId).filter(Boolean) ?? [],
   };
 }
 const page = ref();
@@ -267,11 +264,7 @@ async function save() {
       :time-filter="!isTemplate"
     >
       <template #toolbar>
-        <Button
-          v-if="resource === 'contract-templates' && canGym(writeCode)"
-          type="primary"
-          @click="createContract"
-        >
+        <Button v-if="resource === 'contract-templates' && canGym(writeCode)" type="primary" @click="createContract">
           上传合同模板
         </Button>
       </template>
@@ -291,24 +284,10 @@ async function save() {
           >
             {{ row.status === 'published' ? '停用' : '发布' }}
           </Button>
-          <Button
-            v-if="isContract"
-            type="link"
-            @click="openGymFile(row.fileId)"
-          >
-            查看PDF
-          </Button>
-          <Button
-            v-if="isContract && row.status === 'draft'"
-            type="link"
-            @click="replaceFile(row)"
-          >
-            替换PDF
-          </Button>
+          <Button v-if="isContract" type="link" @click="openGymFile(row.fileId)"> 查看PDF </Button>
+          <Button v-if="isContract && row.status === 'draft'" type="link" @click="replaceFile(row)"> 替换PDF </Button>
         </template>
-        <Button v-if="!isTemplate" type="link" @click="details(row)">
-          详情
-        </Button>
+        <Button v-if="!isTemplate" type="link" @click="details(row)"> 详情 </Button>
         <Button
           v-if="
             resource === 'contracts' &&
@@ -321,11 +300,7 @@ async function save() {
           未签提醒
         </Button>
         <Button
-          v-if="
-            resource === 'approvals' &&
-            row.status === 'pending' &&
-            canGym('approvals:decide')
-          "
+          v-if="resource === 'approvals' && row.status === 'pending' && canGym('approvals:decide')"
           type="link"
           @click="openDecision(row)"
         >
@@ -343,26 +318,21 @@ async function save() {
     >
       <Form v-if="mode === 'contract' || mode === 'file'" layout="vertical">
         <template v-if="mode === 'contract'">
-          <FormItem label="模板名称">
-            <Input v-model:value="contractName" />
-</FormItem><FormItem label="适用类型">
+          <FormItem label="模板名称"> <Input v-model:value="contractName" /> </FormItem
+          ><FormItem label="适用类型">
             <Select
               v-model:value="applicableType"
               :options="[
                 { label: '会员卡', value: 'card' },
                 { label: '课程', value: 'course' },
               ]"
-            />
-</FormItem><FormItem label="提前提醒天数">
+            /> </FormItem
+          ><FormItem label="提前提醒天数">
             <InputNumber v-model:value="reminderDays" :min="0" :max="365" />
           </FormItem>
         </template>
         <FormItem label="合同PDF">
-          <Upload
-            :before-upload="upload"
-            :show-upload-list="false"
-            accept=".pdf"
-          >
+          <Upload :before-upload="upload" :show-upload-list="false" accept=".pdf">
             <Button :loading="busy">上传PDF</Button>
           </Upload>
           {{ filename }}
@@ -376,16 +346,15 @@ async function save() {
               { label: '通过', value: 'approve' },
               { label: '拒绝', value: 'reject' },
             ]"
-          />
-</FormItem><FormItem label="审批意见">
+          /> </FormItem
+        ><FormItem label="审批意见">
           <Input.TextArea v-model:value="comment" />
         </FormItem>
       </Form>
       <Form v-else-if="mode === 'remind'" layout="vertical">
-        <Alert
-          type="info"
-          message="当前为Mock，未配置真实渠道时会记录失败结果，不会发送消息。"
-        /><FormItem label="渠道">
+        <Alert type="info" message="当前为Mock，未配置真实渠道时会记录失败结果，不会发送消息。" /><FormItem
+          label="渠道"
+        >
           <Select
             v-model:value="channel"
             :options="[
@@ -398,36 +367,21 @@ async function save() {
       </Form>
       <template v-else-if="current">
         <Descriptions :column="2" bordered>
-          <DescriptionsItem
-            v-for="column in columns"
-            :key="column.dataIndex"
-            :label="column.title"
-          >
+          <DescriptionsItem v-for="column in columns" :key="column.dataIndex" :label="column.title">
             {{ current[column.dataIndex] ?? '—' }}
           </DescriptionsItem>
         </Descriptions>
         <template v-if="isContract">
           <Descriptions :column="1" bordered class="mt-3">
-            <DescriptionsItem label="签署IP">
-              {{ current.signIp ?? '尚未签署' }}
-</DescriptionsItem><DescriptionsItem label="设备标识">
-              {{ current.signDeviceUid ?? '—' }}
-</DescriptionsItem><DescriptionsItem label="签署设备信息">
+            <DescriptionsItem label="签署IP"> {{ current.signIp ?? '尚未签署' }} </DescriptionsItem
+            ><DescriptionsItem label="设备标识"> {{ current.signDeviceUid ?? '—' }} </DescriptionsItem
+            ><DescriptionsItem label="签署设备信息">
               {{ current.signUserAgent ?? '—' }}
             </DescriptionsItem>
           </Descriptions>
           <Space class="my-3">
-            <Button
-              v-if="current.unsignedFileId"
-              @click="openGymFile(current.unsignedFileId)"
-            >
-              合同原件
-</Button><Button
-              v-if="current.signedFileId"
-              @click="openGymFile(current.signedFileId)"
-            >
-              已签合同
-            </Button>
+            <Button v-if="current.unsignedFileId" @click="openGymFile(current.unsignedFileId)"> 合同原件 </Button
+            ><Button v-if="current.signedFileId" @click="openGymFile(current.signedFileId)"> 已签合同 </Button>
           </Space>
           <Table
             :data-source="current.events"
@@ -452,14 +406,12 @@ async function save() {
         </template>
         <template v-else>
           <Descriptions :column="1" bordered class="my-3">
-            <DescriptionsItem label="原价">
-              {{ current.requestSnapshot.originalPrice }}
-</DescriptionsItem><DescriptionsItem label="申请价">
-              {{ current.requestSnapshot.requestedPrice }}
-</DescriptionsItem><DescriptionsItem label="原因">
+            <DescriptionsItem label="原价"> {{ current.requestSnapshot.originalPrice }} </DescriptionsItem
+            ><DescriptionsItem label="申请价"> {{ current.requestSnapshot.requestedPrice }} </DescriptionsItem
+            ><DescriptionsItem label="原因">
               {{ current.requestSnapshot.reason }}
-            </DescriptionsItem>
-</Descriptions><Table
+            </DescriptionsItem> </Descriptions
+          ><Table
             :data-source="current.tasks"
             row-key="id"
             :pagination="false"

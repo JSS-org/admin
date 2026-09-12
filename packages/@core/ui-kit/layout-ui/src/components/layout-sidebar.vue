@@ -149,9 +149,7 @@ const hiddenSideStyle = computed((): CSSProperties => {
 
 const sidebarVisualWidth = computed(() => {
   const currentWidth = Number.parseFloat(getMenuWidthValue(false));
-  return !props.isMobile && !props.isSidebarMixed
-    ? Math.max(currentWidth, props.expandedWidth)
-    : currentWidth;
+  return !props.isMobile && !props.isSidebarMixed ? Math.max(currentWidth, props.expandedWidth) : currentWidth;
 });
 
 const dragBarStyle = computed((): CSSProperties => {
@@ -240,19 +238,10 @@ watchEffect(() => {
 });
 
 function getMenuWidthValue(isHiddenDom: boolean) {
-  const {
-    collapseWidth,
-    extraWidth,
-    mixedWidth,
-    fixedExtra,
-    isSidebarMixed,
-    width,
-  } = props;
+  const { collapseWidth, extraWidth, mixedWidth, fixedExtra, isSidebarMixed, width } = props;
 
   let widthValue =
-    width === 0
-      ? '0px'
-      : `${width + (isSidebarMixed && fixedExtra && extraVisible.value ? extraWidth : 0)}px`;
+    width === 0 ? '0px' : `${width + (isSidebarMixed && fixedExtra && extraVisible.value ? extraWidth : 0)}px`;
 
   if (isHiddenDom && expandOnHovering.value && !expandOnHover.value) {
     widthValue = isSidebarMixed ? `${mixedWidth}px` : `${collapseWidth}px`;
@@ -340,8 +329,7 @@ const handleDragSidebar = (e: MouseEvent) => {
     (newWidth) => {
       if (isSidebarMixed) {
         emit('update:width', newWidth - width);
-        extraCollapse.value = collapse.value =
-          newWidth - width <= collapseWidth;
+        extraCollapse.value = collapse.value = newWidth - width <= collapseWidth;
       } else {
         emit('update:width', newWidth);
         collapse.value = extraCollapse.value = newWidth <= collapseWidth;
@@ -356,12 +344,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    v-if="domVisible"
-    :class="theme"
-    :style="hiddenSideStyle"
-    class="h-full"
-  ></div>
+  <div v-if="domVisible" :class="theme" :style="hiddenSideStyle" class="h-full"></div>
   <Transition name="mobile-sidebar">
     <aside
       v-if="!isMobile || !collapse"
@@ -375,8 +358,7 @@ onUnmounted(() => {
         {
           'border-r border-border bg-sidebar transition-[clip-path,transform] duration-300 ease-out':
             !isMobile && !isSidebarMixed,
-          'transition-transform duration-300 ease-out':
-            !isMobile && isSidebarMixed,
+          'transition-transform duration-300 ease-out': !isMobile && isSidebarMixed,
         },
       ]"
       @mouseenter="handleMouseenter"
@@ -404,10 +386,7 @@ onUnmounted(() => {
         </VbenScrollbar>
 
         <div :style="collapseStyle"></div>
-        <SidebarCollapseButton
-          v-if="showCollapseButton && !isSidebarMixed"
-          v-model:collapsed="collapse"
-        />
+        <SidebarCollapseButton v-if="showCollapseButton && !isSidebarMixed" v-model:collapsed="collapse" />
       </div>
       <div
         v-if="isSidebarMixed"
@@ -420,24 +399,13 @@ onUnmounted(() => {
         :style="extraStyle"
         class="fixed top-0 h-full overflow-hidden border-r border-border bg-sidebar transition-[left,width] duration-300 ease-out"
       >
-        <SidebarCollapseButton
-          v-if="isSidebarMixed && expandOnHover"
-          v-model:collapsed="extraCollapse"
-        />
+        <SidebarCollapseButton v-if="isSidebarMixed && expandOnHover" v-model:collapsed="extraCollapse" />
 
-        <SidebarFixedButton
-          v-if="!extraCollapse"
-          v-model:expand-on-hover="expandOnHover"
-        />
+        <SidebarFixedButton v-if="!extraCollapse" v-model:expand-on-hover="expandOnHover" />
         <div v-if="!extraCollapse" :style="extraTitleStyle" class="pl-2">
           <slot name="extra-title"></slot>
         </div>
-        <VbenScrollbar
-          :style="extraContentStyle"
-          class="border-border py-2"
-          shadow
-          shadow-border
-        >
+        <VbenScrollbar :style="extraContentStyle" class="border-border py-2" shadow shadow-border>
           <slot name="extra"></slot>
         </VbenScrollbar>
       </div>

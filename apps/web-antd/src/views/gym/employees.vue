@@ -5,15 +5,7 @@ import type { GymRow } from '#/api/gym';
 
 import { ref } from 'vue';
 
-import {
-  Button,
-  Form,
-  FormItem,
-  Input,
-  message,
-  Select,
-  Space,
-} from 'ant-design-vue';
+import { Button, Form, FormItem, Input, message, Select, Space } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 
@@ -97,9 +89,7 @@ async function save() {
     if (mode.value === 'roles')
       await gymApi.put(`accounts/${row.accountId}/roles`, {
         assignments: links.value.map((l) =>
-          roles.value.find((r) => r.id === l.roleId)?.scopeType === 'hq'
-            ? { roleId: l.roleId }
-            : l,
+          roles.value.find((r) => r.id === l.roleId)?.scopeType === 'hq' ? { roleId: l.roleId } : l,
         ),
       });
     else if (mode.value === 'stores')
@@ -154,29 +144,18 @@ const titles: Record<string, string> = {
       :prepare="prepare"
     >
       <template #actions="{ row, reload }">
-        <Button
-          v-if="canGym('employees:write')"
-          type="link"
-          @click="open(row, 'stores')"
-        >
-          所属门店
-        </Button>
+        <Button v-if="canGym('employees:write')" type="link" @click="open(row, 'stores')"> 所属门店 </Button>
         <template v-if="canGym('accounts:write')">
-          <Button
-            v-if="!row.accountId"
-            type="link"
-            @click="open(row, 'account')"
-          >
-            创建账号
-          </Button>
+          <Button v-if="!row.accountId" type="link" @click="open(row, 'account')"> 创建账号 </Button>
           <template v-else>
-            <Button type="link" @click="open(row, 'roles')">授权</Button><Button type="link" @click="open(row, 'password')">密码</Button><Button
+            <Button type="link" @click="open(row, 'roles')">授权</Button
+            ><Button type="link" @click="open(row, 'password')">密码</Button
+            ><Button
               type="link"
               @click="
                 async () => {
                   await gymApi.patch(`accounts/${row.accountId}`, {
-                    status:
-                      row.accountStatus === 'active' ? 'inactive' : 'active',
+                    status: row.accountStatus === 'active' ? 'inactive' : 'active',
                   });
                   await reload();
                 }
@@ -188,12 +167,7 @@ const titles: Record<string, string> = {
         </template>
       </template>
     </ResourcePage>
-    <AdminDrawer
-      v-model:open="visible"
-      :title="titles[mode]"
-      :confirm-loading="saving"
-      @ok="save"
-    >
+    <AdminDrawer v-model:open="visible" :title="titles[mode]" :confirm-loading="saving" @ok="save">
       <template v-if="mode === 'roles'">
         <Space v-for="(link, index) in links" :key="index" wrap class="mb-3">
           <Select
@@ -203,20 +177,16 @@ const titles: Record<string, string> = {
             style="min-width: 150px"
           />
           <Select
-            v-if="
-              roles.find((r) => r.id === link.roleId)?.scopeType === 'store'
-            "
+            v-if="roles.find((r) => r.id === link.roleId)?.scopeType === 'store'"
             v-model:value="link.storeId"
             placeholder="授权门店"
             :options="
-              stores
-                .filter((s) => current?.storeIds.includes(s.id))
-                .map((s) => ({ label: s.name, value: s.id }))
+              stores.filter((s) => current?.storeIds.includes(s.id)).map((s) => ({ label: s.name, value: s.id }))
             "
             style="min-width: 150px"
           />
-          <Button danger @click="links.splice(index, 1)">移除</Button>
-</Space><Button @click="links.push({})">增加授权</Button>
+          <Button danger @click="links.splice(index, 1)">移除</Button> </Space
+        ><Button @click="links.push({})">增加授权</Button>
       </template>
       <Select
         v-else-if="mode === 'stores'"
@@ -226,9 +196,8 @@ const titles: Record<string, string> = {
         style="width: 100%"
       />
       <Form v-else layout="vertical">
-        <FormItem v-if="mode === 'account'" label="用户名">
-          <Input v-model:value="username" />
-</FormItem><FormItem label="密码（至少6位）">
+        <FormItem v-if="mode === 'account'" label="用户名"> <Input v-model:value="username" /> </FormItem
+        ><FormItem label="密码（至少6位）">
           <Input.Password v-model:value="password" />
         </FormItem>
       </Form>

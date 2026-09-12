@@ -7,8 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import LayoutSidebar from '../components/layout-sidebar.vue';
 
 vi.mock('@vben-core/composables', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('@vben-core/composables')>();
+  const actual = await importOriginal<typeof import('@vben-core/composables')>();
   return {
     ...actual,
     useScrollLock: () => computed({ get: () => false, set: () => {} }),
@@ -16,8 +15,7 @@ vi.mock('@vben-core/composables', async (importOriginal) => {
 });
 
 vi.mock('../hooks/use-sidebar-drag', async (importOriginal) => {
-  const actual =
-    await importOriginal<typeof import('../hooks/use-sidebar-drag')>();
+  const actual = await importOriginal<typeof import('../hooks/use-sidebar-drag')>();
   return {
     ...actual,
     useSidebarDrag: () => ({ startDrag: vi.fn(), endDrag: vi.fn() }),

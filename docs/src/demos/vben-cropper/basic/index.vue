@@ -41,18 +41,8 @@ onBeforeUnmount(() => {
   <div>
     <VCropper ref="cropperRef" :img="imageUrl" :width="500" :height="300" />
     <div class="mt-4 flex gap-2">
-      <button
-        class="px-4 py-2 bg-blue-500 rounded hover:bg-blue-600"
-        @click="handleCrop"
-      >
-        裁剪图片
-      </button>
-      <button
-        class="px-4 py-2 bg-gray-500 rounded hover:bg-gray-600"
-        @click="handleReset"
-      >
-        重置
-      </button>
+      <button class="px-4 py-2 bg-blue-500 rounded hover:bg-blue-600" @click="handleCrop">裁剪图片</button>
+      <button class="px-4 py-2 bg-gray-500 rounded hover:bg-gray-600" @click="handleReset">重置</button>
     </div>
     <div v-if="croppedImage" class="mt-4">
       <p class="text-sm text-gray-500 mb-2">裁剪结果:</p>

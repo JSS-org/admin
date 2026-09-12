@@ -190,10 +190,10 @@ const cache = new StorageManager({
 new StorageManager(options?: StorageManagerOptions)
 ```
 
-| 参数 | 类型 | 默认值 | 说明 |
-| --- | --- | --- | --- |
-| `driver` | `IStorageDriver` | `new LocalStorageDriver()` | 存储驱动实例 |
-| `prefix` | `string` | `''` | 键前缀，用于命名空间隔离 |
+| 参数     | 类型             | 默认值                     | 说明                     |
+| -------- | ---------------- | -------------------------- | ------------------------ |
+| `driver` | `IStorageDriver` | `new LocalStorageDriver()` | 存储驱动实例             |
+| `prefix` | `string`         | `''`                       | 键前缀，用于命名空间隔离 |
 
 #### 方法
 
@@ -267,12 +267,7 @@ const cache = new StorageManager({
 ### 根据环境动态选择 Driver
 
 ```typescript
-import {
-  IndexedDBDriver,
-  LocalStorageDriver,
-  MemoryStorageDriver,
-  StorageManager,
-} from '@vben-core/shared/cache';
+import { IndexedDBDriver, LocalStorageDriver, MemoryStorageDriver, StorageManager } from '@vben-core/shared/cache';
 
 function createStorageManager(prefix: string) {
   // SSR 环境使用内存驱动
@@ -355,10 +350,10 @@ interface StorageItem<T> {
 
 采用**惰性删除 + 主动清理**双重策略：
 
-| 策略 | 触发时机 | 说明 |
-| --- | --- | --- |
-| 惰性删除 | 调用 `getItem` 时 | 读取时检查过期，过期则删除并返回默认值 |
-| 主动清理 | 调用 `clearExpiredItems` 时 | 遍历所有带前缀的 key，删除已过期项 |
+| 策略     | 触发时机                    | 说明                                   |
+| -------- | --------------------------- | -------------------------------------- |
+| 惰性删除 | 调用 `getItem` 时           | 读取时检查过期，过期则删除并返回默认值 |
+| 主动清理 | 调用 `clearExpiredItems` 时 | 遍历所有带前缀的 key，删除已过期项     |
 
 ---
 

@@ -4,11 +4,7 @@ import { globalShareState } from '@vben-core/shared/global-state';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import {
-  COMPONENT_BIND_EVENT_MAP,
-  COMPONENT_MAP,
-  setupVbenForm,
-} from '../src/config';
+import { COMPONENT_BIND_EVENT_MAP, COMPONENT_MAP, setupVbenForm } from '../src/config';
 
 const builtInCheckbox = COMPONENT_MAP.VbenCheckbox;
 const componentMapReference = COMPONENT_MAP;

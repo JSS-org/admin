@@ -21,8 +21,6 @@ const actions: ActionItem[] = [
 <template>
   <div>
     <VbenTableAction :actions="actions" align="start" divider />
-    <p style="margin-top: 8px; font-size: 13px; opacity: 0.7">
-      最近点击：{{ last }}
-    </p>
+    <p style="margin-top: 8px; font-size: 13px; opacity: 0.7">最近点击：{{ last }}</p>
   </div>
 </template>

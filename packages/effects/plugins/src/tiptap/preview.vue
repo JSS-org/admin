@@ -11,24 +11,14 @@ const props = withDefaults(defineProps<TipTapPreviewProps>(), {
   minHeight: 160,
 });
 const contentMinHeight = computed(() =>
-  typeof props.minHeight === 'number'
-    ? `${props.minHeight}px`
-    : props.minHeight,
+  typeof props.minHeight === 'number' ? `${props.minHeight}px` : props.minHeight,
 );
 const previewClass = computed(() =>
-  cn(
-    'vben-tiptap-content',
-    'text-foreground bg-transparent p-0 leading-7',
-    props.class,
-  ),
+  cn('vben-tiptap-content', 'text-foreground bg-transparent p-0 leading-7', props.class),
 );
 </script>
 
 <template>
   <!-- eslint-disable vue/no-v-html -->
-  <div
-    :class="previewClass"
-    :style="{ minHeight: contentMinHeight }"
-    v-html="content"
-  ></div>
+  <div :class="previewClass" :style="{ minHeight: contentMinHeight }" v-html="content"></div>
 </template>

@@ -63,11 +63,9 @@ Based on the above configuration, we can use `/api` as the prefix for API reques
 ```ts
 import axios from 'axios';
 
-axios
-  .post('/api/auth/login', { username: 'vben', password: '123456' })
-  .then((res) => {
-    console.log(res);
-  });
+axios.post('/api/auth/login', { username: 'vben', password: '123456' }).then((res) => {
+  console.log(res);
+});
 ```
 
 At this point, the request will be proxied to `http://localhost:5320/api/auth/login`.
@@ -169,11 +167,7 @@ import type { HttpResponse } from '@vben/request';
 
 import { useAppConfig } from '@vben/hooks';
 import { preferences } from '@vben/preferences';
-import {
-  authenticateResponseInterceptor,
-  errorMessageResponseInterceptor,
-  RequestClient,
-} from '@vben/request';
+import { authenticateResponseInterceptor, errorMessageResponseInterceptor, RequestClient } from '@vben/request';
 import { useAccessStore } from '@vben/stores';
 
 import { message } from 'antdv-next';
@@ -280,10 +274,7 @@ export const baseRequestClient = new RequestClient({ baseURL: apiURL });
 To handle multiple API endpoints, simply create multiple `requestClient` instances, as follows:
 
 ```ts
-const { apiURL, otherApiURL } = useAppConfig(
-  import.meta.env,
-  import.meta.env.PROD,
-);
+const { apiURL, otherApiURL } = useAppConfig(import.meta.env, import.meta.env.PROD);
 
 export const requestClient = createRequestClient(apiURL);
 

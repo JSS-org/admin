@@ -227,18 +227,14 @@ describe('useVbenForm integration', () => {
     expect(defaultSlotProps.componentProps.disabled).toBe(false);
     expect(defaultSlotProps.componentProps.modelValue).toBe('default-initial');
     expect(defaultSlotProps.componentProps.name).toBe('defaultField');
-    expect(defaultSlotProps.componentProps).toHaveProperty(
-      'onUpdate:modelValue',
-    );
+    expect(defaultSlotProps.componentProps).toHaveProperty('onUpdate:modelValue');
     expect(defaultSlotProps.componentProps).not.toHaveProperty('value');
 
     expect(valueSlotProps.componentProps.disabled).toBe(false);
     expect(valueSlotProps.componentProps.value).toBe('value-initial');
     expect(valueSlotProps.componentProps).toHaveProperty('onUpdate:value');
     expect(valueSlotProps.componentProps).not.toHaveProperty('modelValue');
-    expect(valueSlotProps.componentProps).not.toHaveProperty(
-      'onUpdate:modelValue',
-    );
+    expect(valueSlotProps.componentProps).not.toHaveProperty('onUpdate:modelValue');
 
     await wrapper.get('.default-protocol-input').trigger('blur');
     await wrapper.get('.default-protocol-input').setValue('default-updated');
@@ -268,8 +264,7 @@ describe('useVbenForm integration', () => {
     });
     const wrapper = mount(Form, {
       slots: {
-        default: ({ values }: { values: Record<string, any> }) =>
-          h('span', { class: 'slot-value' }, values.name),
+        default: ({ values }: { values: Record<string, any> }) => h('span', { class: 'slot-value' }, values.name),
       },
     });
     wrappers.push(wrapper);
@@ -288,9 +283,7 @@ describe('useVbenForm integration', () => {
       name: string;
     }
 
-    let latestSlotProps:
-      | undefined
-      | VbenFormFieldSlotProps<SlotFormValues, 'name'>;
+    let latestSlotProps: undefined | VbenFormFieldSlotProps<SlotFormValues, 'name'>;
     const [Form, formApi] = useVbenForm<SlotFormValues>({
       schema: [
         {
@@ -321,9 +314,7 @@ describe('useVbenForm integration', () => {
     expect(latestSlotProps.modelValue).toBe('Ada');
     expect(latestSlotProps.componentProps.modelValue).toBe('Ada');
     expect(latestSlotProps.componentProps.disabled).toBe(false);
-    expect(latestSlotProps.componentProps).toHaveProperty(
-      'onUpdate:modelValue',
-    );
+    expect(latestSlotProps.componentProps).toHaveProperty('onUpdate:modelValue');
     expect(latestSlotProps.componentProps).not.toHaveProperty('formApi');
     expect(latestSlotProps.componentProps).not.toHaveProperty('values');
     expect(latestSlotProps).not.toHaveProperty('onUpdate:modelValue');
@@ -381,9 +372,7 @@ describe('useVbenForm integration', () => {
     expect(fieldSlotProps.commonDisabled?.disabled).toBe(true);
     expect(fieldSlotProps.commonDisabled?.componentProps.disabled).toBe(true);
     expect(fieldSlotProps.dependencyDisabled?.disabled).toBe(true);
-    expect(fieldSlotProps.dependencyDisabled?.componentProps.disabled).toBe(
-      true,
-    );
+    expect(fieldSlotProps.dependencyDisabled?.componentProps.disabled).toBe(true);
   });
 
   it('supports a field-level change event fallback for legacy components', async () => {
@@ -442,9 +431,7 @@ describe('useVbenForm integration', () => {
   });
 
   it('binds fields, renders accessible errors, and submits valid values', async () => {
-    const consoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     const handleSubmit = vi.fn();
     const [Form, formApi] = useVbenForm({
       handleSubmit,
@@ -657,9 +644,7 @@ describe('useVbenForm integration', () => {
           component: TestInput,
           dependencies: {
             rules(values) {
-              return values.toggle === true
-                ? z.string().min(1, 'Details is required')
-                : null;
+              return values.toggle === true ? z.string().min(1, 'Details is required') : null;
             },
             triggerFields: ['toggle'],
           },
@@ -825,9 +810,7 @@ describe('useVbenForm integration', () => {
     await formApi.setFieldValue('contacts[0].name', 'Ada Lovelace');
     await flushPromises();
 
-    expect(wrapper.get('input[name="contacts[0].name"]').element).toBe(
-      firstInputElement,
-    );
+    expect(wrapper.get('input[name="contacts[0].name"]').element).toBe(firstInputElement);
     expect(firstInput.element.getAttribute('value')).toBe('Ada Lovelace');
 
     formApi.updateSchema([
@@ -838,12 +821,8 @@ describe('useVbenForm integration', () => {
     ]);
     await flushPromises();
 
-    expect(
-      wrapper.get('input[name="contacts[0].name"]').attributes(),
-    ).toHaveProperty('disabled');
-    expect(
-      wrapper.get('input[name="contacts[1].name"]').attributes(),
-    ).toHaveProperty('disabled');
+    expect(wrapper.get('input[name="contacts[0].name"]').attributes()).toHaveProperty('disabled');
+    expect(wrapper.get('input[name="contacts[1].name"]').attributes()).toHaveProperty('disabled');
   });
 
   it('scopes resolve dependencies to array rows', async () => {
@@ -891,9 +870,7 @@ describe('useVbenForm integration', () => {
         }),
       }),
     );
-    expect(
-      wrapper.get('input[name="contacts[0].phone"]').attributes('disabled'),
-    ).toBeDefined();
+    expect(wrapper.get('input[name="contacts[0].phone"]').attributes('disabled')).toBeDefined();
   });
 
   it('reports changed fields and submits valid changes', async () => {
@@ -924,19 +901,12 @@ describe('useVbenForm integration', () => {
     await vi.runAllTimersAsync();
     await flushPromises();
 
-    expect(handleValuesChange).toHaveBeenCalledWith(
-      { name: ' Ada ' },
-      ['name'],
-      expect.any(Function),
-    );
+    expect(handleValuesChange).toHaveBeenCalledWith({ name: ' Ada ' }, ['name'], expect.any(Function));
     const valuesChangeCall = handleValuesChange.mock.calls.at(0);
     expect(valuesChangeCall).toBeDefined();
     if (!valuesChangeCall) return;
     expect(valuesChangeCall[2]()).toEqual({ name: 'Ada' });
-    expect(handleSubmit).toHaveBeenCalledWith(
-      { name: 'Ada' },
-      { name: ' Ada ' },
-    );
+    expect(handleSubmit).toHaveBeenCalledWith({ name: 'Ada' }, { name: ' Ada ' });
   });
 
   it('respects blur and change validation triggers', async () => {
@@ -1045,10 +1015,7 @@ describe('useVbenForm integration', () => {
     await flushPromises();
 
     expect(handleSubmit).toHaveBeenCalledOnce();
-    expect(handleSubmit).toHaveBeenCalledWith(
-      { normalizedName: 'TEST' },
-      { name: ' test ' },
-    );
+    expect(handleSubmit).toHaveBeenCalledWith({ normalizedName: 'TEST' }, { name: ' test ' });
   });
 
   it('does not expose raw values through native form submit events', async () => {
@@ -1225,9 +1192,6 @@ describe('useVbenForm integration', () => {
 
     await formApi.validateAndSubmit();
     await flushPromises();
-    expect(handleSubmit).toHaveBeenCalledWith(
-      { name: 'HELLO' },
-      { name: ' hello ' },
-    );
+    expect(handleSubmit).toHaveBeenCalledWith({ name: 'HELLO' }, { name: ' hello ' });
   });
 });

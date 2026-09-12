@@ -199,8 +199,7 @@ const routes: RouteRecordRaw[] = [
                   {
                     name: 'Menu321Demo',
                     path: 'menu3-2-1',
-                    component: () =>
-                      import('#/views/demos/nested/menu-3-2-1.vue'),
+                    component: () => import('#/views/demos/nested/menu-3-2-1.vue'),
                     meta: {
                       icon: 'ic:round-menu',
                       keepAlive: true,
@@ -338,8 +337,7 @@ interface RouteMeta {
   /**
    * 徽标颜色
    */
-  badgeVariants?:
-    'default' | 'destructive' | 'primary' | 'success' | 'warning' | string;
+  badgeVariants?: 'default' | 'destructive' | 'primary' | 'success' | 'warning' | string;
   /**
    * 路由的完整路径作为key（默认true）
    */

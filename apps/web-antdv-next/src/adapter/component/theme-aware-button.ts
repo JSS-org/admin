@@ -8,10 +8,7 @@ import { preferences, usePreferences } from '@vben/preferences';
 import { ConfigProvider, theme } from 'antdv-next';
 import { useConfig } from 'antdv-next/config-provider/context';
 
-function createThemeAwareButton(
-  Button: Component,
-  type: 'default' | 'primary',
-) {
+function createThemeAwareButton(Button: Component, type: 'default' | 'primary') {
   return defineComponent({
     inheritAttrs: false,
     setup(props, { attrs, slots }) {
@@ -23,9 +20,7 @@ function createThemeAwareButton(
       const { isDark } = usePreferences();
       const { tokens } = useAntdDesignTokens();
       const buttonTheme = computed(() => {
-        const algorithm = [
-          isDark.value ? theme.darkAlgorithm : theme.defaultAlgorithm,
-        ];
+        const algorithm = [isDark.value ? theme.darkAlgorithm : theme.defaultAlgorithm];
         if (preferences.app.compact) {
           algorithm.push(theme.compactAlgorithm);
         }

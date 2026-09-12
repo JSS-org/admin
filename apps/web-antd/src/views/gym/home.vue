@@ -47,18 +47,14 @@ const shortcuts = [
   },
 ];
 
-const visibleShortcuts = computed(() =>
-  shortcuts.filter((shortcut) => accessStore.getMenuByPath(shortcut.path)),
-);
+const visibleShortcuts = computed(() => shortcuts.filter((shortcut) => accessStore.getMenuByPath(shortcut.path)));
 </script>
 
 <template>
   <div class="gym-view">
     <AdminPage title="首页">
       <section aria-labelledby="home-shortcuts-title">
-        <h2 id="home-shortcuts-title" class="mb-4 text-base font-medium">
-          常用功能
-        </h2>
+        <h2 id="home-shortcuts-title" class="mb-4 text-base font-medium">常用功能</h2>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           <RouterLink
             v-for="shortcut in visibleShortcuts"
@@ -67,11 +63,7 @@ const visibleShortcuts = computed(() =>
             class="bg-card text-card-foreground hover:border-primary focus-visible:ring-ring flex items-start gap-4 rounded-lg border p-5 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
           >
             <span class="bg-primary/10 text-primary rounded-lg p-3">
-              <IconifyIcon
-                :icon="shortcut.icon"
-                class="size-6"
-                aria-hidden="true"
-              />
+              <IconifyIcon :icon="shortcut.icon" class="size-6" aria-hidden="true" />
             </span>
             <div class="min-w-0 flex-1">
               <h3 class="mb-2 text-base font-medium">{{ shortcut.title }}</h3>

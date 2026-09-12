@@ -12,8 +12,7 @@ function createBundle(assets: FakeAsset[]) {
   return Object.fromEntries(assets.map((asset) => [asset.fileName, asset]));
 }
 
-const LAYER_ORDER_STATEMENT =
-  '@layer properties, theme, base, ant, antd, el, td, components, utilities;';
+const LAYER_ORDER_STATEMENT = '@layer properties, theme, base, ant, antd, el, td, components, utilities;';
 
 describe('viteCssLayerPlugin', () => {
   it('wraps matching css modules in the target layer', () => {
@@ -46,11 +45,7 @@ describe('viteCssLayerPlugin', () => {
 
     if (typeof transform !== 'function') return;
 
-    const result = transform.call(
-      undefined as never,
-      '.local { color: red; }',
-      '/src/views/home/index.css',
-    );
+    const result = transform.call(undefined as never, '.local { color: red; }', '/src/views/home/index.css');
 
     expect(result).toBeUndefined();
   });
@@ -79,9 +74,7 @@ describe('viteCssLayerPlugin', () => {
 
     generateBundle.call(undefined as never, {} as never, bundle);
 
-    expect(bundle['element-x.css'].source).toBe(
-      `${LAYER_ORDER_STATEMENT}\n@layer el{.el-button{color:red}}`,
-    );
+    expect(bundle['element-x.css'].source).toBe(`${LAYER_ORDER_STATEMENT}\n@layer el{.el-button{color:red}}`);
     expect(bundle['theme-x.css'].source).toBe('.local { color: blue; }');
   });
 
@@ -104,9 +97,7 @@ describe('viteCssLayerPlugin', () => {
 
     generateBundle.call(undefined as never, {} as never, bundle);
 
-    expect(bundle['element-x.css'].source).toBe(
-      `${LAYER_ORDER_STATEMENT}\n@layer el{.el-button{color:red}}`,
-    );
+    expect(bundle['element-x.css'].source).toBe(`${LAYER_ORDER_STATEMENT}\n@layer el{.el-button{color:red}}`);
   });
 
   it('injects the statement even when the asset starts with a BOM', () => {
@@ -128,9 +119,7 @@ describe('viteCssLayerPlugin', () => {
 
     generateBundle.call(undefined as never, {} as never, bundle);
 
-    expect(bundle['element-x.css'].source).toBe(
-      `${LAYER_ORDER_STATEMENT}\n\uFEFF@layer el{.el-button{color:red}}`,
-    );
+    expect(bundle['element-x.css'].source).toBe(`${LAYER_ORDER_STATEMENT}\n\uFEFF@layer el{.el-button{color:red}}`);
   });
 
   it('ignores non-css assets', () => {
@@ -152,8 +141,6 @@ describe('viteCssLayerPlugin', () => {
 
     generateBundle.call(undefined as never, {} as never, bundle);
 
-    expect(bundle['element-x.js'].source).toBe(
-      '@layer el{.el-button{color:red}}',
-    );
+    expect(bundle['element-x.js'].source).toBe('@layer el{.el-button{color:red}}');
   });
 });

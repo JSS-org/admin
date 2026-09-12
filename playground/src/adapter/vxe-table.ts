@@ -10,10 +10,7 @@ import { useAccess } from '@vben/access';
 import { VbenTableAction as VbenTableActionCore } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 import { $te } from '@vben/locales';
-import {
-  setupVbenVxeTable,
-  useVbenVxeGrid as useGrid,
-} from '@vben/plugins/vxe-table';
+import { setupVbenVxeTable, useVbenVxeGrid as useGrid } from '@vben/plugins/vxe-table';
 import { get, isFunction, isString } from '@vben/utils';
 
 import { objectOmit } from '@vueuse/core';
@@ -74,11 +71,7 @@ setupVbenVxeTable({
     vxeUI.renderer.add('CellLink', {
       renderTableDefault(renderOpts) {
         const { props } = renderOpts;
-        return h(
-          Button,
-          { size: 'small', type: 'link' },
-          { default: () => props?.text },
-        );
+        return h(Button, { size: 'small', type: 'link' }, { default: () => props?.text });
       },
     });
 
@@ -163,9 +156,7 @@ setupVbenVxeTable({
             text: $t('common.detail'),
           },
         };
-        const operations: Array<Recordable<any>> = (
-          options || ['edit', 'detail', 'delete']
-        )
+        const operations: Array<Recordable<any>> = (options || ['edit', 'detail', 'delete'])
           .map((opt) => {
             if (isString(opt)) {
               return presets[opt]
@@ -207,9 +198,7 @@ setupVbenVxeTable({
               default: () => {
                 const content = [];
                 if (opt.icon) {
-                  content.push(
-                    h(IconifyIcon, { class: 'size-5', icon: opt.icon }),
-                  );
+                  content.push(h(IconifyIcon, { class: 'size-5', icon: opt.icon }));
                 }
                 content.push(opt.text);
                 return content;
@@ -260,17 +249,13 @@ setupVbenVxeTable({
                 h(
                   'div',
                   { class: 'truncate' },
-                  $t('ui.actionMessage.deleteConfirm', [
-                    row[attrs?.nameField || 'name'],
-                  ]),
+                  $t('ui.actionMessage.deleteConfirm', [row[attrs?.nameField || 'name']]),
                 ),
             },
           );
         }
 
-        const btns = operations.map((opt) =>
-          opt.code === 'delete' ? renderConfirm(opt) : renderBtn(opt),
-        );
+        const btns = operations.map((opt) => (opt.code === 'delete' ? renderConfirm(opt) : renderBtn(opt)));
         return h(
           'div',
           {
@@ -292,19 +277,8 @@ export const useVbenVxeGrid = <
   TFormValues extends FormValues = FormValues,
   TSubmitValues extends FormValues = TFormValues,
 >(
-  ...rest: Parameters<
-    typeof useGrid<
-      T,
-      ComponentType,
-      ComponentPropsMap,
-      TFormValues,
-      TSubmitValues
-    >
-  >
-) =>
-  useGrid<T, ComponentType, ComponentPropsMap, TFormValues, TSubmitValues>(
-    ...rest,
-  );
+  ...rest: Parameters<typeof useGrid<T, ComponentType, ComponentPropsMap, TFormValues, TSubmitValues>>
+) => useGrid<T, ComponentType, ComponentPropsMap, TFormValues, TSubmitValues>(...rest);
 
 /**
  * 表格操作按钮组件
@@ -320,8 +294,7 @@ export const VbenTableAction = defineComponent(
       if (!auth) return true;
       return hasAccessByCodes(Array.isArray(auth) ? auth : [auth]);
     }
-    return () =>
-      h(VbenTableActionCore, { hasPermission, ...props, ...attrs }, slots);
+    return () => h(VbenTableActionCore, { hasPermission, ...props, ...attrs }, slots);
   },
   {
     name: 'VbenTableAction',
@@ -333,7 +306,5 @@ export type OnActionClickParams<T = Recordable<any>> = {
   code: string;
   row: T;
 };
-export type OnActionClickFn<T = Recordable<any>> = (
-  params: OnActionClickParams<T>,
-) => void;
+export type OnActionClickFn<T = Recordable<any>> = (params: OnActionClickParams<T>) => void;
 export type * from '@vben/plugins/vxe-table';

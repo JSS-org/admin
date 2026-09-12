@@ -67,9 +67,7 @@ afterEach(() => {
 describe('issue #8214: form field named nodeName crashes TreeSelect render', () => {
   it('renders MRE schema (TreeSelect parentId + Input nodeName) without error', async () => {
     // MRE: TreeSelect(fieldName parentId) + Input(fieldName nodeName)
-    const consoleError = vi
-      .spyOn(console, 'error')
-      .mockImplementation(() => {});
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
     const [Form] = useVbenForm({
       schema: [
         {
@@ -122,9 +120,7 @@ describe('issue #8214: form field named nodeName crashes TreeSelect render', () 
     // 反向场景：TreeSelect 字段本身就是 nodeName（最严格情形）
     // 环境前提：happy-dom 的 <form> 必须支持 nodeName 固有属性，
     // 否则 conflictsWithFormProperty 检测会误判（返回 undefined → 不剥离 name）
-    expect(Reflect.get(document.createElement('form'), 'nodeName')).toBe(
-      'FORM',
-    );
+    expect(Reflect.get(document.createElement('form'), 'nodeName')).toBe('FORM');
     const [Form] = useVbenForm({
       schema: [
         {

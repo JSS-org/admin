@@ -35,10 +35,7 @@ If these configurations do not meet your needs, you can implement your own login
 If you want to adjust the content of the login form, you can configure the `AuthenticationLogin` component parameters in `src/views/_core/authentication/login.vue` within your application:
 
 ```vue
-<AuthenticationLogin
-  :loading="authStore.loginLoading"
-  @submit="authStore.authLogin"
-/>
+<AuthenticationLogin :loading="authStore.loginLoading" @submit="authStore.authLogin" />
 ```
 
 ::: details AuthenticationLogin Component Props

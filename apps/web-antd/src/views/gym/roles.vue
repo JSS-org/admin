@@ -85,12 +85,7 @@ async function save() {
         <Button type="link" @click="open(row)">配置权限</Button>
       </template>
     </ResourcePage>
-    <AdminDrawer
-      v-model:open="visible"
-      title="权限配置"
-      :width="760"
-      @ok="save"
-    >
+    <AdminDrawer v-model:open="visible" title="权限配置" :width="760" @ok="save">
       <CheckboxGroup
         v-model:value="codes"
         :options="

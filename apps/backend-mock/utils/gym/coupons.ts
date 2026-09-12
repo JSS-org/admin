@@ -41,11 +41,8 @@ export function batchIdentity(req: Request, table: string) {
   const digest = createHash('sha256')
     .update(JSON.stringify(canonical(req.body)))
     .digest('hex');
-  const previous = rows(table).find(
-    (b) => b.createdBy === req.actor.id && b.requestKey === key,
-  );
-  if (previous && previous.requestDigest !== digest)
-    fail('幂等键已用于不同批量操作', 409);
+  const previous = rows(table).find((b) => b.createdBy === req.actor.id && b.requestKey === key);
+  if (previous && previous.requestDigest !== digest) fail('幂等键已用于不同批量操作', 409);
   return {
     previous,
     fields: { createdBy: req.actor.id, requestKey: key, requestDigest: digest },
@@ -108,9 +105,7 @@ function batchView(req: Request, batch: Row) {
     rows('couponRecipients').filter((r) => r.batchId === batch.id),
   );
   if (recipients.length === 0) fail('批次不可访问', 404);
-  const successCount = recipients.filter(
-    (r) => r.status === 'succeeded',
-  ).length;
+  const successCount = recipients.filter((r) => r.status === 'succeeded').length;
   return {
     id: batch.id,
     templateId: batch.templateId,
@@ -125,9 +120,7 @@ function batchView(req: Request, batch: Row) {
 }
 export function coupons(req: Request): any {
   const { actor, method, body, query } = req;
-  const [resource = '', rid, action, extra] = req.path
-    .split('/')
-    .filter(Boolean);
+  const [resource = '', rid, action, extra] = req.path.split('/').filter(Boolean);
   if (
     ![
       'coupon-batches',
@@ -145,11 +138,9 @@ export function coupons(req: Request): any {
   if (resource === 'gift-code-batches') return gifts(req, rid, action);
   let code = 'coupons:read';
   if (resource === 'coupon-quota-batches') code = 'coupons:allocate';
-  else if (method !== 'GET')
-    code = resource === 'coupon-batches' ? 'coupons:issue' : 'coupons:manage';
+  else if (method !== 'GET') code = resource === 'coupon-batches' ? 'coupons:issue' : 'coupons:manage';
   allowed(actor, code);
-  if (['coupons:allocate', 'coupons:manage'].includes(code))
-    marketingHQ(req, code);
+  if (['coupons:allocate', 'coupons:manage'].includes(code)) marketingHQ(req, code);
   if (query.storeId) storeScope(actor, uuid(query.storeId));
   if (query.memberId) memberScope(actor, uuid(query.memberId), query.storeId);
   if (resource === 'coupon-templates') {
@@ -161,9 +152,7 @@ export function coupons(req: Request): any {
         row ??
         page(
           rows('couponTemplates').filter(
-            (t) =>
-              templateVisible(req, t) &&
-              (!query.storeId || usable(t, query.storeId)),
+            (t) => templateVisible(req, t) && (!query.storeId || usable(t, query.storeId)),
           ),
           { ...query, storeId: undefined },
         )
@@ -184,11 +173,7 @@ export function coupons(req: Request): any {
         'applicableProductType',
         ...(row ? ['status'] : []),
       ]);
-      if (
-        row &&
-        row.allocatedCount > 0 &&
-        Object.keys(body).some((k) => k !== 'status')
-      )
+      if (row && row.allocatedCount > 0 && Object.keys(body).some((k) => k !== 'status'))
         fail('已分配额度或已发券的模板只能停用，请新建模板', 409);
       const data = {
         status: 'active',
@@ -208,10 +193,7 @@ export function coupons(req: Request): any {
         if (Number(data.discountAmount) <= 0) fail('减免金额须大于0');
         data.discountRate = null;
       } else {
-        if (
-          !/^0\.\d{1,6}$/.test(String(data.discountRate)) ||
-          Number(data.discountRate) <= 0
-        )
+        if (!/^0\.\d{1,6}$/.test(String(data.discountRate)) || Number(data.discountRate) <= 0)
           fail('折扣比例须大于0且小于1，最多6位小数');
         data.discountAmount = null;
       }
@@ -222,25 +204,12 @@ export function coupons(req: Request): any {
         data.totalLimit === null || data.totalLimit === undefined
           ? null
           : integer(data.totalLimit, '总张数上限', 1, 1_000_000_000);
-      data.perMemberLimit = integer(
-        data.perMemberLimit,
-        '每人领取上限',
-        1,
-        1000,
-      );
+      data.perMemberLimit = integer(data.perMemberLimit, '每人领取上限', 1, 1000);
       data.storeIds = listIds(data.storeIds, '门店');
       data.storeIds.forEach((s: string) => storeScope(actor, s));
-      if (data.scope === 'selected' && data.storeIds.length === 0)
-        fail('至少选择一个门店');
-      if (data.applicableProductType)
-        choice(
-          data.applicableProductType,
-          ['card', 'course', 'all'],
-          '商品类型',
-        );
-      return row
-        ? Object.assign(row, data, { updatedAt: now() })
-        : insert('couponTemplates', data);
+      if (data.scope === 'selected' && data.storeIds.length === 0) fail('至少选择一个门店');
+      if (data.applicableProductType) choice(data.applicableProductType, ['card', 'course', 'all'], '商品类型');
+      return row ? Object.assign(row, data, { updatedAt: now() }) : insert('couponTemplates', data);
     }
   }
   if (resource === 'coupon-store-quotas' && method === 'GET' && !rid)
@@ -281,13 +250,8 @@ export function coupons(req: Request): any {
       const identity = batchIdentity(req, 'couponQuotaBatches');
       if (identity.previous) return identity.previous;
       const template = requireTemplate(req, body.templateId);
-      const targetMode = choice(
-        body.targetMode,
-        ['selected', 'allEligible'],
-        '目标范围',
-      );
-      if (targetMode === 'allEligible' && body.storeIds !== undefined)
-        fail('全部适用门店不能同时指定门店列表');
+      const targetMode = choice(body.targetMode, ['selected', 'allEligible'], '目标范围');
+      if (targetMode === 'allEligible' && body.storeIds !== undefined) fail('全部适用门店不能同时指定门店列表');
       const selected =
         targetMode === 'selected'
           ? listIds(body.storeIds, '门店')
@@ -297,15 +261,13 @@ export function coupons(req: Request): any {
       if (selected.length === 0) fail('没有符合条件的门店');
       for (const storeId of selected) {
         const store = storeScope(actor, storeId);
-        if (store.status !== 'active' || !usable(template, storeId))
-          fail('包含停用或不适用的门店');
+        if (store.status !== 'active' || !usable(template, storeId)) fail('包含停用或不适用的门店');
       }
       const quantity = integer(body.quantityPerStore, '每店张数', 1, 1_000_000);
       const total = quantity * selected.length;
       if (
         !Number.isSafeInteger(total) ||
-        (template.totalLimit !== null &&
-          template.allocatedCount + total > template.totalLimit)
+        (template.totalLimit !== null && template.allocatedCount + total > template.totalLimit)
       )
         fail('优惠券总部可分配总额不足', 409);
       const batch = insert('couponQuotaBatches', {
@@ -331,9 +293,7 @@ export function coupons(req: Request): any {
           processedAt: now(),
         });
         const quota =
-          rows('couponQuotas').find(
-            (q) => q.templateId === template.id && q.storeId === storeId,
-          ) ??
+          rows('couponQuotas').find((q) => q.templateId === template.id && q.storeId === storeId) ??
           insert('couponQuotas', {
             templateId: template.id,
             storeId,
@@ -374,11 +334,7 @@ export function coupons(req: Request): any {
       const identity = batchIdentity(req, 'couponBatches');
       if (identity.previous) return batchView(req, identity.previous);
       const template = requireTemplate(req, body.templateId, true);
-      if (
-        !Array.isArray(body.targets) ||
-        body.targets.length === 0 ||
-        body.targets.length > 500
-      )
+      if (!Array.isArray(body.targets) || body.targets.length === 0 || body.targets.length > 500)
         fail('单次请选择1到500位会员');
       const targets: { memberId: string; storeId: string }[] = [];
       for (const target of body.targets) {
@@ -388,18 +344,14 @@ export function coupons(req: Request): any {
         memberScope(actor, memberId, storeId);
         if (!usable(template, storeId)) fail('优惠券不适用于目标门店');
         const duplicate = targets.find((t) => t.memberId === memberId);
-        if (duplicate && duplicate.storeId !== storeId)
-          fail('同一会员不能指定不同发行门店');
+        if (duplicate && duplicate.storeId !== storeId) fail('同一会员不能指定不同发行门店');
         if (!duplicate) targets.push({ memberId, storeId });
       }
       const demands = new Map<string, number>();
-      for (const target of targets)
-        demands.set(target.storeId, (demands.get(target.storeId) ?? 0) + 1);
+      for (const target of targets) demands.set(target.storeId, (demands.get(target.storeId) ?? 0) + 1);
       const quotas = new Map<string, Row>();
       for (const [storeId, count] of demands) {
-        const quota = rows('couponQuotas').find(
-          (q) => q.storeId === storeId && q.templateId === template.id,
-        );
+        const quota = rows('couponQuotas').find((q) => q.storeId === storeId && q.templateId === template.id);
         if (
           !quota ||
           quota.status !== 'active' ||
@@ -463,12 +415,8 @@ export function coupons(req: Request): any {
           ledger(quota, 'issue', 0, -1, 1, recipient.id);
         }
       }
-      const recipients = rows('couponRecipients').filter(
-        (r) => r.batchId === batch.id,
-      );
-      batch.status = recipients.every((r) => r.status === 'succeeded')
-        ? 'succeeded'
-        : 'completed';
+      const recipients = rows('couponRecipients').filter((r) => r.batchId === batch.id);
+      batch.status = recipients.every((r) => r.status === 'succeeded') ? 'succeeded' : 'completed';
       audit(req, 'coupon.issue', batch);
       return batchView(req, batch);
     }
@@ -494,38 +442,22 @@ function gifts(req: Request, rid?: string, action?: string) {
         }
       : page(rows('giftBatches'), query);
   if (method === 'POST' && !rid) {
-    only(body, [
-      'name',
-      'rewardType',
-      'cardTemplateId',
-      'courseProductId',
-      'pointAmount',
-      'count',
-      'expiresAt',
-    ]);
+    only(body, ['name', 'rewardType', 'cardTemplateId', 'courseProductId', 'pointAmount', 'count', 'expiresAt']);
     const identity = batchIdentity(req, 'giftBatches');
     if (identity.previous) return identity.previous;
     const data = { ...body };
     data.name = str(data.name, '批次名称');
     choice(data.rewardType, ['card', 'course', 'points'], '礼品类型');
     if (
-      [data.cardTemplateId, data.courseProductId, data.pointAmount].filter(
-        (v) => v !== undefined && v !== null,
-      ).length !== 1
+      [data.cardTemplateId, data.courseProductId, data.pointAmount].filter((v) => v !== undefined && v !== null)
+        .length !== 1
     )
       fail('请选择且仅选择一种礼品权益');
-    if (
-      data.rewardType === 'card' &&
-      find('cardTemplates', uuid(data.cardTemplateId)).status !== 'published'
-    )
+    if (data.rewardType === 'card' && find('cardTemplates', uuid(data.cardTemplateId)).status !== 'published')
       fail('请选择已发布卡种');
-    if (
-      data.rewardType === 'course' &&
-      find('courseProducts', uuid(data.courseProductId)).status !== 'active'
-    )
+    if (data.rewardType === 'course' && find('courseProducts', uuid(data.courseProductId)).status !== 'active')
       fail('请选择有效课程');
-    if (data.rewardType === 'points')
-      data.pointAmount = integer(data.pointAmount, '积分', 1, 1_000_000);
+    if (data.rewardType === 'points') data.pointAmount = integer(data.pointAmount, '积分', 1, 1_000_000);
     data.count = integer(data.count, '数量', 1, 1000);
     data.expiresAt = new Date(date(data.expiresAt, '过期时间')).toISOString();
     if (Date.parse(data.expiresAt) <= Date.now()) fail('过期时间必须在未来');

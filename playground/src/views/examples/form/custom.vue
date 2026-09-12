@@ -31,9 +31,7 @@ type CustomSubmitValues = ReturnType<typeof encodeCustomFormValues>;
 
 const dynamicComponentType = ref<'input' | 'select'>('input');
 
-function decodeCustomFormValues(
-  values: Readonly<CustomSubmitValues>,
-): CustomFormValues {
+function decodeCustomFormValues(values: Readonly<CustomSubmitValues>): CustomFormValues {
   const { phoneNumber, phoneType, ...formValues } = values;
   return {
     ...formValues,
@@ -170,9 +168,7 @@ function onSubmit(values: CustomSubmitValues) {
     <Card title="基础示例">
       <template #extra>
         <Button @click="handleToggleDynamicComponent">
-          {{
-            dynamicComponentType === 'input' ? '切换为下拉框' : '切换为输入框'
-          }}
+          {{ dynamicComponentType === 'input' ? '切换为下拉框' : '切换为输入框' }}
         </Button>
       </template>
       <Form>

@@ -8,11 +8,11 @@ This migration upgrades form schemas from Zod 3 to Zod 4 and replaces vee-valida
 
 ## Dependency Changes
 
-| Area | Before | After |
-| --- | --- | --- |
-| Schema | `zod@^3.25.76` | `zod@^4.4.3` |
-| Defaults | `zod-defaults@0.1.3` | `zod-defaults@^0.2.3` |
-| Form engine | `vee-validate@^4.15.1` | `@tanstack/vue-form@^1.33.2` |
+| Area        | Before                      | After                                           |
+| ----------- | --------------------------- | ----------------------------------------------- |
+| Schema      | `zod@^3.25.76`              | `zod@^4.4.3`                                    |
+| Defaults    | `zod-defaults@0.1.3`        | `zod-defaults@^0.2.3`                           |
+| Form engine | `vee-validate@^4.15.1`      | `@tanstack/vue-form@^1.33.2`                    |
 | Zod adapter | `@vee-validate/zod@^4.15.1` | Removed; TanStack Form supports Standard Schema |
 
 Source files, package manifests, and the lockfile must no longer depend on `vee-validate` or `@vee-validate/zod`.
@@ -120,10 +120,7 @@ setupVbenForm({
   rules: {
     required(value, _params, context) {
       const isEmpty =
-        value === undefined ||
-        value === null ||
-        value === '' ||
-        (Array.isArray(value) && value.length === 0);
+        value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0);
       return isEmpty ? `${context.label} is required` : true;
     },
   },
@@ -162,8 +159,7 @@ Replace `required_error` and `invalid_type_error` with `error`:
 
 ```ts
 const count = z.number({
-  error: (issue) =>
-    issue.input === undefined ? 'Count is required' : 'Count must be a number',
+  error: (issue) => (issue.input === undefined ? 'Count is required' : 'Count must be a number'),
 });
 ```
 

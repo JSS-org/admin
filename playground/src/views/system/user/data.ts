@@ -92,9 +92,7 @@ export function useGridFormSchema(): VbenFormSchema[] {
  * 用户详情描述列表项
  * @param row 用户数据
  */
-export function useDescriptionItems(
-  row?: SystemUserApi.SystemUser,
-): DescriptionsItemType[] {
+export function useDescriptionItems(row?: SystemUserApi.SystemUser): DescriptionsItemType[] {
   const enabled = row?.status === 1;
   return [
     { label: $t('system.user.name'), content: row?.name },
@@ -109,8 +107,7 @@ export function useDescriptionItems(
             color: enabled ? 'success' : 'error',
           },
           {
-            default: () =>
-              enabled ? $t('common.enabled') : $t('common.disabled'),
+            default: () => (enabled ? $t('common.enabled') : $t('common.disabled')),
           },
         ),
     },

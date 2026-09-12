@@ -5,16 +5,7 @@ import { Page } from '@vben/common-ui';
 import { Motion, MotionGroup, MotionPresets } from '@vben/plugins/motion';
 
 import { refAutoReset, watchDebounced } from '@vueuse/core';
-import {
-  Button,
-  Card,
-  Col,
-  Form,
-  FormItem,
-  InputNumber,
-  Row,
-  Select,
-} from 'antdv-next';
+import { Button, Card, Col, Form, FormItem, InputNumber, Row, Select } from 'antdv-next';
 // 本例子用不到visible类型的动画。带有VisibleOnce和Visible的类型会在组件进入视口被显示时执行动画，
 const presets = MotionPresets.filter((v) => !v.includes('Visible'));
 const showCard1 = refAutoReset(true, 100);
@@ -79,17 +70,9 @@ function openDocPage() {
         </div>
       </div>
     </Card>
-    <Card
-      class="mt-2"
-      title="使用组件（将内部作为一个整体添加动画）"
-      :styles="{ body: { padding: 0 } }"
-    >
+    <Card class="mt-2" title="使用组件（将内部作为一个整体添加动画）" :styles="{ body: { padding: 0 } }">
       <div class="relative flex-center min-h-32 gap-2 overflow-hidden">
-        <Motion
-          v-bind="motionProps"
-          v-if="showCard2"
-          class="flex items-center gap-2"
-        >
+        <Motion v-bind="motionProps" v-if="showCard2" class="flex items-center gap-2">
           <Button size="large">这个按钮在显示时会有动画效果</Button>
           <span>附属组件，会作为整体处理动画</span>
         </Motion>
@@ -114,10 +97,7 @@ function openDocPage() {
           <Row>
             <Col :span="8">
               <FormItem prop="preset" label="动画效果">
-                <Select
-                  v-model:value="motionProps.preset"
-                  :options="presets.map((p) => ({ label: p, value: p }))"
-                />
+                <Select v-model:value="motionProps.preset" :options="presets.map((p) => ({ label: p, value: p }))" />
               </FormItem>
             </Col>
             <Col :span="8">
@@ -144,11 +124,7 @@ function openDocPage() {
         </Form>
       </div>
     </Card>
-    <Card
-      class="mt-2"
-      title="分组动画（每个子元素都会应用相同的独立动画）"
-      :styles="{ body: { padding: 0 } }"
-    >
+    <Card class="mt-2" title="分组动画（每个子元素都会应用相同的独立动画）" :styles="{ body: { padding: 0 } }">
       <div class="relative flex-center min-h-32 gap-2 overflow-hidden">
         <MotionGroup v-bind="motionGroupProps" v-if="showCard3">
           <Button size="large">按钮1</Button>

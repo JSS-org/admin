@@ -96,8 +96,7 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'FormScrollToErrorExample',
             path: 'scroll-to-error-test',
-            component: () =>
-              import('#/views/examples/form/scroll-to-error-test.vue'),
+            component: () => import('#/views/examples/form/scroll-to-error-test.vue'),
             meta: {
               title: $t('examples.form.scrollToError'),
             },
@@ -172,8 +171,7 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'VxeTableCustomCellExample',
             path: 'custom-cell',
-            component: () =>
-              import('#/views/examples/vxe-table/custom-cell.vue'),
+            component: () => import('#/views/examples/vxe-table/custom-cell.vue'),
             meta: {
               title: $t('examples.vxeTable.custom-cell'),
             },
@@ -231,8 +229,7 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'DragVerifyExample',
             path: 'slider',
-            component: () =>
-              import('#/views/examples/captcha/slider-captcha.vue'),
+            component: () => import('#/views/examples/captcha/slider-captcha.vue'),
             meta: {
               title: $t('examples.captcha.sliderCaptcha'),
             },
@@ -240,8 +237,7 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'RotateVerifyExample',
             path: 'slider-rotate',
-            component: () =>
-              import('#/views/examples/captcha/slider-rotate-captcha.vue'),
+            component: () => import('#/views/examples/captcha/slider-rotate-captcha.vue'),
             meta: {
               title: $t('examples.captcha.sliderRotateCaptcha'),
             },
@@ -249,8 +245,7 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'TranslateVerifyExample',
             path: 'slider-translate',
-            component: () =>
-              import('#/views/examples/captcha/slider-translate-captcha.vue'),
+            component: () => import('#/views/examples/captcha/slider-translate-captcha.vue'),
             meta: {
               title: $t('examples.captcha.sliderTranslateCaptcha'),
             },
@@ -258,8 +253,7 @@ const routes: RouteRecordRaw[] = [
           {
             name: 'CaptchaPointSelectionExample',
             path: 'point-selection',
-            component: () =>
-              import('#/views/examples/captcha/point-selection-captcha.vue'),
+            component: () => import('#/views/examples/captcha/point-selection-captcha.vue'),
             meta: {
               title: $t('examples.captcha.pointSelection'),
             },

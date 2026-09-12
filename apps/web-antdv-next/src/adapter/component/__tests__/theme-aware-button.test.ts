@@ -1,4 +1,4 @@
-/* eslint-disable vue/one-component-per-file, vue/require-default-prop */
+/* eslint-disable vue/require-default-prop */
 
 import type { App, Component } from 'vue';
 
@@ -42,15 +42,13 @@ vi.mock('antdv-next/config-provider/context', () => ({
 }));
 
 vi.mock('antdv-next', async () => {
-  const { defineComponent, h } =
-    await vi.importActual<typeof import('vue')>('vue');
+  const { defineComponent, h } = await vi.importActual<typeof import('vue')>('vue');
   return {
     ConfigProvider: defineComponent({
       props: { theme: Object },
       setup(props, { slots }) {
         mocks.providerThemes.push(props.theme);
-        return () =>
-          h('section', { 'data-theme-provider': '' }, slots.default?.());
+        return () => h('section', { 'data-theme-provider': '' }, slots.default?.());
       },
     }),
     theme: {
@@ -65,12 +63,7 @@ const Button = defineComponent({
   inheritAttrs: false,
   props: { type: String },
   setup(props, { attrs, slots }) {
-    return () =>
-      h(
-        'button',
-        { ...attrs, 'data-button-type': props.type },
-        slots.default?.(),
-      );
+    return () => h('button', { ...attrs, 'data-button-type': props.type }, slots.default?.());
   },
 });
 
@@ -79,9 +72,7 @@ let activeApp: App | undefined;
 function mountButton(component: Component) {
   const container = document.createElement('div');
   document.body.append(container);
-  activeApp = createApp(() =>
-    h(component, { 'data-probe': 'button' }, () => 'Submit'),
-  );
+  activeApp = createApp(() => h(component, { 'data-probe': 'button' }, () => 'Submit'));
   activeApp.mount(container);
   return container;
 }
@@ -105,9 +96,7 @@ describe('createThemeAwareButton', () => {
     const container = mountButton(createThemeAwareButton(Button, 'primary'));
 
     expect(container.querySelector('[data-theme-provider]')).toBeNull();
-    expect(container.querySelector('button')?.dataset.buttonType).toBe(
-      'primary',
-    );
+    expect(container.querySelector('button')?.dataset.buttonType).toBe('primary');
     expect(container.querySelector('button')?.dataset.probe).toBe('button');
   });
 
@@ -123,8 +112,6 @@ describe('createThemeAwareButton', () => {
         token: mocks.tokens,
       },
     ]);
-    expect(container.querySelector('button')?.dataset.buttonType).toBe(
-      'default',
-    );
+    expect(container.querySelector('button')?.dataset.buttonType).toBe('default');
   });
 });

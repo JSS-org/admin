@@ -110,19 +110,13 @@ function confirm(content: string, title: string) {
  * @param row 行数据
  * @returns 返回false则中止改变，返回其他值（undefined、true）则允许改变
  */
-async function onStatusChange(
-  newStatus: number,
-  row: SystemUserApi.SystemUser,
-) {
+async function onStatusChange(newStatus: number, row: SystemUserApi.SystemUser) {
   const status: Recordable<string> = {
     0: '禁用',
     1: '启用',
   };
   try {
-    await confirm(
-      `你要将${row.name}的状态切换为 【${status[newStatus.toString()]}】 吗？`,
-      `切换状态`,
-    );
+    await confirm(`你要将${row.name}的状态切换为 【${status[newStatus.toString()]}】 吗？`, `切换状态`);
     await updateUser(row.id, { status: newStatus });
     return true;
   } catch {
@@ -184,9 +178,7 @@ function searchDept(value: string) {
     loadDeptList();
     return;
   }
-  const filtered = deptList.value.filter((dept) =>
-    dept.name.toLowerCase().includes(value.toLowerCase()),
-  );
+  const filtered = deptList.value.filter((dept) => dept.name.toLowerCase().includes(value.toLowerCase()));
   deptList.value = filtered;
 }
 
@@ -204,10 +196,7 @@ watch(inputSearchValue, (value) => {
     <DetailDrawer @success="onRefresh" />
     <div class="flex size-full">
       <Card class="w-1/6">
-        <InputSearch
-          v-model:value="inputSearchValue"
-          :placeholder="$t('system.user.placeholder')"
-        />
+        <InputSearch v-model:value="inputSearchValue" :placeholder="$t('system.user.placeholder')" />
         <Tree
           label-field="name"
           value-field="id"

@@ -47,11 +47,7 @@ outline: deep
 ::: details ant design vue 表单适配器
 
 ```ts
-import type {
-  FormValues,
-  VbenFormProps as FormProps,
-  VbenFormSchema as FormSchema,
-} from '@vben/common-ui';
+import type { FormValues, VbenFormProps as FormProps, VbenFormSchema as FormSchema } from '@vben/common-ui';
 
 import type { ComponentType } from './component';
 
@@ -102,8 +98,11 @@ function useVbenForm<TValues extends FormValues = FormValues>(
 }
 
 export { useVbenForm, z };
-export type VbenFormSchema<TValues extends FormValues = FormValues> =
-  FormSchema<ComponentType, Record<never, never>, TValues>;
+export type VbenFormSchema<TValues extends FormValues = FormValues> = FormSchema<
+  ComponentType,
+  Record<never, never>,
+  TValues
+>;
 export type VbenFormProps<TValues extends FormValues = FormValues> = FormProps<
   ComponentType,
   Record<never, never>,
@@ -153,10 +152,7 @@ import {
   Upload,
 } from 'antdv-next';
 
-const withDefaultPlaceholder = <T extends Component>(
-  component: T,
-  type: 'input' | 'select',
-) => {
+const withDefaultPlaceholder = <T extends Component>(component: T, type: 'input' | 'select') => {
   return (props: any, { attrs, slots }: Omit<SetupContext, 'expose'>) => {
     const placeholder = props?.placeholder || $t(`ui.placeholder.${type}`);
     return h(component, { ...props, ...attrs, placeholder }, slots);
@@ -420,15 +416,11 @@ async function fillForm() {
     <template #email="{ componentField, field, formApi, values }">
       <!-- field.state.value、componentField.modelValue 均为 string -->
       <input v-bind="componentField" :data-email="values.email" />
-      <button type="button" @click="formApi.clearValidation('email')">
-        Clear
-      </button>
+      <button type="button" @click="formApi.clearValidation('email')">Clear</button>
     </template>
     <template #default="{ formApi, shapes, values }">
       <!-- values: AccountFormValues -->
-      <button type="button" @click="formApi.submit()">
-        Submit {{ shapes.length }} fields for {{ values.email }}
-      </button>
+      <button type="button" @click="formApi.submit()">Submit {{ shapes.length }} fields for {{ values.email }}</button>
     </template>
   </Form>
 </template>
@@ -646,9 +638,7 @@ export interface FormFieldSchema<
   /** 组件 */
   component: Component | T;
   /** 组件参数 */
-  componentProps?:
-    | MaybeComponentProps
-    | ((ctx: FormSchemaContext<TValues>) => MaybeComponentProps);
+  componentProps?: MaybeComponentProps | ((ctx: FormSchemaContext<TValues>) => MaybeComponentProps);
   /** 默认值 */
   defaultValue?: any;
   /** 依赖 */
@@ -664,9 +654,7 @@ export interface FormFieldSchema<
   /** 表单的标签（如果是一个string，会用于默认必选规则的消息提示） */
   label?: CustomRenderType;
   /** 自定义组件内部渲染  */
-  renderComponentContent?: (
-    ctx: FormSchemaContext<TValues>,
-  ) => Record<string, any>;
+  renderComponentContent?: (ctx: FormSchemaContext<TValues>) => Record<string, any>;
   /** 字段规则 */
   rules?: FormSchemaRuleType;
   /** 后缀 */

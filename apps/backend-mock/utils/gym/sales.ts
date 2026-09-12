@@ -33,27 +33,18 @@ export function amount(value: bigint): string {
 }
 function cardForStore(id: string, storeId: string, monthly = false) {
   const card = find('cardTemplates', uuid(id));
-  if (
-    card.status !== 'published' ||
-    (card.accessScope === 'selected' && !card.storeIds.includes(storeId))
-  )
+  if (card.status !== 'published' || (card.accessScope === 'selected' && !card.storeIds.includes(storeId)))
     fail('卡种尚未发布或不适用于该门店');
-  if (
-    monthly &&
-    (card.kind !== 'period' || card.durationDays < 28 || card.durationDays > 31)
-  )
+  if (monthly && (card.kind !== 'period' || card.durationDays < 28 || card.durationDays > 31))
     fail('连续包月须选择月卡模板');
   return card;
 }
 function settings(req: Request, storeId: string, kind: string) {
   const { actor, body, method } = req;
   allowed(actor, 'sales:settings');
-  if (!actor.globalCodes.includes('sales:settings'))
-    fail('仅总部可配置售卡', 403);
+  if (!actor.globalCodes.includes('sales:settings')) fail('仅总部可配置售卡', 403);
   storeScope(actor, uuid(storeId));
-  const existing = rows('salesSettings').find(
-    (s) => s.storeId === storeId && s.kind === kind,
-  );
+  const existing = rows('salesSettings').find((s) => s.storeId === storeId && s.kind === kind);
   const defaults: Record<string, any> = {
     'online-sales-settings': {
       enabled: false,
@@ -74,8 +65,7 @@ function settings(req: Request, storeId: string, kind: string) {
     only(body, ['enabled', 'contractRequired', 'offers']);
     const enabled = boolean(body.enabled, '售卡开关');
     const contractRequired = boolean(body.contractRequired, '合同要求');
-    if (!Array.isArray(body.offers) || body.offers.length > 1000)
-      fail('售卡配置必须为列表且不超过1000项');
+    if (!Array.isArray(body.offers) || body.offers.length > 1000) fail('售卡配置必须为列表且不超过1000项');
     const offers = body.offers.map((o: Row) => {
       only(o, ['cardTemplateId', 'salePrice', 'startsAt', 'endsAt', 'enabled']);
       cardForStore(o.cardTemplateId, storeId);
@@ -84,79 +74,47 @@ function settings(req: Request, storeId: string, kind: string) {
         salePrice: money(o.salePrice),
         enabled: boolean(o.enabled, '启用'),
       };
-      if (item.startsAt)
-        item.startsAt = new Date(date(item.startsAt, '开始时间')).toISOString();
-      if (item.endsAt)
-        item.endsAt = new Date(date(item.endsAt, '结束时间')).toISOString();
-      if (item.startsAt && item.endsAt && item.startsAt >= item.endsAt)
-        fail('售卡时间范围不合法');
+      if (item.startsAt) item.startsAt = new Date(date(item.startsAt, '开始时间')).toISOString();
+      if (item.endsAt) item.endsAt = new Date(date(item.endsAt, '结束时间')).toISOString();
+      if (item.startsAt && item.endsAt && item.startsAt >= item.endsAt) fail('售卡时间范围不合法');
       return item;
     });
-    if (new Set(offers.map((o) => o.cardTemplateId)).size !== offers.length)
-      fail('卡种不可重复');
+    if (new Set(offers.map((o) => o.cardTemplateId)).size !== offers.length) fail('卡种不可重复');
     data = { enabled, contractRequired, offers };
   }
   if (kind === 'subscription-settings') {
     only(body, ['items']);
-    if (!Array.isArray(body.items) || body.items.length > 1000)
-      fail('包月配置必须为列表且不超过1000项');
+    if (!Array.isArray(body.items) || body.items.length > 1000) fail('包月配置必须为列表且不超过1000项');
     const items = body.items.map((item: Row): Row => {
-      only(item, [
-        'cardTemplateId',
-        'price',
-        'billingDay',
-        'renewalNoticeDays',
-        'graceDays',
-        'enabled',
-      ]);
+      only(item, ['cardTemplateId', 'price', 'billingDay', 'renewalNoticeDays', 'graceDays', 'enabled']);
       cardForStore(item.cardTemplateId, storeId, true);
       return {
         ...item,
         price: money(item.price),
-        billingDay: item.billingDay
-          ? integer(item.billingDay, '扣款日', 1, 28)
-          : null,
-        renewalNoticeDays: integer(
-          item.renewalNoticeDays,
-          '提前通知天数',
-          0,
-          30,
-        ),
+        billingDay: item.billingDay ? integer(item.billingDay, '扣款日', 1, 28) : null,
+        renewalNoticeDays: integer(item.renewalNoticeDays, '提前通知天数', 0, 30),
         graceDays: integer(item.graceDays, '宽限天数', 0, 30),
         enabled: boolean(item.enabled, '启用'),
       };
     });
-    if (new Set(items.map((i) => i.cardTemplateId)).size !== items.length)
-      fail('卡种不可重复');
+    if (new Set(items.map((i) => i.cardTemplateId)).size !== items.length) fail('卡种不可重复');
     data = { items };
   }
   if (kind === 'verification-settings') {
-    only(body, [
-      'enabled',
-      'requireCheckin',
-      'supportedChannels',
-      'allowedStart',
-      'allowedEnd',
-    ]);
+    only(body, ['enabled', 'requireCheckin', 'supportedChannels', 'allowedStart', 'allowedEnd']);
     if (!Array.isArray(body.supportedChannels)) fail('请选择核销渠道');
     const supportedChannels = [
-      ...new Set(
-        body.supportedChannels.map((c) =>
-          choice(c, ['miniapp', 'app', 'meituan', 'douyin'], '核销渠道'),
-        ),
-      ),
+      ...new Set(body.supportedChannels.map((c) => choice(c, ['miniapp', 'app', 'meituan', 'douyin'], '核销渠道'))),
     ];
     for (const key of ['allowedStart', 'allowedEnd'])
-      if (body[key] && !/^([01]\d|2[0-3]):[0-5]\d$/.test(body[key]))
-        fail('允许核销时间须为HH:mm');
+      if (body[key] && !/^([01]\d|2[0-3]):[0-5]\d$/.test(body[key])) fail('允许核销时间须为HH:mm');
     data = {
       ...body,
       enabled: boolean(body.enabled, '核销开关'),
       requireCheckin: boolean(body.requireCheckin, '签到要求'),
       supportedChannels,
     };
-    if (data.enabled && supportedChannels.length === 0)
-      fail('启用核销时至少选一个渠道');
+    if (data.enabled && supportedChannels.length === 0) fail('启用核销时至少选一个渠道');
   }
   return existing
     ? Object.assign(existing, data, { updatedAt: now() })
@@ -173,38 +131,26 @@ export interface SaleFact {
   occurredAt: string;
 }
 // Payment and refund events retain their own dates. A later refund never rewrites an earlier month's receipts.
-export function saleFacts(
-  actor: Actor,
-  query: Record<string, any>,
-): SaleFact[] {
+export function saleFacts(actor: Actor, query: Record<string, any>): SaleFact[] {
   const [from, to] = range(query);
-  const orders = scopeRows(actor, rows('orders')).filter(
-    (o) => !query.storeId || o.storeId === query.storeId,
-  );
+  const orders = scopeRows(actor, rows('orders')).filter((o) => !query.storeId || o.storeId === query.storeId);
   const facts: SaleFact[] = [];
   for (const order of orders) {
-    const payments = rows('payments').filter(
-      (p) => p.orderId === order.id && p.status === 'succeeded',
-    );
+    const payments = rows('payments').filter((p) => p.orderId === order.id && p.status === 'succeeded');
     const events = payments.map((p) => ({
       at: p.paidAt,
       cents: cents(p.amount),
     }));
     for (const refund of rows('refunds').filter(
-      (r) =>
-        payments.some((p) => p.id === r.paymentTransactionId) &&
-        r.status === 'succeeded',
+      (r) => payments.some((p) => p.id === r.paymentTransactionId) && r.status === 'succeeded',
     ))
       events.push({ at: refund.refundedAt, cents: -cents(refund.amount) });
     const items = rows('orderItems').filter((i) => i.orderId === order.id);
     const total = items.reduce((sum, i) => sum + cents(i.payableAmount), 0n);
-    for (const event of events.filter(
-      (e) => Date.parse(e.at) >= from && Date.parse(e.at) < to,
-    )) {
+    for (const event of events.filter((e) => Date.parse(e.at) >= from && Date.parse(e.at) < to)) {
       let assigned = 0n;
       items.forEach((item, index) => {
-        let value =
-          total > 0n ? (event.cents * cents(item.payableAmount)) / total : 0n;
+        let value = total > 0n ? (event.cents * cents(item.payableAmount)) / total : 0n;
         if (index === items.length - 1) value = event.cents - assigned;
         assigned += value;
         facts.push({
@@ -228,17 +174,13 @@ function reports(req: Request, name: string) {
   if (query.storeId) storeScope(actor, uuid(query.storeId));
   const permitted = accessibleStores(actor);
   const stores = rows('stores').filter(
-    (s) =>
-      (!permitted || permitted.includes(s.id)) &&
-      (!query.storeId || s.id === query.storeId),
+    (s) => (!permitted || permitted.includes(s.id)) && (!query.storeId || s.id === query.storeId),
   );
   const [from, to] = range(query);
   if (name === 'members') {
     const result = stores.map((store) => {
       const members = rows('members').filter((m) =>
-        rows('memberStores').some(
-          (s) => s.memberId === m.id && s.storeId === store.id,
-        ),
+        rows('memberStores').some((s) => s.memberId === m.id && s.storeId === store.id),
       );
       const expiring = (table: string) =>
         new Set(
@@ -256,11 +198,7 @@ function reports(req: Request, name: string) {
         id: store.id,
         storeName: store.name,
         totalMembers: members.length,
-        newMembers: members.filter(
-          (m) =>
-            Date.parse(m.registeredAt) >= from &&
-            Date.parse(m.registeredAt) < to,
-        ).length,
+        newMembers: members.filter((m) => Date.parse(m.registeredAt) >= from && Date.parse(m.registeredAt) < to).length,
         leads: members.filter((m) => m.customerStage === 'lead').length,
         expiringCards: expiring('memberCards'),
         expiringCourses: expiring('memberCoursePacks'),
@@ -270,11 +208,7 @@ function reports(req: Request, name: string) {
   }
   const facts = saleFacts(actor, query);
   if (name === 'performance') {
-    const group = choice(
-      query.groupBy ?? 'store',
-      ['store', 'employee'],
-      '汇总方式',
-    );
+    const group = choice(query.groupBy ?? 'store', ['store', 'employee'], '汇总方式');
     const groups: Row[] =
       group === 'store'
         ? stores.map((s) => ({ id: s.id, name: s.name }))
@@ -285,49 +219,32 @@ function reports(req: Request, name: string) {
       const values = facts.flatMap((f) => {
         if (group === 'store') return f.storeId === entry.id ? [f] : [];
         return rows('performanceAllocations')
-          .filter(
-            (a) => a.orderItemId === f.itemId && a.employeeId === entry.id,
-          )
+          .filter((a) => a.orderItemId === f.itemId && a.employeeId === entry.id)
           .map((a) => ({
             ...f,
-            cents:
-              (f.cents * BigInt(Math.round(Number(a.shareRatio) * 1_000_000))) /
-              1_000_000n,
+            cents: (f.cents * BigInt(Math.round(Number(a.shareRatio) * 1_000_000))) / 1_000_000n,
           }));
       });
       const net = values.reduce((sum, f) => sum + f.cents, 0n);
-      const count = new Set(
-        values.filter((f) => f.cents > 0n).map((f) => f.orderId),
-      ).size;
+      const count = new Set(values.filter((f) => f.cents > 0n).map((f) => f.orderId)).size;
       const staffCount =
         group === 'store'
-          ? rows('employees').filter(
-              (e) => e.storeIds.includes(entry.id) && e.status === 'active',
-            ).length
+          ? rows('employees').filter((e) => e.storeIds.includes(entry.id) && e.status === 'active').length
           : 1;
       return {
         ...entry,
         netAmount: amount(net),
-        cardAmount: amount(
-          values
-            .filter((f) => f.productType === 'card')
-            .reduce((sum, f) => sum + f.cents, 0n),
-        ),
+        cardAmount: amount(values.filter((f) => f.productType === 'card').reduce((sum, f) => sum + f.cents, 0n)),
         ptAmount: amount(
           values
             .filter(
-              (f) =>
-                f.productType === 'course' &&
-                find('courseProducts', f.courseProductId ?? '').kind ===
-                  'personal',
+              (f) => f.productType === 'course' && find('courseProducts', f.courseProductId ?? '').kind === 'personal',
             )
             .reduce((sum, f) => sum + f.cents, 0n),
         ),
         orderCount: count,
         employeeCount: staffCount,
-        averageEmployeeAmount: amount(
-          staffCount ? net / BigInt(staffCount) : 0n,
-        ),
+        averageEmployeeAmount: amount(staffCount ? net / BigInt(staffCount) : 0n),
         averageOrderAmount: amount(count ? net / BigInt(count) : 0n),
       };
     });
@@ -335,30 +252,22 @@ function reports(req: Request, name: string) {
       ...page(results, { page: query.page, pageSize: query.pageSize }),
       summary: {
         netAmount: amount(facts.reduce((sum, f) => sum + f.cents, 0n)),
-        orderCount: new Set(
-          facts.filter((f) => f.cents > 0n).map((f) => f.orderId),
-        ).size,
+        orderCount: new Set(facts.filter((f) => f.cents > 0n).map((f) => f.orderId)).size,
       },
     };
   }
   if (name === 'member-cards') {
-    const cards = rows('cardTemplates').filter(
-      (c) => !query.cardTemplateId || c.id === query.cardTemplateId,
-    );
+    const cards = rows('cardTemplates').filter((c) => !query.cardTemplateId || c.id === query.cardTemplateId);
     const result = cards.map((card) => {
       const values = facts.filter((f) => f.cardTemplateId === card.id);
       const sold = rows('memberCards').filter(
-        (c) =>
-          c.cardTemplateId === card.id &&
-          stores.some((s) => s.id === c.issuedStoreId),
+        (c) => c.cardTemplateId === card.id && stores.some((s) => s.id === c.issuedStoreId),
       );
       return {
         id: card.id,
         name: card.name,
         version: card.version,
-        soldCount: sold.filter(
-          (c) => Date.parse(c.startsAt) >= from && Date.parse(c.startsAt) < to,
-        ).length,
+        soldCount: sold.filter((c) => Date.parse(c.startsAt) >= from && Date.parse(c.startsAt) < to).length,
         netAmount: amount(values.reduce((sum, f) => sum + f.cents, 0n)),
         holderCount: new Set(sold.map((c) => c.memberId)).size,
         usageCount: rows('cardUsage').filter(
@@ -376,18 +285,12 @@ function reports(req: Request, name: string) {
 }
 export function sales(req: Request): any {
   const { actor, method, query } = req;
-  const [resource = '', rid, action, extra] = req.path
-    .split('/')
-    .filter(Boolean);
+  const [resource = '', rid, action, extra] = req.path.split('/').filter(Boolean);
   if (
     resource === 'stores' &&
     rid &&
     action &&
-    [
-      'online-sales-settings',
-      'subscription-settings',
-      'verification-settings',
-    ].includes(action) &&
+    ['online-sales-settings', 'subscription-settings', 'verification-settings'].includes(action) &&
     !extra
   )
     return settings(req, rid, action);
@@ -415,9 +318,7 @@ export function sales(req: Request): any {
   if (resource === 'self-service-card-orders') {
     const qualifies = (order: Row) =>
       ['app', 'miniapp'].includes(order.channel) &&
-      rows('orderItems').some(
-        (i) => i.orderId === order.id && i.productType === 'card',
-      );
+      rows('orderItems').some((i) => i.orderId === order.id && i.productType === 'card');
     if (row && !qualifies(row)) fail('记录不存在', 404);
     if (action) fail('接口不存在', 404);
     if (row)
@@ -425,9 +326,7 @@ export function sales(req: Request): any {
         ...decorate(row),
         items: rows('orderItems').filter((i) => i.orderId === row.id),
         cards: rows('memberCards').filter((c) =>
-          rows('orderItems').some(
-            (i) => i.id === c.orderItemId && i.orderId === row.id,
-          ),
+          rows('orderItems').some((i) => i.id === c.orderItemId && i.orderId === row.id),
         ),
         payments: rows('payments')
           .filter((p) => p.orderId === row.id)
@@ -438,9 +337,7 @@ export function sales(req: Request): any {
             paidAt: p.paidAt,
           })),
         refunds: rows('refunds').filter((r) =>
-          rows('payments').some(
-            (p) => p.id === r.paymentTransactionId && p.orderId === row.id,
-          ),
+          rows('payments').some((p) => p.id === r.paymentTransactionId && p.orderId === row.id),
         ),
       };
     return page(

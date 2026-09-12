@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import type { ZodType } from 'zod';
 
-import type {
-  FormCommonConfig,
-  FormFieldSchema,
-  FormGroupSchema,
-  FormRenderProps,
-  FormShape,
-} from '../types';
+import type { FormCommonConfig, FormFieldSchema, FormGroupSchema, FormRenderProps, FormShape } from '../types';
 import type { NormalizedFormFieldSchema } from './schema';
 
 import { computed, reactive, toRaw, toRefs } from 'vue';
@@ -19,11 +13,7 @@ import { useExpandable } from './expandable';
 import FormField from './form-field.vue';
 import FormGroup from './form-group.vue';
 import { getBaseRules, getDefaultValueInZodStack } from './helper';
-import {
-  createFormFieldSchema,
-  getFormFieldSchemas,
-  isFormGroupSchema,
-} from './schema';
+import { createFormFieldSchema, getFormFieldSchemas, isFormGroupSchema } from './schema';
 import { useFormLabelWidth } from './utils';
 
 interface NormalizedFormGroupSchema extends FormGroupSchema {
@@ -34,16 +24,13 @@ interface NormalizedFormGroupSchema extends FormGroupSchema {
 
 interface Props extends FormRenderProps {}
 
-const props = withDefaults(
-  defineProps<Props & { globalCommonConfig?: FormCommonConfig }>(),
-  {
-    collapsedRows: 1,
-    commonConfig: () => ({}),
-    globalCommonConfig: () => ({}),
-    showCollapseButton: false,
-    wrapperClass: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
-  },
-);
+const props = withDefaults(defineProps<Props & { globalCommonConfig?: FormCommonConfig }>(), {
+  collapsedRows: 1,
+  commonConfig: () => ({}),
+  globalCommonConfig: () => ({}),
+  showCollapseButton: false,
+  wrapperClass: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3',
+});
 
 const emits = defineEmits<{
   submit: [event: any];
@@ -115,38 +102,33 @@ function normalizeFieldSchema(schema: FormFieldSchema, hidden = false) {
   });
 }
 
-const computedSchema = computed(
-  (): Array<NormalizedFormFieldSchema | NormalizedFormGroupSchema> => {
-    const keepIndex = keepFormItemIndex.value;
-    const result: Array<NormalizedFormFieldSchema | NormalizedFormGroupSchema> =
-      [];
+const computedSchema = computed((): Array<NormalizedFormFieldSchema | NormalizedFormGroupSchema> => {
+  const keepIndex = keepFormItemIndex.value;
+  const result: Array<NormalizedFormFieldSchema | NormalizedFormGroupSchema> = [];
 
-    (props.schema ?? []).forEach((schema, index) => {
-      const hidden =
-        // 折叠状态 & 显示折叠按钮 & 当前索引大于保留索引（分组按一个顶层项计算）
-        props.showCollapseButton && !!formCollapsed.value && keepIndex
-          ? keepIndex <= index
-          : false;
+  (props.schema ?? []).forEach((schema, index) => {
+    const hidden =
+      // 折叠状态 & 显示折叠按钮 & 当前索引大于保留索引（分组按一个顶层项计算）
+      props.showCollapseButton && !!formCollapsed.value && keepIndex ? keepIndex <= index : false;
 
-      if (isFormGroupSchema(schema)) {
-        if (schema.hide || schema.children.length === 0) {
-          return;
-        }
-        result.push({
-          ...schema,
-          fields: schema.children.map((field) => normalizeFieldSchema(field)),
-          hidden,
-          key: schema.name ?? `group-${index}`,
-        });
+    if (isFormGroupSchema(schema)) {
+      if (schema.hide || schema.children.length === 0) {
         return;
       }
+      result.push({
+        ...schema,
+        fields: schema.children.map((field) => normalizeFieldSchema(field)),
+        hidden,
+        key: schema.name ?? `group-${index}`,
+      });
+      return;
+    }
 
-      result.push(normalizeFieldSchema(schema, hidden));
-    });
+    result.push(normalizeFieldSchema(schema, hidden));
+  });
 
-    return result;
-  },
-);
+  return result;
+});
 
 function isNormalizedFormGroupSchema(
   schema: NormalizedFormFieldSchema | NormalizedFormGroupSchema,
@@ -164,9 +146,7 @@ function getGroupWrapperClass(schema: NormalizedFormGroupSchema) {
     <div ref="wrapperRef" :class="wrapperClass">
       <template
         v-for="cSchema in computedSchema"
-        :key="
-          isNormalizedFormGroupSchema(cSchema) ? cSchema.key : cSchema.fieldName
-        "
+        :key="isNormalizedFormGroupSchema(cSchema) ? cSchema.key : cSchema.fieldName"
       >
         <FormGroup
           v-if="isNormalizedFormGroupSchema(cSchema)"
@@ -189,12 +169,7 @@ function getGroupWrapperClass(schema: NormalizedFormGroupSchema) {
         <!-- <div v-if="$slots[cSchema.fieldName]" :class="cSchema.formItemClass">
           <slot :definition="cSchema" :name="cSchema.fieldName"> </slot>
         </div> -->
-        <FormField
-          v-else
-          v-bind="cSchema"
-          :class="cSchema.formItemClass"
-          :rules="cSchema.rules"
-        >
+        <FormField v-else v-bind="cSchema" :class="cSchema.formItemClass" :rules="cSchema.rules">
           <template #default="slotProps">
             <slot v-bind="slotProps" :name="cSchema.fieldName"> </slot>
           </template>

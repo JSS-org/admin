@@ -25,20 +25,12 @@ const loadingV = refAutoReset(false, 3000);
 
     <Card title="Vben Loading" v-loading="loadingV" class="mt-4">
       <template #extra>
-        <Button type="primary" @click="loadingV = true">
-          v-loading 指令
-        </Button>
+        <Button type="primary" @click="loadingV = true"> v-loading 指令 </Button>
       </template>
-      <template #actions>
-        Loading组件可以设置文字，并且也提供了icon插槽用于替换加载图标。
-      </template>
+      <template #actions> Loading组件可以设置文字，并且也提供了icon插槽用于替换加载图标。 </template>
       <div class="flex gap-4">
         <div class="size-40">
-          <Loading
-            :spinning="loading"
-            text="正在加载..."
-            class="flex-center size-full"
-          >
+          <Loading :spinning="loading" text="正在加载..." class="flex-center size-full">
             <Button type="primary" @click="loading = true">默认动画</Button>
           </Loading>
         </div>
@@ -46,10 +38,7 @@ const loadingV = refAutoReset(false, 3000);
           <Loading :spinning="loading" class="flex-center size-full">
             <Button type="primary" @click="loading = true">自定义动画1</Button>
             <template #icon>
-              <IconifyIcon
-                icon="svg-spinners:ring-resize"
-                class="size-10 text-primary"
-              />
+              <IconifyIcon icon="svg-spinners:ring-resize" class="size-10 text-primary" />
             </template>
           </Loading>
         </div>
@@ -57,10 +46,7 @@ const loadingV = refAutoReset(false, 3000);
           <Loading :spinning="loading" class="flex-center size-full">
             <Button type="primary" @click="loading = true">自定义动画2</Button>
             <template #icon>
-              <IconifyIcon
-                icon="svg-spinners:bars-scale"
-                class="size-10 text-primary"
-              />
+              <IconifyIcon icon="svg-spinners:bars-scale" class="size-10 text-primary" />
             </template>
           </Loading>
         </div>
@@ -79,13 +65,9 @@ const loadingV = refAutoReset(false, 3000);
       }"
     >
       <template #extra>
-        <Button type="primary" @click="spinningV = true">
-          v-spinning 指令
-        </Button>
+        <Button type="primary" @click="spinningV = true"> v-spinning 指令 </Button>
       </template>
-      <template #actions>
-        Spinner组件是Loading组件的一个特例，只有一个固定的统一样式。
-      </template>
+      <template #actions> Spinner组件是Loading组件的一个特例，只有一个固定的统一样式。 </template>
       <Spinner :spinning="spinning" class="flex-center size-40">
         <Button type="primary" @click="spinning = true">显示Spinner</Button>
       </Spinner>

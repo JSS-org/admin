@@ -19,10 +19,7 @@ useTDesignDesignTokens();
 watch(
   () => isDark.value,
   (dark) => {
-    document.documentElement.setAttribute(
-      'theme-mode',
-      dark ? 'dark' : 'light',
-    );
+    document.documentElement.setAttribute('theme-mode', dark ? 'dark' : 'light');
   },
   { immediate: true },
 );

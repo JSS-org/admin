@@ -3,27 +3,9 @@ import type { FilterField } from './filter-bar.vue';
 
 import type { GymRow } from '#/api/gym';
 
-import {
-  computed,
-  getCurrentInstance,
-  reactive,
-  ref,
-  useSlots,
-  watch,
-} from 'vue';
+import { computed, getCurrentInstance, reactive, ref, useSlots, watch } from 'vue';
 
-import {
-  Button,
-  Form,
-  FormItem,
-  Input,
-  InputNumber,
-  message,
-  Select,
-  Space,
-  Table,
-  Tag,
-} from 'ant-design-vue';
+import { Button, Form, FormItem, Input, InputNumber, message, Select, Space, Table, Tag } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 
@@ -34,16 +16,7 @@ import FilterBar from './filter-bar.vue';
 export interface Field {
   key: string;
   label: string;
-  type?:
-    | 'date'
-    | 'datetime'
-    | 'money'
-    | 'multi'
-    | 'number'
-    | 'password'
-    | 'select'
-    | 'text'
-    | 'textarea';
+  type?: 'date' | 'datetime' | 'money' | 'multi' | 'number' | 'password' | 'select' | 'text' | 'textarea';
   required?: boolean;
   options?: { label: string; value: any }[];
   source?: string;
@@ -65,10 +38,7 @@ const props = withDefaults(
     keywordFilter?: boolean;
     filterFields?: FilterField[];
     idempotent?: boolean;
-    prepare?: (
-      values: Record<string, any>,
-      row?: GymRow,
-    ) => Record<string, any>;
+    prepare?: (values: Record<string, any>, row?: GymRow) => Record<string, any>;
     initial?: (row: GymRow) => GymRow;
     editable?: (row: GymRow) => boolean;
   }>(),
@@ -108,14 +78,10 @@ const sourceRows = reactive<Record<string, GymRow[]>>({});
 const formRef = ref();
 const stores = ref<{ label: string; value: string }[]>([]);
 const writable = computed(() => !!props.writeCode && canGym(props.writeCode));
-const visibleFields = computed(() =>
-  props.fields.filter((f) => !f.hidden && !(current.value && f.immutable)),
-);
+const visibleFields = computed(() => props.fields.filter((f) => !f.hidden && !(current.value && f.immutable)));
 const displayColumns = computed(() => [
   ...props.columns,
-  ...((writable.value && props.edit) ||
-  slots.actions ||
-  instance?.vnode.props?.onDetail
+  ...((writable.value && props.edit) || slots.actions || instance?.vnode.props?.onDetail
     ? [{ title: '操作', dataIndex: '_actions', width: 240 }]
     : []),
 ]);
@@ -178,9 +144,7 @@ async function load() {
   }
 }
 async function loadOptions() {
-  const sources = [
-    ...new Set(props.fields.flatMap((f) => (f.source ? [f.source] : []))),
-  ];
+  const sources = [...new Set(props.fields.flatMap((f) => (f.source ? [f.source] : [])))];
   if (props.storeFilter && !sources.includes('stores')) sources.push('stores');
   await Promise.all(
     sources.map(async (source) => {
@@ -210,20 +174,11 @@ async function loadOptions() {
 }
 function fieldOptions(field: Field) {
   if (field.options) return field.options;
-  if (!field.source || !form.storeId || field.source === 'stores')
-    return options[field.key] ?? [];
+  if (!field.source || !form.storeId || field.source === 'stores') return options[field.key] ?? [];
   return (sourceRows[field.source] ?? [])
     .filter((r) => {
-      if (
-        field.source === 'course-products' &&
-        (r.kind !== 'group' || r.status !== 'active')
-      )
-        return false;
-      if (field.source === 'members')
-        return (
-          r.storeIds?.includes(form.storeId) ||
-          r.registeredStoreId === form.storeId
-        );
+      if (field.source === 'course-products' && (r.kind !== 'group' || r.status !== 'active')) return false;
+      if (field.source === 'members') return r.storeIds?.includes(form.storeId) || r.registeredStoreId === form.storeId;
       if (!r.storeId && !r.storeIds) return true;
       return r.storeId === form.storeId || r.storeIds?.includes(form.storeId);
     })
@@ -236,9 +191,7 @@ async function open(row?: GymRow) {
   const raw = row ? await gymApi.get(`${props.endpoint}/${row.id}`) : undefined;
   const detail = raw && props.initial ? props.initial(raw) : raw;
   for (const f of props.fields)
-    form[f.key] =
-      detail?.[f.key] ??
-      structuredClone(f.default ?? (f.type === 'multi' ? [] : undefined));
+    form[f.key] = detail?.[f.key] ?? structuredClone(f.default ?? (f.type === 'multi' ? [] : undefined));
   visible.value = true;
 }
 async function save() {
@@ -247,18 +200,11 @@ async function save() {
   try {
     const payload: Record<string, any> = {};
     for (const f of visibleFields.value)
-      if (form[f.key] !== undefined && form[f.key] !== '')
-        payload[f.key] = form[f.key];
-    const data = props.prepare
-      ? props.prepare(payload, current.value)
-      : payload;
+      if (form[f.key] !== undefined && form[f.key] !== '') payload[f.key] = form[f.key];
+    const data = props.prepare ? props.prepare(payload, current.value) : payload;
     const saved = await (current.value
       ? gymApi.patch(`${props.endpoint}/${current.value.id}`, data)
-      : gymApi.post(
-          props.endpoint,
-          data,
-          props.idempotent ? requestKey : undefined,
-        ));
+      : gymApi.post(props.endpoint, data, props.idempotent ? requestKey : undefined));
     message.success('已保存');
     visible.value = false;
     await load();
@@ -271,18 +217,11 @@ async function save() {
 function display(value: any, key: string) {
   if (value === undefined || value === null || value === '') return '—';
   if (Array.isArray(value))
-    return value
-      .map(
-        (v) =>
-          options[key]?.find((o) => o.value === v)?.label ?? statuses[v] ?? v,
-      )
-      .join('、');
+    return value.map((v) => options[key]?.find((o) => o.value === v)?.label ?? statuses[v] ?? v).join('、');
   if (typeof value === 'boolean') return value ? '是' : '否';
   const label =
     options[key]?.find((o) => o.value === value)?.label ??
-    props.fields
-      .find((f) => f.key === key)
-      ?.options?.find((o) => o.value === value)?.label;
+    props.fields.find((f) => f.key === key)?.options?.find((o) => o.value === value)?.label;
   if (label) return label;
   if (statuses[value]) return statuses[value];
   if (typeof value === 'object') return Object.values(value).join(' / ');
@@ -323,9 +262,7 @@ defineExpose({ load, open, items });
       @reset="search"
     />
     <div v-if="(writable && create) || $slots.toolbar" class="gym-toolbar">
-      <Button v-if="writable && create" type="primary" @click="open()">
-        新增
-      </Button>
+      <Button v-if="writable && create" type="primary" @click="open()"> 新增 </Button>
       <slot name="toolbar" :reload="load"></slot>
     </div>
     <slot name="summary" :data="response"></slot>
@@ -353,21 +290,13 @@ defineExpose({ load, open, items });
       <template #bodyCell="{ column, record, text }">
         <Space v-if="column.dataIndex === '_actions'" wrap>
           <Button
-            v-if="
-              writable &&
-              edit !== false &&
-              (!editable || editable(record as GymRow))
-            "
+            v-if="writable && edit !== false && (!editable || editable(record as GymRow))"
             type="link"
             @click="open(record as GymRow)"
           >
             编辑
           </Button>
-          <Button
-            v-if="instance?.vnode.props?.onDetail"
-            type="link"
-            @click="emit('detail', record as GymRow)"
-          >
+          <Button v-if="instance?.vnode.props?.onDetail" type="link" @click="emit('detail', record as GymRow)">
             详情
           </Button>
           <slot name="actions" :row="record as GymRow" :reload="load"></slot>
@@ -392,16 +321,10 @@ defineExpose({ load, open, items });
           :key="field.key"
           :name="field.key"
           :label="field.label"
-          :rules="
-            field.required
-              ? [{ required: true, message: `请填写${field.label}` }]
-              : []
-          "
+          :rules="field.required ? [{ required: true, message: `请填写${field.label}` }] : []"
         >
           <Select
-            v-if="
-              field.source || field.type === 'select' || field.type === 'multi'
-            "
+            v-if="field.source || field.type === 'select' || field.type === 'multi'"
             v-model:value="form[field.key]"
             :options="fieldOptions(field)"
             :mode="field.type === 'multi' ? 'multiple' : undefined"
@@ -416,11 +339,7 @@ defineExpose({ load, open, items });
             :precision="0"
             style="width: 100%"
           />
-          <Input.TextArea
-            v-else-if="field.type === 'textarea'"
-            v-model:value="form[field.key]"
-            :rows="3"
-          />
+          <Input.TextArea v-else-if="field.type === 'textarea'" v-model:value="form[field.key]" :rows="3" />
           <Input
             v-else
             v-model:value="form[field.key]"

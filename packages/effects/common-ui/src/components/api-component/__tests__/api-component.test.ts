@@ -14,12 +14,7 @@ const ValueInput = defineComponent({
   },
   emits: ['update:value'],
   setup(props, { emit }) {
-    return () =>
-      h(
-        'button',
-        { onClick: () => emit('update:value', 'selected') },
-        props.value,
-      );
+    return () => h('button', { onClick: () => emit('update:value', 'selected') }, props.value);
   },
 });
 
@@ -30,12 +25,7 @@ const ModelValueInput = defineComponent({
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    return () =>
-      h(
-        'button',
-        { onClick: () => emit('update:modelValue', 'selected') },
-        props.modelValue,
-      );
+    return () => h('button', { onClick: () => emit('update:modelValue', 'selected') }, props.modelValue);
   },
 });
 
@@ -46,12 +36,7 @@ const KebabModelInput = defineComponent({
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
-    return () =>
-      h(
-        'button',
-        { onClick: () => emit('update:modelValue', 'selected') },
-        props.modelValue,
-      );
+    return () => h('button', { onClick: () => emit('update:modelValue', 'selected') }, props.modelValue);
   },
 });
 
@@ -132,9 +117,7 @@ describe('api-component.vue', () => {
   });
 
   it('fetches when the api is provided after mount', async () => {
-    const api = vi
-      .fn()
-      .mockResolvedValue([{ label: 'Loaded', value: 'loaded' }]);
+    const api = vi.fn().mockResolvedValue([{ label: 'Loaded', value: 'loaded' }]);
     const apiRef = ref<ApiComponentProps['api']>();
     const Harness = defineComponent({
       setup() {
@@ -154,13 +137,9 @@ describe('api-component.vue', () => {
 
     expect(api).toHaveBeenCalledTimes(1);
     await vi.waitFor(() => {
-      const events = wrapper
-        .findComponent(ApiComponent)
-        .emitted('optionsChange');
+      const events = wrapper.findComponent(ApiComponent).emitted('optionsChange');
       const lastEvent = events?.at(-1)?.[0];
-      expect(lastEvent).toEqual([
-        expect.objectContaining({ label: 'Loaded', value: 'loaded' }),
-      ]);
+      expect(lastEvent).toEqual([expect.objectContaining({ label: 'Loaded', value: 'loaded' })]);
     });
   });
 });

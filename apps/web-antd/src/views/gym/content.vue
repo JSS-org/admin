@@ -5,19 +5,7 @@ import type { GymRow } from '#/api/gym';
 
 import { computed, onMounted, ref } from 'vue';
 
-import {
-  Alert,
-  Button,
-  Checkbox,
-  Form,
-  FormItem,
-  Input,
-  message,
-  Select,
-  Space,
-  Table,
-  Upload,
-} from 'ant-design-vue';
+import { Alert, Button, Checkbox, Form, FormItem, Input, message, Select, Space, Table, Upload } from 'ant-design-vue';
 
 import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 
@@ -38,9 +26,7 @@ const title = computed(
       feedback: '匿名反馈',
     })[props.resource] ?? '内容',
 );
-const isSettings = computed(() =>
-  ['client-settings', 'franchise-brand'].includes(props.resource),
-);
+const isSettings = computed(() => ['client-settings', 'franchise-brand'].includes(props.resource));
 const fields = computed<Field[]>(() => {
   if (props.resource === 'franchise-inquiries')
     return [
@@ -110,39 +96,21 @@ const columns = computed(() => {
       ['收到时间', 'receivedAt'],
     ];
   if (props.resource === 'reviews')
-    values.splice(
-      2,
-      0,
-      ['评分', 'rating'],
-      ['匿名', 'anonymous'],
-      ['评价会员', 'memberName'],
-    );
+    values.splice(2, 0, ['评分', 'rating'], ['匿名', 'anonymous'], ['评价会员', 'memberName']);
   return values.map(([title = '', dataIndex = '']) => ({ title, dataIndex }));
 });
 function prepare(values: Record<string, any>) {
   const result = { ...values };
-  for (const key of [
-    'registrationStartsAt',
-    'registrationEndsAt',
-    'startsAt',
-    'endsAt',
-  ])
+  for (const key of ['registrationStartsAt', 'registrationEndsAt', 'startsAt', 'endsAt'])
     if (result[key]) result[key] = new Date(result[key]).toISOString();
   return result;
 }
 function initial(row: GymRow) {
   const result = { ...row };
-  for (const key of [
-    'registrationStartsAt',
-    'registrationEndsAt',
-    'startsAt',
-    'endsAt',
-  ])
+  for (const key of ['registrationStartsAt', 'registrationEndsAt', 'startsAt', 'endsAt'])
     if (result[key]) {
       const time = new Date(result[key]);
-      result[key] = new Date(time.getTime() - time.getTimezoneOffset() * 60_000)
-        .toISOString()
-        .slice(0, 16);
+      result[key] = new Date(time.getTime() - time.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
     }
   return result;
 }
@@ -162,9 +130,7 @@ async function load() {
   try {
     data.value = await gymApi.get(
       props.resource,
-      props.resource === 'client-settings'
-        ? { platform: platform.value, storeId: storeId.value }
-        : undefined,
+      props.resource === 'client-settings' ? { platform: platform.value, storeId: storeId.value } : undefined,
     );
   } finally {
     busy.value = false;
@@ -180,21 +146,14 @@ onMounted(async () => {
           pageSize: 100,
         });
         stores.value.push(...result.items);
-        if (stores.value.length >= result.total || result.items.length === 0)
-          break;
+        if (stores.value.length >= result.total || result.items.length === 0) break;
       }
     }
     await load();
   }
-  if (['feedback', 'reviews'].includes(props.resource))
-    summary.value = await gymApi.get('reports/feedback');
+  if (['feedback', 'reviews'].includes(props.resource)) summary.value = await gymApi.get('reports/feedback');
 });
-async function upload(
-  file: File,
-  target: Record<string, any>,
-  key: string,
-  list = false,
-) {
+async function upload(file: File, target: Record<string, any>, key: string, list = false) {
   busy.value = true;
   try {
     const result = await uploadGymFile(
@@ -237,14 +196,7 @@ async function save() {
         enabled: b.enabled,
       }));
     } else {
-      for (const key of [
-        'name',
-        'introduction',
-        'contactPhone',
-        'logoFileId',
-        'status',
-      ])
-        body[key] = data.value[key];
+      for (const key of ['name', 'introduction', 'contactPhone', 'logoFileId', 'status']) body[key] = data.value[key];
       body.models = data.value.models.map((m: GymRow) => ({
         modelCode: m.modelCode,
         name: m.name,
@@ -295,11 +247,7 @@ const scopeFilter = computed({
 <template>
   <div class="gym-view">
     <Page v-if="isSettings" :title="title">
-      <Alert
-        type="info"
-        message="当前仅管理展示资料，尚未提供小程序/App前台服务。"
-        class="mb-4"
-      />
+      <Alert type="info" message="当前仅管理展示资料，尚未提供小程序/App前台服务。" class="mb-4" />
       <FilterBar
         v-if="resource === 'client-settings'"
         v-model="scopeFilter"
@@ -328,31 +276,22 @@ const scopeFilter = computed({
       />
       <Form layout="vertical">
         <template v-if="resource === 'client-settings'">
-          <FormItem label="展示名称">
-            <Input v-model:value="data.systemName" />
-</FormItem><FormItem label="应用ID">
-            <Input v-model:value="data.appId" />
-</FormItem><FormItem label="欢迎文字">
-            <Input.TextArea v-model:value="data.welcomeText" />
-</FormItem><FormItem label="客服信息">
-            <Input v-model:value="data.customerService" />
-</FormItem><FormItem label="App下载链接">
-            <Input v-model:value="data.appDownloadUrl" />
-</FormItem><FormItem label="封面">
+          <FormItem label="展示名称"> <Input v-model:value="data.systemName" /> </FormItem
+          ><FormItem label="应用ID"> <Input v-model:value="data.appId" /> </FormItem
+          ><FormItem label="欢迎文字"> <Input.TextArea v-model:value="data.welcomeText" /> </FormItem
+          ><FormItem label="客服信息"> <Input v-model:value="data.customerService" /> </FormItem
+          ><FormItem label="App下载链接"> <Input v-model:value="data.appDownloadUrl" /> </FormItem
+          ><FormItem label="封面">
             <Upload
               :before-upload="(file) => upload(file, data, 'coverFileId')"
               :show-upload-list="false"
               accept=".png,.jpg,.jpeg"
             >
-              <Button>上传封面</Button>
-</Upload><Button
-              v-if="data.coverFileId"
-              type="link"
-              @click="openGymFile(data.coverFileId)"
-            >
+              <Button>上传封面</Button> </Upload
+            ><Button v-if="data.coverFileId" type="link" @click="openGymFile(data.coverFileId)">
               查看封面
-            </Button>
-</FormItem><Checkbox v-model:checked="data.enabled">启用展示</Checkbox>
+            </Button> </FormItem
+          ><Checkbox v-model:checked="data.enabled">启用展示</Checkbox>
           <div v-for="(block, index) in data.blocks" :key="index" class="my-4">
             <Space wrap>
               <Select
@@ -364,17 +303,10 @@ const scopeFilter = computed({
                   { label: '链接', value: 'link' },
                 ]"
                 style="min-width: 120px"
-              /><Input
-                v-model:value="block.title"
-                placeholder="标题"
-              /><Checkbox v-model:checked="block.enabled"> 启用 </Checkbox><Button @click="data.blocks.splice(index, 1)">
-                移除区块
-              </Button>
-</Space><Input.TextArea
-              v-model:value="block.body"
-              placeholder="内容"
-              class="my-2"
-            /><Input
+              /><Input v-model:value="block.title" placeholder="标题" /><Checkbox v-model:checked="block.enabled">
+                启用 </Checkbox
+              ><Button @click="data.blocks.splice(index, 1)"> 移除区块 </Button> </Space
+            ><Input.TextArea v-model:value="block.body" placeholder="内容" class="my-2" /><Input
               v-model:value="block.linkUrl"
               placeholder="跳转链接（链接区块必填）"
             /><Space class="my-2">
@@ -383,10 +315,8 @@ const scopeFilter = computed({
                 :show-upload-list="false"
                 accept=".png,.jpg,.jpeg,.mp4"
               >
-                <Button>上传图片/视频</Button>
-</Upload><Button v-if="block.fileId" @click="openGymFile(block.fileId)">
-                查看媒体
-              </Button>
+                <Button>上传图片/视频</Button> </Upload
+              ><Button v-if="block.fileId" @click="openGymFile(block.fileId)"> 查看媒体 </Button>
             </Space>
           </div>
           <Button
@@ -404,21 +334,18 @@ const scopeFilter = computed({
           </Button>
         </template>
         <template v-else>
-          <FormItem label="品牌名称">
-            <Input v-model:value="data.name" />
-</FormItem><FormItem label="品牌介绍">
-            <Input.TextArea v-model:value="data.introduction" />
-</FormItem><FormItem label="联系电话">
-            <Input v-model:value="data.contactPhone" />
-</FormItem><FormItem label="发布状态">
+          <FormItem label="品牌名称"> <Input v-model:value="data.name" /> </FormItem
+          ><FormItem label="品牌介绍"> <Input.TextArea v-model:value="data.introduction" /> </FormItem
+          ><FormItem label="联系电话"> <Input v-model:value="data.contactPhone" /> </FormItem
+          ><FormItem label="发布状态">
             <Select
               v-model:value="data.status"
               :options="[
                 { label: '草稿', value: 'draft' },
                 { label: '发布（三种模型均需图片/视频）', value: 'published' },
               ]"
-            />
-</FormItem><FormItem label="品牌标志">
+            /> </FormItem
+          ><FormItem label="品牌标志">
             <Upload
               :before-upload="(file) => upload(file, data, 'logoFileId')"
               :show-upload-list="false"
@@ -429,37 +356,21 @@ const scopeFilter = computed({
           </FormItem>
           <div v-for="(model, index) in data.models" :key="index" class="my-4">
             <Space wrap>
-              <FormItem label="模型编号">
-                <Input v-model:value="model.modelCode" />
-</FormItem><FormItem label="模型名称">
-                <Input v-model:value="model.name" />
-</FormItem><FormItem label="面积（㎡）">
-                <Input v-model:value="model.areaSqm" />
-</FormItem><Button @click="data.models.splice(index, 1)">
-                移除模型
-              </Button>
-</Space><FormItem label="模型说明">
-              <Input.TextArea v-model:value="model.description" />
-</FormItem><FormItem label="投资说明">
-              <Input.TextArea
-                v-model:value="model.investmentDescription"
-              />
-</FormItem><Upload
+              <FormItem label="模型编号"> <Input v-model:value="model.modelCode" /> </FormItem
+              ><FormItem label="模型名称"> <Input v-model:value="model.name" /> </FormItem
+              ><FormItem label="面积（㎡）"> <Input v-model:value="model.areaSqm" /> </FormItem
+              ><Button @click="data.models.splice(index, 1)"> 移除模型 </Button> </Space
+            ><FormItem label="模型说明"> <Input.TextArea v-model:value="model.description" /> </FormItem
+            ><FormItem label="投资说明"> <Input.TextArea v-model:value="model.investmentDescription" /> </FormItem
+            ><Upload
               :before-upload="(file) => upload(file, model, 'fileIds', true)"
               :show-upload-list="false"
               accept=".png,.jpg,.jpeg,.mp4"
             >
-              <Button>上传立体图 / 视频</Button>
-</Upload><Space
-              v-for="(fileId, fileIndex) in model.fileIds"
-              :key="fileId"
-              class="my-2"
-            >
-              <Button type="link" @click="openGymFile(fileId)">
-                视图 {{ Number(fileIndex) + 1 }}
-</Button><Button @click="model.fileIds.splice(fileIndex, 1)">
-                移除
-              </Button>
+              <Button>上传立体图 / 视频</Button> </Upload
+            ><Space v-for="(fileId, fileIndex) in model.fileIds" :key="fileId" class="my-2">
+              <Button type="link" @click="openGymFile(fileId)"> 视图 {{ Number(fileIndex) + 1 }} </Button
+              ><Button @click="model.fileIds.splice(fileIndex, 1)"> 移除 </Button>
             </Space>
           </div>
           <Button
@@ -471,9 +382,7 @@ const scopeFilter = computed({
           </Button>
         </template>
         <FormItem>
-          <Button type="primary" :loading="busy" @click="save">
-            保存配置
-          </Button>
+          <Button type="primary" :loading="busy" @click="save"> 保存配置 </Button>
         </FormItem>
       </Form>
     </Page>
@@ -509,8 +418,10 @@ const scopeFilter = computed({
       </template>
       <template v-if="resource === 'activities'" #actions="{ row, reload }">
         <template v-if="resource === 'activities'">
-          <Button type="link" @click="detail(row)">报名记录</Button><template v-if="canGym('activities:manage')">
-            <Button type="link" @click="cover(row)">封面</Button><Button
+          <Button type="link" @click="detail(row)">报名记录</Button
+          ><template v-if="canGym('activities:manage')">
+            <Button type="link" @click="cover(row)">封面</Button
+            ><Button
               type="link"
               @click="
                 async () => {
@@ -521,8 +432,8 @@ const scopeFilter = computed({
                 }
               "
             >
-              发布
-</Button><Button
+              发布 </Button
+            ><Button
               type="link"
               @click="
                 async () => {
@@ -539,29 +450,18 @@ const scopeFilter = computed({
         </template>
       </template>
     </ResourcePage>
-    <AdminDrawer
-      v-model:open="visible"
-      title="活动资料"
-      :footer="mode === 'cover' ? undefined : null"
-      @ok="saveCover"
-    >
+    <AdminDrawer v-model:open="visible" title="活动资料" :footer="mode === 'cover' ? undefined : null" @ok="saveCover">
       <template v-if="mode === 'cover' && current">
         <Upload
-          :before-upload="
-            (file) => (current ? upload(file, current, 'coverFileId') : false)
-          "
+          :before-upload="(file) => (current ? upload(file, current, 'coverFileId') : false)"
           :show-upload-list="false"
           accept=".png,.jpg,.jpeg"
         >
-          <Button>上传活动封面</Button>
-</Upload><Button
-          v-if="current.coverFileId"
-          type="link"
-          @click="openGymFile(current.coverFileId)"
-        >
+          <Button>上传活动封面</Button> </Upload
+        ><Button v-if="current.coverFileId" type="link" @click="openGymFile(current.coverFileId)">
           查看封面
-        </Button>
-</template><Table
+        </Button> </template
+      ><Table
         v-else
         :data-source="registrations"
         row-key="id"

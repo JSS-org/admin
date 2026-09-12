@@ -20,20 +20,20 @@ Use `prefix`, `suffix`, `separator`, and `decimal` to control how the number is 
 
 ## Props
 
-| Prop | Description | Type | Default |
-| --- | --- | --- | --- |
-| `startVal` | starting value | `number` | `0` |
-| `endVal` | ending value | `number` | `2021` |
-| `duration` | animation duration in ms | `number` | `1500` |
-| `autoplay` | start automatically | `boolean` | `true` |
-| `prefix` | value prefix | `string` | `''` |
-| `suffix` | value suffix | `string` | `''` |
-| `separator` | thousands separator | `string` | `','` |
-| `decimal` | decimal separator | `string` | `'.'` |
-| `color` | text color | `string` | `''` |
-| `useEasing` | enable transition preset easing | `boolean` | `true` |
-| `transition` | transition preset name | `keyof typeof TransitionPresets` | `'linear'` |
-| `decimals` | decimal places to keep | `number` | `0` |
+| Prop         | Description                     | Type                             | Default    |
+| ------------ | ------------------------------- | -------------------------------- | ---------- |
+| `startVal`   | starting value                  | `number`                         | `0`        |
+| `endVal`     | ending value                    | `number`                         | `2021`     |
+| `duration`   | animation duration in ms        | `number`                         | `1500`     |
+| `autoplay`   | start automatically             | `boolean`                        | `true`     |
+| `prefix`     | value prefix                    | `string`                         | `''`       |
+| `suffix`     | value suffix                    | `string`                         | `''`       |
+| `separator`  | thousands separator             | `string`                         | `','`      |
+| `decimal`    | decimal separator               | `string`                         | `'.'`      |
+| `color`      | text color                      | `string`                         | `''`       |
+| `useEasing`  | enable transition preset easing | `boolean`                        | `true`     |
+| `transition` | transition preset name          | `keyof typeof TransitionPresets` | `'linear'` |
+| `decimals`   | decimal places to keep          | `number`                         | `0`        |
 
 ## Events
 

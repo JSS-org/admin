@@ -22,11 +22,7 @@ import type { UploadProps } from 'tdesign-vue-next/es/upload/types';
 
 import type { Component } from 'vue';
 
-import type {
-  ApiComponentSharedProps,
-  BaseFormComponentType,
-  IconPickerProps,
-} from '@vben/common-ui';
+import type { ApiComponentSharedProps, BaseFormComponentType, IconPickerProps } from '@vben/common-ui';
 import type { Recordable } from '@vben/types';
 
 import { defineAsyncComponent, defineComponent, h, ref } from 'vue';
@@ -41,26 +37,16 @@ import { notification } from '#/adapter/tdesign';
  * 可用于 vben-form、vben-modal、vben-drawer 等组件使用,
  */
 
-const AutoComplete = defineAsyncComponent(
-  () => import('tdesign-vue-next/es/auto-complete'),
-);
+const AutoComplete = defineAsyncComponent(() => import('tdesign-vue-next/es/auto-complete'));
 const Button = defineAsyncComponent(() => import('tdesign-vue-next/es/button'));
-const Checkbox = defineAsyncComponent(
-  () => import('tdesign-vue-next/es/checkbox'),
-);
+const Checkbox = defineAsyncComponent(() => import('tdesign-vue-next/es/checkbox'));
 const CheckboxGroup = defineAsyncComponent(() =>
   import('tdesign-vue-next/es/checkbox').then((res) => res.CheckboxGroup),
 );
-const DatePicker = defineAsyncComponent(
-  () => import('tdesign-vue-next/es/date-picker'),
-);
-const Divider = defineAsyncComponent(
-  () => import('tdesign-vue-next/es/divider'),
-);
+const DatePicker = defineAsyncComponent(() => import('tdesign-vue-next/es/date-picker'));
+const Divider = defineAsyncComponent(() => import('tdesign-vue-next/es/divider'));
 const Input = defineAsyncComponent(() => import('tdesign-vue-next/es/input'));
-const InputNumber = defineAsyncComponent(
-  () => import('tdesign-vue-next/es/input-number'),
-);
+const InputNumber = defineAsyncComponent(() => import('tdesign-vue-next/es/input-number'));
 // const InputPassword = defineAsyncComponent(() =>
 //   import('tdesign-vue-next/es/input').then((res) => res.InputPassword),
 // );
@@ -68,9 +54,7 @@ const InputNumber = defineAsyncComponent(
 //   () => import('tdesign-vue-next/es/mentions'),
 // );
 const Radio = defineAsyncComponent(() => import('tdesign-vue-next/es/radio'));
-const RadioGroup = defineAsyncComponent(() =>
-  import('tdesign-vue-next/es/radio').then((res) => res.RadioGroup),
-);
+const RadioGroup = defineAsyncComponent(() => import('tdesign-vue-next/es/radio').then((res) => res.RadioGroup));
 const RangePicker = defineAsyncComponent(() =>
   import('tdesign-vue-next/es/date-picker').then((res) => res.DateRangePicker),
 );
@@ -78,15 +62,9 @@ const Rate = defineAsyncComponent(() => import('tdesign-vue-next/es/rate'));
 const Select = defineAsyncComponent(() => import('tdesign-vue-next/es/select'));
 const Space = defineAsyncComponent(() => import('tdesign-vue-next/es/space'));
 const Switch = defineAsyncComponent(() => import('tdesign-vue-next/es/switch'));
-const Textarea = defineAsyncComponent(
-  () => import('tdesign-vue-next/es/textarea'),
-);
-const TimePicker = defineAsyncComponent(
-  () => import('tdesign-vue-next/es/time-picker'),
-);
-const TreeSelect = defineAsyncComponent(
-  () => import('tdesign-vue-next/es/tree-select'),
-);
+const Textarea = defineAsyncComponent(() => import('tdesign-vue-next/es/textarea'));
+const TimePicker = defineAsyncComponent(() => import('tdesign-vue-next/es/time-picker'));
+const TreeSelect = defineAsyncComponent(() => import('tdesign-vue-next/es/tree-select'));
 const Upload = defineAsyncComponent(() => import('tdesign-vue-next/es/upload'));
 
 const withDefaultPlaceholder = (
@@ -98,10 +76,7 @@ const withDefaultPlaceholder = (
     name: component.name,
     inheritAttrs: false,
     setup: (props: any, { attrs, expose, slots }) => {
-      const placeholder =
-        props?.placeholder ||
-        attrs?.placeholder ||
-        $t(`ui.placeholder.${type}`);
+      const placeholder = props?.placeholder || attrs?.placeholder || $t(`ui.placeholder.${type}`);
       // 透传组件暴露的方法
       const innerRef = ref();
       expose(
@@ -113,12 +88,7 @@ const withDefaultPlaceholder = (
           },
         ),
       );
-      return () =>
-        h(
-          component,
-          { ...componentProps, placeholder, ...props, ...attrs, ref: innerRef },
-          slots,
-        );
+      return () => h(component, { ...componentProps, placeholder, ...props, ...attrs, ref: innerRef }, slots);
     },
   });
 };
@@ -226,11 +196,7 @@ async function initComponentAdapter() {
         ghost = true;
         variant = 'base';
       }
-      return h(
-        Button,
-        { ...props, ghost, variant, attrs, theme: 'default' },
-        slots,
-      );
+      return h(Button, { ...props, ghost, variant, attrs, theme: 'default' }, slots);
     },
     Divider,
     IconPicker: withDefaultPlaceholder(IconPicker, 'select', {
@@ -250,20 +216,12 @@ async function initComponentAdapter() {
         ghost = true;
         variant = 'base';
       }
-      return h(
-        Button,
-        { ...props, ghost, variant, attrs, theme: 'primary' },
-        slots,
-      );
+      return h(Button, { ...props, ghost, variant, attrs, theme: 'primary' }, slots);
     },
     Radio,
     RadioGroup,
     RangePicker: (props, { attrs, slots }) => {
-      return h(
-        RangePicker,
-        { ...props, modelValue: props.modelValue ?? [], attrs },
-        slots,
-      );
+      return h(RangePicker, { ...props, modelValue: props.modelValue ?? [], attrs }, slots);
     },
     Rate,
     Select: withDefaultPlaceholder(Select, 'select'),

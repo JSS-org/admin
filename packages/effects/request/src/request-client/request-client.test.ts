@@ -2,10 +2,7 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import {
-  defaultResponseInterceptor,
-  errorMessageResponseInterceptor,
-} from './preset-interceptors';
+import { defaultResponseInterceptor, errorMessageResponseInterceptor } from './preset-interceptors';
 import { RequestClient } from './request-client';
 
 describe('requestClient', () => {

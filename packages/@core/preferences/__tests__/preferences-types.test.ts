@@ -11,11 +11,8 @@ interface ProjectPreferences {
 
 describe('custom preferences types', () => {
   it('accepts a typed partial update', () => {
-    const updateProjectPreferences =
-      updateCustomPreferences<ProjectPreferences>;
+    const updateProjectPreferences = updateCustomPreferences<ProjectPreferences>;
 
-    expectTypeOf(updateProjectPreferences)
-      .parameter(0)
-      .toEqualTypeOf<DeepPartial<ProjectPreferences>>();
+    expectTypeOf(updateProjectPreferences).parameter(0).toEqualTypeOf<DeepPartial<ProjectPreferences>>();
   });
 });

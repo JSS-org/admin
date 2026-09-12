@@ -38,9 +38,7 @@ function encodeArrayFormValues(values: Readonly<ArrayFormValues>) {
 
 type ArraySubmitValues = ReturnType<typeof encodeArrayFormValues>;
 
-function decodeArrayFormValues(
-  values: Readonly<ArraySubmitValues>,
-): ArrayFormValues {
+function decodeArrayFormValues(values: Readonly<ArraySubmitValues>): ArrayFormValues {
   return {
     ...values,
     contacts: values.contacts.map((contact) => ({
@@ -51,18 +49,8 @@ function decodeArrayFormValues(
 }
 
 const submitValues = ref<Partial<ArraySubmitValues>>({});
-const formattedSubmitValues = computed(() =>
-  JSON.stringify(submitValues.value, null, 2),
-);
-const outputClass = [
-  'bg-muted',
-  'text-muted-foreground',
-  'max-h-105',
-  'overflow-auto',
-  'rounded-md',
-  'p-3',
-  'text-xs',
-];
+const formattedSubmitValues = computed(() => JSON.stringify(submitValues.value, null, 2));
+const outputClass = ['bg-muted', 'text-muted-foreground', 'max-h-105', 'overflow-auto', 'rounded-md', 'p-3', 'text-xs'];
 
 const schema: VbenFormSchema<ArrayFormValues>[] = [
   {
@@ -142,8 +130,7 @@ const schema: VbenFormSchema<ArrayFormValues>[] = [
         dependencies: {
           componentProps: (_values, _form, _api, ctx) => ({
             disabled: ctx?.row?.role === 'viewer',
-            placeholder:
-              ctx?.row?.role === 'viewer' ? '观察员无需电话' : '请输入电话',
+            placeholder: ctx?.row?.role === 'viewer' ? '观察员无需电话' : '请输入电话',
           }),
           triggerFields: ['role'],
         },

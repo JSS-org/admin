@@ -46,11 +46,7 @@ Each `setupVbenForm` call rebuilds the component and model-prop mappings from th
 ### Form Adapter Example
 
 ```ts
-import type {
-  FormValues,
-  VbenFormProps as FormProps,
-  VbenFormSchema as FormSchema,
-} from '@vben/common-ui';
+import type { FormValues, VbenFormProps as FormProps, VbenFormSchema as FormSchema } from '@vben/common-ui';
 
 import type { ComponentType } from './component';
 
@@ -94,8 +90,11 @@ function useVbenForm<TValues extends FormValues = FormValues>(
 }
 
 export { useVbenForm, z };
-export type VbenFormSchema<TValues extends FormValues = FormValues> =
-  FormSchema<ComponentType, Record<never, never>, TValues>;
+export type VbenFormSchema<TValues extends FormValues = FormValues> = FormSchema<
+  ComponentType,
+  Record<never, never>,
+  TValues
+>;
 export type VbenFormProps<TValues extends FormValues = FormValues> = FormProps<
   ComponentType,
   Record<never, never>,
@@ -139,10 +138,7 @@ import {
   Upload,
 } from 'antdv-next';
 
-const withDefaultPlaceholder = <T extends Component>(
-  component: T,
-  type: 'input' | 'select',
-) => {
+const withDefaultPlaceholder = <T extends Component>(component: T, type: 'input' | 'select') => {
   return (props: any, { attrs, slots }: Omit<SetupContext, 'expose'>) => {
     const placeholder = props?.placeholder || $t(`ui.placeholder.${type}`);
     return h(component, { ...props, ...attrs, placeholder }, slots);
@@ -261,14 +257,10 @@ async function fillForm() {
     <template #email="{ componentField, field, formApi, values }">
       <!-- field.state.value and componentField.modelValue are strings -->
       <input v-bind="componentField" :data-email="values.email" />
-      <button type="button" @click="formApi.clearValidation('email')">
-        Clear
-      </button>
+      <button type="button" @click="formApi.clearValidation('email')">Clear</button>
     </template>
     <template #default="{ formApi, shapes, values }">
-      <button type="button" @click="formApi.submit()">
-        Submit {{ shapes.length }} fields for {{ values.email }}
-      </button>
+      <button type="button" @click="formApi.submit()">Submit {{ shapes.length }} fields for {{ values.email }}</button>
     </template>
   </Form>
 </template>

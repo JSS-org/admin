@@ -8,9 +8,7 @@ import { Card, Radio, RadioGroup } from 'antdv-next';
 import { getParamsData } from '#/api/examples/params';
 
 const params = { ids: [2512, 3241, 4255] };
-const paramsSerializer = ref<'brackets' | 'comma' | 'indices' | 'repeat'>(
-  'brackets',
-);
+const paramsSerializer = ref<'brackets' | 'comma' | 'indices' | 'repeat'>('brackets');
 const response = ref('');
 const paramsStr = computed(() => {
   // 写一段代码，从完整的URL中提取参数部分

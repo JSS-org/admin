@@ -179,41 +179,19 @@ const routes: RouteRecordRaw[] = [
 ];
 const pages = routes[0]?.children ?? [];
 const groups: [string, string, string, string[]][] = [
-  [
-    'store-management',
-    '门店管理',
-    'lucide:building-2',
-    ['stores', 'checkins', 'qr-codes', 'reviews'],
-  ],
+  ['store-management', '门店管理', 'lucide:building-2', ['stores', 'checkins', 'qr-codes', 'reviews']],
   [
     'staff',
     '员工管理',
     'lucide:contact-round',
-    [
-      'employees',
-      'roles',
-      'salary-templates',
-      'employee-salary-assignments',
-      'payrolls',
-    ],
+    ['employees', 'roles', 'salary-templates', 'employee-salary-assignments', 'payrolls'],
   ],
-  [
-    'membership',
-    '会员管理',
-    'lucide:users',
-    ['members', 'body-measurements', 'blacklists'],
-  ],
+  ['membership', '会员管理', 'lucide:users', ['members', 'body-measurements', 'blacklists']],
   [
     'membership-cards',
     '会员卡管理',
     'lucide:credit-card',
-    [
-      'cards',
-      'settings',
-      'self-service-card-orders',
-      'subscriptions',
-      'verifications',
-    ],
+    ['cards', 'settings', 'self-service-card-orders', 'subscriptions', 'verifications'],
   ],
   [
     'training',
@@ -221,18 +199,8 @@ const groups: [string, string, string, string[]][] = [
     'lucide:calendar-days',
     ['course-products', 'course-sessions', 'bookings', 'lesson-records'],
   ],
-  [
-    'contract-management',
-    '合同管理',
-    'lucide:file-text',
-    ['contract-templates', 'contracts'],
-  ],
-  [
-    'approval-management',
-    '审批管理',
-    'lucide:file-check',
-    ['approval-templates', 'approvals'],
-  ],
+  ['contract-management', '合同管理', 'lucide:file-text', ['contract-templates', 'contracts']],
+  ['approval-management', '审批管理', 'lucide:file-check', ['approval-templates', 'approvals']],
   ['hardware', '设备管理', 'lucide:door-open', ['devices', 'equipment']],
   [
     'coupons',
@@ -248,36 +216,11 @@ const groups: [string, string, string, string[]][] = [
       'gift-code-batches',
     ],
   ],
-  [
-    'points',
-    '积分管理',
-    'lucide:coins',
-    ['point-rules', 'point-products', 'point-ledger', 'point-redemptions'],
-  ],
-  [
-    'communications',
-    '消息管理',
-    'lucide:messages-square',
-    ['message-batches', 'feedback'],
-  ],
-  [
-    'content',
-    '内容管理',
-    'lucide:megaphone',
-    ['client-settings', 'activities'],
-  ],
-  [
-    'franchise',
-    '加盟管理',
-    'lucide:handshake',
-    ['franchise-brand', 'franchise-inquiries'],
-  ],
-  [
-    'finance',
-    '财务管理',
-    'lucide:wallet',
-    ['payment-accounts', 'settlement-rules', 'settlements'],
-  ],
+  ['points', '积分管理', 'lucide:coins', ['point-rules', 'point-products', 'point-ledger', 'point-redemptions']],
+  ['communications', '消息管理', 'lucide:messages-square', ['message-batches', 'feedback']],
+  ['content', '内容管理', 'lucide:megaphone', ['client-settings', 'activities']],
+  ['franchise', '加盟管理', 'lucide:handshake', ['franchise-brand', 'franchise-inquiries']],
+  ['finance', '财务管理', 'lucide:wallet', ['payment-accounts', 'settlement-rules', 'settlements']],
   [
     'reports',
     '统计报表',
@@ -285,40 +228,34 @@ const groups: [string, string, string, string[]][] = [
     ['reports/performance', 'reports/members', 'reports/member-cards'],
   ],
 ];
-const groupedRoutes: RouteRecordRaw[] = groups.map(
-  ([key, title, icon, paths], order): RouteRecordRaw => ({
-    name: `GymGroup-${key}`,
-    path: `/gym/${key}`,
-    meta: {
-      title,
-      icon,
-      order,
-      authority: paths.some((path) =>
-        pages
-          .find((page) => page.path === path)
-          ?.meta?.authority?.includes('store'),
-      )
-        ? ['hq', 'store']
-        : ['hq'],
-    },
-    children: paths.flatMap<RouteRecordRaw>((path, index) => {
-      const page = pages.find((page) => page.path === path);
-      return page
-        ? [
-            {
-              ...page,
-              path: `/gym/${path}`,
-              meta: {
-                ...page.meta,
-                title: page.meta?.title ?? path,
-                order: index,
-              },
+const groupedRoutes: RouteRecordRaw[] = groups.map(([key, title, icon, paths], order): RouteRecordRaw => ({
+  name: `GymGroup-${key}`,
+  path: `/gym/${key}`,
+  meta: {
+    title,
+    icon,
+    order,
+    authority: paths.some((path) => pages.find((page) => page.path === path)?.meta?.authority?.includes('store'))
+      ? ['hq', 'store']
+      : ['hq'],
+  },
+  children: paths.flatMap<RouteRecordRaw>((path, index) => {
+    const page = pages.find((page) => page.path === path);
+    return page
+      ? [
+          {
+            ...page,
+            path: `/gym/${path}`,
+            meta: {
+              ...page.meta,
+              title: page.meta?.title ?? path,
+              order: index,
             },
-          ]
-        : [];
-    }),
+          },
+        ]
+      : [];
   }),
-);
+}));
 const homeRoute: RouteRecordRaw = {
   name: 'GymHome',
   path: '/gym/home',

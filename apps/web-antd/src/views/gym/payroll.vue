@@ -116,10 +116,8 @@ async function saveTemplate() {
       effectiveTo: effectiveTo || null,
       rules: rules.map((r: Record<string, any>) => ruleBody(r)),
     };
-    if (form.value.newVersion)
-      await gymApi.post(`salary-templates/${form.value.id}/versions`, body);
-    else if (form.value.id)
-      await gymApi.patch(`salary-templates/${form.value.id}`, body);
+    if (form.value.newVersion) await gymApi.post(`salary-templates/${form.value.id}/versions`, body);
+    else if (form.value.id) await gymApi.patch(`salary-templates/${form.value.id}`, body);
     else await gymApi.post('salary-templates', body);
     visible.value = false;
     await list.value?.load();
@@ -178,21 +176,13 @@ function confirm(row: GymRow) {
       :edit="false"
     >
       <template #toolbar>
-        <Button
-          v-if="canGym('payroll:templates')"
-          type="primary"
-          @click="edit()"
-        >
-          新增模板
-        </Button>
+        <Button v-if="canGym('payroll:templates')" type="primary" @click="edit()"> 新增模板 </Button>
       </template>
       <template #actions="{ row }">
         <Space>
-          <Button @click="edit(row)">
-            {{ row.status === 'draft' ? '编辑' : '查看规则' }}
-</Button><Button v-if="row.status === 'draft'" @click="publish(row)">
-            发布
-</Button><Button @click="edit(row, true)">创建新版本</Button>
+          <Button @click="edit(row)"> {{ row.status === 'draft' ? '编辑' : '查看规则' }} </Button
+          ><Button v-if="row.status === 'draft'" @click="publish(row)"> 发布 </Button
+          ><Button @click="edit(row, true)">创建新版本</Button>
         </Space>
       </template>
     </ResourcePage>
@@ -269,13 +259,7 @@ function confirm(row: GymRow) {
       ]"
     >
       <template #toolbar>
-        <Button
-          v-if="canGym('payroll:calculate')"
-          type="primary"
-          @click="calculateVisible = true"
-        >
-          计算月工资
-        </Button>
+        <Button v-if="canGym('payroll:calculate')" type="primary" @click="calculateVisible = true"> 计算月工资 </Button>
       </template>
       <template #actions="{ row }">
         <Space>
@@ -284,11 +268,8 @@ function confirm(row: GymRow) {
             :loading="busy"
             @click="calculate(row)"
           >
-            重算
-</Button><Button
-            v-if="canGym('payroll:confirm') && row.status === 'calculated'"
-            @click="confirm(row)"
-          >
+            重算 </Button
+          ><Button v-if="canGym('payroll:confirm') && row.status === 'calculated'" @click="confirm(row)">
             确认工资
           </Button>
         </Space>
@@ -313,24 +294,15 @@ function confirm(row: GymRow) {
           <Input v-model:value="form.name" />
         </FormItem>
         <FormItem label="整月底薪">
-          <InputNumber
-            v-model:value="form.baseSalary"
-            :min="0"
-            :precision="2"
-          />
+          <InputNumber v-model:value="form.baseSalary" :min="0" :precision="2" />
         </FormItem>
         <Space>
-          <FormItem label="生效日期">
-            <Input v-model:value="form.effectiveFrom" type="date" />
-</FormItem><FormItem label="失效日期（不含）">
+          <FormItem label="生效日期"> <Input v-model:value="form.effectiveFrom" type="date" /> </FormItem
+          ><FormItem label="失效日期（不含）">
             <Input v-model:value="form.effectiveTo" type="date" />
           </FormItem>
         </Space>
-        <FormItem
-          v-for="(rule, index) in form.rules"
-          :key="index"
-          :label="`规则 ${Number(index) + 1}`"
-        >
+        <FormItem v-for="(rule, index) in form.rules" :key="index" :label="`规则 ${Number(index) + 1}`">
           <Space wrap>
             <Select
               v-model:value="rule.component"
@@ -342,9 +314,7 @@ function confirm(row: GymRow) {
                 }))
               "
             />
-            <template
-              v-if="['card_sales', 'pt_sales'].includes(rule.component)"
-            >
+            <template v-if="['card_sales', 'pt_sales'].includes(rule.component)">
               <InputNumber
                 v-model:value="rule.rate"
                 aria-label="提成比例"
@@ -357,12 +327,7 @@ function confirm(row: GymRow) {
                 aria-label="区间下限"
                 placeholder="金额下限"
                 :min="0"
-              /><InputNumber
-                v-model:value="rule.upperBound"
-                aria-label="区间上限"
-                placeholder="金额上限"
-                :min="0"
-              />
+              /><InputNumber v-model:value="rule.upperBound" aria-label="区间上限" placeholder="金额上限" :min="0" />
             </template>
             <InputNumber
               v-else-if="rule.component === 'lessons'"
@@ -383,60 +348,28 @@ function confirm(row: GymRow) {
             <Button @click="form.rules.splice(Number(index), 1)">移除</Button>
           </Space>
         </FormItem>
-        <Button @click="form.rules.push({ component: 'card_sales', rate: 0 })">
-          添加规则
-        </Button>
+        <Button @click="form.rules.push({ component: 'card_sales', rate: 0 })"> 添加规则 </Button>
       </Form>
     </AdminDrawer>
-    <AdminDrawer
-      v-model:open="calculateVisible"
-      title="计算月工资"
-      :confirm-loading="busy"
-      @ok="calculate()"
-    >
-      <Alert
-        message="须为每位员工配置覆盖整月的唯一已发布模板。未全部计算成功时保留原工资。"
-        type="info"
-      />
+    <AdminDrawer v-model:open="calculateVisible" title="计算月工资" :confirm-loading="busy" @ok="calculate()">
+      <Alert message="须为每位员工配置覆盖整月的唯一已发布模板。未全部计算成功时保留原工资。" type="info" />
       <Form layout="vertical">
         <FormItem label="门店">
-          <Select
-            v-model:value="storeId"
-            :options="stores.map((s) => ({ label: s.name, value: s.id }))"
-          />
-</FormItem><FormItem label="月份">
+          <Select v-model:value="storeId" :options="stores.map((s) => ({ label: s.name, value: s.id }))" /> </FormItem
+        ><FormItem label="月份">
           <Input v-model:value="month" type="month" />
         </FormItem>
       </Form>
     </AdminDrawer>
-    <AdminDrawer
-      v-model:open="showDetail"
-      title="工资明细"
-      width="1200px"
-      :footer="null"
-    >
-      <p>
-        {{ detail?.storeName }} / {{ detail?.month }} /
-        {{ detail?.status }}；实发合计 {{ detail?.netAmount }}
-      </p>
-      <Table
-        row-key="id"
-        :data-source="detail?.items"
-        :columns="itemColumns"
-        :pagination="false"
-      >
+    <AdminDrawer v-model:open="showDetail" title="工资明细" width="1200px" :footer="null">
+      <p>{{ detail?.storeName }} / {{ detail?.month }} / {{ detail?.status }}；实发合计 {{ detail?.netAmount }}</p>
+      <Table row-key="id" :data-source="detail?.items" :columns="itemColumns" :pagination="false">
         <template #bodyCell="{ column, record }">
-          <Button v-if="column.key === 'action'" @click="selectedItem = record">
-            计算来源
-          </Button>
+          <Button v-if="column.key === 'action'" @click="selectedItem = record"> 计算来源 </Button>
         </template>
       </Table>
       <template v-if="selectedItem">
-        <p>
-          {{ selectedItem.employeeName }}：{{
-            selectedItem.calculationSnapshot.basis
-          }}
-        </p>
+        <p>{{ selectedItem.employeeName }}：{{ selectedItem.calculationSnapshot.basis }}</p>
         <p>
           模板 {{ selectedItem.calculationSnapshot.template.name }}，版本
           {{ selectedItem.calculationSnapshot.template.version }}
@@ -453,10 +386,7 @@ function confirm(row: GymRow) {
             { title: '金额', dataIndex: 'amount' },
           ]"
         />
-        <details
-          v-for="component in selectedItem.components"
-          :key="component.id"
-        >
+        <details v-for="component in selectedItem.components" :key="component.id">
           <summary>{{ component.label }}来源</summary>
           <pre>{{ JSON.stringify(component.sourceSnapshot, null, 2) }}</pre>
         </details>

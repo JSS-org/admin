@@ -10,26 +10,8 @@ const items = [
 </script>
 <template>
   <div class="flex gap-4 flex-col">
-    <VbenDescriptions
-      size="small"
-      bordered
-      title="Small"
-      :column="2"
-      :items="items"
-    />
-    <VbenDescriptions
-      size="middle"
-      bordered
-      title="Middle"
-      :column="2"
-      :items="items"
-    />
-    <VbenDescriptions
-      size="large"
-      bordered
-      title="Large"
-      :column="2"
-      :items="items"
-    />
+    <VbenDescriptions size="small" bordered title="Small" :column="2" :items="items" />
+    <VbenDescriptions size="middle" bordered title="Middle" :column="2" :items="items" />
+    <VbenDescriptions size="large" bordered title="Large" :column="2" :items="items" />
   </div>
 </template>

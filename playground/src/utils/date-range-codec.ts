@@ -4,10 +4,7 @@ import dayjs from 'dayjs';
 
 type DateRange = [Dayjs, Dayjs];
 
-type OptionalDateRangeField<
-  TFormValues extends Record<string, unknown>,
-  TRangeField extends keyof TFormValues,
-> =
+type OptionalDateRangeField<TFormValues extends Record<string, unknown>, TRangeField extends keyof TFormValues> =
   Record<never, never> extends Pick<TFormValues, TRangeField>
     ? [Exclude<TFormValues[TRangeField], undefined>] extends [never]
       ? never
@@ -21,8 +18,7 @@ type DateRangeSubmitValues<
   TRangeField extends keyof TFormValues,
   TStartField extends string,
   TEndField extends string,
-> = Omit<TFormValues, TRangeField> &
-  Record<TEndField | TStartField, string | undefined>;
+> = Omit<TFormValues, TRangeField> & Record<TEndField | TStartField, string | undefined>;
 
 interface DateRangeCodecOptions<
   TFormValues extends Record<string, unknown>,
@@ -35,29 +31,15 @@ interface DateRangeCodecOptions<
   startField: TStartField;
 }
 
-export function createDateRangeCodec<
-  TFormValues extends Record<string, unknown>,
->() {
+export function createDateRangeCodec<TFormValues extends Record<string, unknown>>() {
   return function createCodec<
     TRangeField extends keyof TFormValues & string,
     TStartField extends string,
     TEndField extends string,
-  >(
-    options: DateRangeCodecOptions<
-      TFormValues,
-      TRangeField,
-      TStartField,
-      TEndField
-    >,
-  ) {
+  >(options: DateRangeCodecOptions<TFormValues, TRangeField, TStartField, TEndField>) {
     const { endField, startField } = options;
     const rangeField = options.rangeField as TRangeField;
-    type SubmitValues = DateRangeSubmitValues<
-      TFormValues,
-      TRangeField,
-      TStartField,
-      TEndField
-    >;
+    type SubmitValues = DateRangeSubmitValues<TFormValues, TRangeField, TStartField, TEndField>;
 
     return {
       decode(values: Readonly<SubmitValues>): TFormValues {

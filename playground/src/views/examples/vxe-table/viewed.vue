@@ -162,9 +162,7 @@ function onClassNameSet() {
   gridApi.setState({
     viewedRowOptions: {
       rowClassName: () => {
-        return isClassName.value
-          ? 'bg-red-100 vxe-row--viewed'
-          : 'vxe-row--viewed';
+        return isClassName.value ? 'bg-red-100 vxe-row--viewed' : 'vxe-row--viewed';
       },
     },
   });
@@ -193,15 +191,9 @@ function onClearViewed() {
     <Modal class="w-150" title="数据修改"> 数据修改完成后设置行标记</Modal>
     <Grid table-title="已查看行标记" table-title-help="提示">
       <template #toolbar-tools>
-        <Button class="mr-2" type="primary" @click="onCustomSet">
-          手动标记
-        </Button>
-        <Button class="mr-2" type="primary" @click="onStyleSet">
-          设置Style
-        </Button>
-        <Button class="mr-2" type="primary" @click="onClassNameSet">
-          设置ClassName
-        </Button>
+        <Button class="mr-2" type="primary" @click="onCustomSet"> 手动标记 </Button>
+        <Button class="mr-2" type="primary" @click="onStyleSet"> 设置Style </Button>
+        <Button class="mr-2" type="primary" @click="onClassNameSet"> 设置ClassName </Button>
         <Button type="primary" @click="onClearViewed"> 清空缓存</Button>
       </template>
     </Grid>

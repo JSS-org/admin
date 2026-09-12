@@ -5,14 +5,7 @@ import type { GymRow } from '#/api/gym';
 
 import { ref } from 'vue';
 
-import {
-  Button,
-  Descriptions,
-  DescriptionsItem,
-  Table,
-  TabPane,
-  Tabs,
-} from 'ant-design-vue';
+import { Button, Descriptions, DescriptionsItem, Table, TabPane, Tabs } from 'ant-design-vue';
 
 import { gymApi } from '#/api/gym';
 
@@ -97,14 +90,10 @@ async function open(row: GymRow) {
         <Button type="link" @click="open(row)">会员详情</Button>
       </template>
     </ResourcePage>
-    <AdminDrawer
-      v-model:open="visible"
-      :title="detail?.name"
-      :footer="null"
-      :width="900"
-    >
+    <AdminDrawer v-model:open="visible" :title="detail?.name" :footer="null" :width="900">
       <Descriptions bordered :column="2">
-        <DescriptionsItem label="手机号">{{ detail?.phone }}</DescriptionsItem><DescriptionsItem label="所属门店">
+        <DescriptionsItem label="手机号">{{ detail?.phone }}</DescriptionsItem
+        ><DescriptionsItem label="所属门店">
           {{ detail?.stores?.map((s: GymRow) => s.name).join('、') }}
         </DescriptionsItem>
       </Descriptions>
@@ -121,8 +110,8 @@ async function open(row: GymRow) {
               { title: '剩余次数', dataIndex: 'remainingUses' },
               { title: '状态', dataIndex: 'status' },
             ]"
-          />
-</TabPane><TabPane key="courses" tab="私教权益">
+          /> </TabPane
+        ><TabPane key="courses" tab="私教权益">
           <Table
             :data-source="detail?.coursePacks"
             row-key="id"

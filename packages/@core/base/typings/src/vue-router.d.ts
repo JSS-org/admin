@@ -41,13 +41,7 @@ interface RouteMeta {
   /**
    * 徽标颜色
    */
-  badgeVariants?:
-    | 'default'
-    | 'destructive'
-    | 'primary'
-    | 'success'
-    | 'warning'
-    | string;
+  badgeVariants?: 'default' | 'destructive' | 'primary' | 'success' | 'warning' | string;
   /**
    * 路由对应dom是否缓存起来
    */
@@ -133,10 +127,7 @@ interface RouteMeta {
 }
 
 // 定义递归类型以将 RouteRecordRaw 的 component 属性更改为 string
-type RouteRecordStringComponent<T = string> = Omit<
-  RouteRecordRaw,
-  'children' | 'component'
-> & {
+type RouteRecordStringComponent<T = string> = Omit<RouteRecordRaw, 'children' | 'component'> & {
   children?: RouteRecordStringComponent<T>[];
   component: T;
 };

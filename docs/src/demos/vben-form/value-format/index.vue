@@ -20,12 +20,8 @@ function encodeValueFormatValues(values: Readonly<ValueFormatFormValues>) {
 
 type ValueFormatSubmitValues = ReturnType<typeof encodeValueFormatValues>;
 
-function decodeValueFormatValues(
-  values: Readonly<ValueFormatSubmitValues>,
-): ValueFormatFormValues {
-  const [firstName = '', ...lastNameParts] = values.fullName
-    .trim()
-    .split(/\s+/);
+function decodeValueFormatValues(values: Readonly<ValueFormatSubmitValues>): ValueFormatFormValues {
+  const [firstName = '', ...lastNameParts] = values.fullName.trim().split(/\s+/);
   return {
     firstName,
     lastName: lastNameParts.join(' '),
@@ -144,9 +140,7 @@ onMounted(async () => {
       <template #extra>
         <Space wrap>
           <Button @click="handleSetSubmitValues">从提交值回填</Button>
-          <Button type="primary" @click="handleInspectValues">
-            查看 getValues 输出
-          </Button>
+          <Button type="primary" @click="handleInspectValues"> 查看 getValues 输出 </Button>
         </Space>
       </template>
       <Form />
@@ -154,14 +148,10 @@ onMounted(async () => {
 
     <div class="grid gap-4 lg:grid-cols-2">
       <Card title="getRawValues() 输出（组件值）">
-        <pre class="bg-muted overflow-auto rounded-md p-4 text-sm">{{
-          liveValuesPreview
-        }}</pre>
+        <pre class="bg-muted overflow-auto rounded-md p-4 text-sm">{{ liveValuesPreview }}</pre>
       </Card>
       <Card title="getValues / submit 输出（codec.encode 后）">
-        <pre class="bg-muted overflow-auto rounded-md p-4 text-sm">{{
-          transformedValuesPreview
-        }}</pre>
+        <pre class="bg-muted overflow-auto rounded-md p-4 text-sm">{{ transformedValuesPreview }}</pre>
       </Card>
     </div>
   </div>

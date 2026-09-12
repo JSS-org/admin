@@ -3,14 +3,7 @@ import type { Field } from './components/resource-page.vue';
 
 import type { GymRow } from '#/api/gym';
 
-import {
-  computed,
-  onActivated,
-  onDeactivated,
-  onMounted,
-  onUnmounted,
-  ref,
-} from 'vue';
+import { computed, onActivated, onDeactivated, onMounted, onUnmounted, ref } from 'vue';
 
 import {
   Alert,
@@ -278,9 +271,7 @@ function initial(row: GymRow) {
   for (const key of ['startsAt', 'endsAt', 'measuredAt'])
     if (data[key]) {
       const time = new Date(data[key]);
-      data[key] = new Date(time.getTime() - time.getTimezoneOffset() * 60_000)
-        .toISOString()
-        .slice(0, 16);
+      data[key] = new Date(time.getTime() - time.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
     }
   return data;
 }
@@ -288,8 +279,7 @@ function prepare(values: Record<string, any>) {
   const result = { ...values };
   for (const key of ['startsAt', 'endsAt', 'measuredAt'])
     if (result[key]) result[key] = new Date(result[key]).toISOString();
-  if (props.resource === 'qr-codes' && result.sceneType === 'store')
-    Reflect.deleteProperty(result, 'sceneId');
+  if (props.resource === 'qr-codes' && result.sceneType === 'store') Reflect.deleteProperty(result, 'sceneId');
   return result;
 }
 const visible = ref(false);
@@ -312,8 +302,7 @@ async function all(endpoint: string, query = {}) {
       pageSize: 100,
     });
     records = [...records, ...result.items];
-    if (records.length >= result.total || result.items.length === 0)
-      return records;
+    if (records.length >= result.total || result.items.length === 0) return records;
   }
 }
 async function openBooking() {
@@ -335,9 +324,7 @@ async function changeSession() {
   rightId.value = undefined;
   rights.value = [];
   const session = sessions.value.find((s) => s.id === sessionId.value);
-  members.value = session
-    ? await all('members', { storeId: session.storeId })
-    : [];
+  members.value = session ? await all('members', { storeId: session.storeId }) : [];
 }
 async function changeMember() {
   rights.value = [];
@@ -350,22 +337,14 @@ async function changeMember() {
   ]);
   rights.value = [
     ...cards
-      .filter(
-        (c) =>
-          c.status === 'active' &&
-          (c.accessScope === 'all' || c.storeIds.includes(session?.storeId)),
-      )
+      .filter((c) => c.status === 'active' && (c.accessScope === 'all' || c.storeIds.includes(session?.storeId)))
       .map((c) => ({
         label: `${c.name} ${c.cardNo}`,
         value: c.id,
         type: 'memberCardId',
       })),
     ...packs
-      .filter(
-        (p) =>
-          p.status === 'active' &&
-          p.courseProductId === session?.courseProductId,
-      )
+      .filter((p) => p.status === 'active' && p.courseProductId === session?.courseProductId)
       .map((p) => ({
         label: `${p.name} 可约${p.remainingSessions - p.reservedSessions}次`,
         value: p.id,
@@ -408,11 +387,7 @@ async function report(file: File) {
   if (!current.value) return false;
   saving.value = true;
   try {
-    const uploaded = await uploadGymFile(
-      file,
-      'body_report',
-      current.value.storeId,
-    );
+    const uploaded = await uploadGymFile(file, 'body_report', current.value.storeId);
     await gymApi.patch(`body-measurements/${current.value.id}`, {
       reportFileId: uploaded.id,
     });
@@ -471,33 +446,20 @@ onUnmounted(stop);
       time-filter
     >
       <template
-        v-if="
-          (resource === 'bookings' && canGym('bookings:write')) ||
-          (resource === 'checkins' && summary)
-        "
+        v-if="(resource === 'bookings' && canGym('bookings:write')) || (resource === 'checkins' && summary)"
         #toolbar
       >
-        <Button
-          v-if="resource === 'bookings' && canGym('bookings:write')"
-          type="primary"
-          @click="openBooking"
-        >
+        <Button v-if="resource === 'bookings' && canGym('bookings:write')" type="primary" @click="openBooking">
           代会员预约
         </Button>
-        <span v-if="resource === 'checkins' && summary">今日授权门店：入场 {{ summary.entries }} 次，会员
-          {{ summary.members }} 人，陌生访客 {{ summary.visitors }} 次，昨日
-          {{ summary.yesterdayEntries }} 次（每15秒刷新）</span>
+        <span v-if="resource === 'checkins' && summary"
+          >今日授权门店：入场 {{ summary.entries }} 次，会员 {{ summary.members }} 人，陌生访客
+          {{ summary.visitors }} 次，昨日 {{ summary.yesterdayEntries }} 次（每15秒刷新）</span
+        >
       </template>
-      <template
-        v-if="!['checkins', 'lesson-records'].includes(resource)"
-        #actions="{ row, reload }"
-      >
+      <template v-if="!['checkins', 'lesson-records'].includes(resource)" #actions="{ row, reload }">
         <Button
-          v-if="
-            resource === 'course-products' &&
-            row.kind === 'group' &&
-            canGym('courses:write')
-          "
+          v-if="resource === 'course-products' && row.kind === 'group' && canGym('courses:write')"
           type="link"
           @click="
             async () => {
@@ -512,12 +474,8 @@ onUnmounted(stop);
         </Button>
         <Button
           v-if="
-            (resource === 'bookings' &&
-              row.status === 'confirmed' &&
-              canGym('bookings:write')) ||
-            (resource === 'course-sessions' &&
-              row.status === 'scheduled' &&
-              canGym('courses:write'))
+            (resource === 'bookings' && row.status === 'confirmed' && canGym('bookings:write')) ||
+            (resource === 'course-sessions' && row.status === 'scheduled' && canGym('courses:write'))
           "
           type="link"
           danger
@@ -525,13 +483,7 @@ onUnmounted(stop);
         >
           取消{{ resource === 'bookings' ? '预约' : '排课' }}
         </Button>
-        <Button
-          v-if="resource === 'body-measurements'"
-          type="link"
-          @click="detail(row)"
-        >
-          详情 / 报告
-        </Button>
+        <Button v-if="resource === 'body-measurements'" type="link" @click="detail(row)"> 详情 / 报告 </Button>
         <Button
           v-if="resource === 'qr-codes' && row.providerCodeFileId"
           type="link"
@@ -584,13 +536,9 @@ onUnmounted(stop);
       </Form>
       <template v-else-if="current">
         <Descriptions :column="1" bordered>
-          <DescriptionsItem
-            v-for="[title, key] in config.columns"
-            :key="key"
-            :label="title"
-          >
-            {{ current[key ?? ''] ?? '—' }}
-</DescriptionsItem><DescriptionsItem label="备注">
+          <DescriptionsItem v-for="[title, key] in config.columns" :key="key" :label="title">
+            {{ current[key ?? ''] ?? '—' }} </DescriptionsItem
+          ><DescriptionsItem label="备注">
             {{ current.note }}
           </DescriptionsItem>
         </Descriptions>
@@ -605,12 +553,8 @@ onUnmounted(stop);
           ]"
         />
         <Space class="mt-4">
-          <Button
-            v-if="current.reportFileId"
-            @click="openGymFile(current.reportFileId)"
-          >
-            查看报告
-</Button><Upload
+          <Button v-if="current.reportFileId" @click="openGymFile(current.reportFileId)"> 查看报告 </Button
+          ><Upload
             v-if="canGym('measurements:write')"
             :before-upload="report"
             :show-upload-list="false"

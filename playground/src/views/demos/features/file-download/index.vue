@@ -37,8 +37,7 @@ function getResponse() {
         type="primary"
         @click="
           downloadFileFromUrl({
-            source:
-              'https://codeload.github.com/vbenjs/vue-vben-admin-doc/zip/main',
+            source: 'https://codeload.github.com/vbenjs/vue-vben-admin-doc/zip/main',
             target: '_self',
           })
         "
@@ -52,8 +51,7 @@ function getResponse() {
         type="primary"
         @click="
           downloadFileFromImageUrl({
-            source:
-              'https://unpkg.com/@vbenjs/static-source@0.1.7/source/logo-v1.webp',
+            source: 'https://unpkg.com/@vbenjs/static-source@0.1.7/source/logo-v1.webp',
             fileName: 'vben-logo.png',
           })
         "
@@ -91,9 +89,7 @@ function getResponse() {
 
     <Card class="my-5" title="Request download">
       <Button type="primary" @click="getBlob"> 获取Blob </Button>
-      <Button type="primary" class="ml-4" @click="getResponse">
-        获取Response
-      </Button>
+      <Button type="primary" class="ml-4" @click="getResponse"> 获取Response </Button>
       <div class="mt-4">{{ downloadResult }}</div>
     </Card>
   </Page>

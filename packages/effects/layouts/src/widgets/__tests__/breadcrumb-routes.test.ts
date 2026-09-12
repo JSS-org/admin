@@ -4,10 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { resolveBreadcrumbMatches } from '../breadcrumb-routes';
 
-function createMatch(
-  name: RouteLocationMatched['name'],
-  path: string,
-): RouteLocationMatched {
+function createMatch(name: RouteLocationMatched['name'], path: string): RouteLocationMatched {
   return { name, path } as RouteLocationMatched;
 }
 

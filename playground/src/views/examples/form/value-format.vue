@@ -29,16 +29,13 @@ function encodeValueFormatValues(values: Readonly<ValueFormatFormValues>) {
 
 type ValueFormatSubmitValues = ReturnType<typeof encodeValueFormatValues>;
 
-function decodeValueFormatValues(
-  values: Readonly<ValueFormatSubmitValues>,
-): ValueFormatFormValues {
+function decodeValueFormatValues(values: Readonly<ValueFormatSubmitValues>): ValueFormatFormValues {
   let reportRange: [Dayjs, Dayjs] | undefined;
   if (values.startTime !== undefined && values.endTime !== undefined) {
     reportRange = [dayjs(values.startTime), dayjs(values.endTime)];
   }
   return {
-    deadline:
-      values.deadline === undefined ? undefined : dayjs(values.deadline),
+    deadline: values.deadline === undefined ? undefined : dayjs(values.deadline),
     keyword: values.keyword,
     reportRange,
   };
@@ -94,9 +91,7 @@ function formatJsonPreview(value: unknown) {
   return JSON.stringify(
     value,
     (_key, currentValue) => {
-      return dayjs.isDayjs(currentValue)
-        ? currentValue.format('YYYY-MM-DD HH:mm:ss')
-        : currentValue;
+      return dayjs.isDayjs(currentValue) ? currentValue.format('YYYY-MM-DD HH:mm:ss') : currentValue;
     },
     2,
   );
@@ -152,9 +147,8 @@ onMounted(async () => {
     <template #description>
       <div class="text-muted-foreground space-y-2">
         <p>
-          <code>getRawValues()</code> 返回组件原始值，<code>getValues()</code> /
-          提交时会按 <code>codec.encode</code> 输出 payload，回填时通过
-          <code>codec.decode</code> 恢复组件值。
+          <code>getRawValues()</code> 返回组件原始值，<code>getValues()</code> / 提交时会按
+          <code>codec.encode</code> 输出 payload，回填时通过 <code>codec.decode</code> 恢复组件值。
         </p>
         <div class="flex flex-wrap gap-2">
           <Tag color="processing">encode：生成完整提交值</Tag>
@@ -171,9 +165,7 @@ onMounted(async () => {
       <template #extra>
         <Space wrap>
           <Button @click="handleSetExampleValue">填充示例数据</Button>
-          <Button type="primary" @click="handleInspectValues">
-            查看 getValues 输出
-          </Button>
+          <Button type="primary" @click="handleInspectValues"> 查看 getValues 输出 </Button>
         </Space>
       </template>
       <Form />
@@ -181,14 +173,10 @@ onMounted(async () => {
 
     <div class="grid gap-4 lg:grid-cols-2">
       <Card title="getRawValues() 输出（组件值）">
-        <pre class="bg-muted overflow-auto rounded-md p-4 text-sm">{{
-          liveValuesPreview
-        }}</pre>
+        <pre class="bg-muted overflow-auto rounded-md p-4 text-sm">{{ liveValuesPreview }}</pre>
       </Card>
       <Card title="getValues / submit 输出（codec.encode 后）">
-        <pre class="bg-muted overflow-auto rounded-md p-4 text-sm">{{
-          transformedValuesPreview
-        }}</pre>
+        <pre class="bg-muted overflow-auto rounded-md p-4 text-sm">{{ transformedValuesPreview }}</pre>
       </Card>
     </div>
   </Page>

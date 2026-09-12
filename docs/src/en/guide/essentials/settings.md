@@ -141,14 +141,9 @@ To add a new dynamically modifiable configuration item, simply follow the steps 
 - In `packages/effects/hooks/src/use-app-config.ts`, add the corresponding configuration item, such as:
 
   ```ts
-  export function useAppConfig(
-    env: Record<string, any>,
-    isProduction: boolean,
-  ): ApplicationConfig {
+  export function useAppConfig(env: Record<string, any>, isProduction: boolean): ApplicationConfig {
     // In production environment, directly use the window._VBEN_ADMIN_PRO_APP_CONF_ global variable
-    const config = isProduction
-      ? window._VBEN_ADMIN_PRO_APP_CONF_
-      : (env as VbenAdminProAppConfigRaw);
+    const config = isProduction ? window._VBEN_ADMIN_PRO_APP_CONF_ : (env as VbenAdminProAppConfigRaw);
 
     const { VITE_GLOB_API_URL, VITE_GLOB_OTHER_API_URL } = config; // [!code ++]
 
@@ -200,10 +195,7 @@ In addition to overriding the built-in framework preferences, you can also add a
 #### 1. Define the extension in `src/preferences.ts`
 
 ```ts
-import {
-  defineOverridesPreferences,
-  definePreferencesExtension,
-} from '@vben/preferences';
+import { defineOverridesPreferences, definePreferencesExtension } from '@vben/preferences';
 
 interface ProjectPreferencesExtension {
   defaultTableSize: number;
@@ -218,54 +210,53 @@ export const overridesPreferences = defineOverridesPreferences({
   },
 });
 
-export const preferencesExtension =
-  definePreferencesExtension<ProjectPreferencesExtension>({
-    tabLabel: 'preferences.antd.tabLabel',
-    title: 'preferences.antd.title',
-    fields: [
-      {
-        component: 'switch',
-        defaultValue: true,
-        key: 'enableFormFullscreen',
-        label: 'preferences.antd.fields.enableFormFullscreen.label',
-        tip: 'preferences.antd.fields.enableFormFullscreen.tip',
-      },
-      {
-        component: 'select',
-        defaultValue: 'single',
-        key: 'tenantMode',
-        label: 'preferences.antd.fields.tenantMode.label',
-        options: [
-          {
-            label: 'preferences.antd.fields.tenantMode.options.single.label',
-            value: 'single',
-          },
-          {
-            label: 'preferences.antd.fields.tenantMode.options.multi.label',
-            value: 'multi',
-          },
-        ],
-      },
-      {
-        component: 'number',
-        componentProps: {
-          max: 200,
-          min: 10,
-          step: 10,
+export const preferencesExtension = definePreferencesExtension<ProjectPreferencesExtension>({
+  tabLabel: 'preferences.antd.tabLabel',
+  title: 'preferences.antd.title',
+  fields: [
+    {
+      component: 'switch',
+      defaultValue: true,
+      key: 'enableFormFullscreen',
+      label: 'preferences.antd.fields.enableFormFullscreen.label',
+      tip: 'preferences.antd.fields.enableFormFullscreen.tip',
+    },
+    {
+      component: 'select',
+      defaultValue: 'single',
+      key: 'tenantMode',
+      label: 'preferences.antd.fields.tenantMode.label',
+      options: [
+        {
+          label: 'preferences.antd.fields.tenantMode.options.single.label',
+          value: 'single',
         },
-        defaultValue: 20,
-        key: 'defaultTableSize',
-        label: 'preferences.antd.fields.defaultTableSize.label',
+        {
+          label: 'preferences.antd.fields.tenantMode.options.multi.label',
+          value: 'multi',
+        },
+      ],
+    },
+    {
+      component: 'number',
+      componentProps: {
+        max: 200,
+        min: 10,
+        step: 10,
       },
-      {
-        component: 'input',
-        defaultValue: '',
-        key: 'reportTitle',
-        label: 'preferences.antd.fields.reportTitle.label',
-        placeholder: 'preferences.antd.fields.reportTitle.placeholder',
-      },
-    ],
-  });
+      defaultValue: 20,
+      key: 'defaultTableSize',
+      label: 'preferences.antd.fields.defaultTableSize.label',
+    },
+    {
+      component: 'input',
+      defaultValue: '',
+      key: 'reportTitle',
+      label: 'preferences.antd.fields.reportTitle.label',
+      placeholder: 'preferences.antd.fields.reportTitle.placeholder',
+    },
+  ],
+});
 ```
 
 - `tabLabel` is the tab label, and `title` is the panel title. If `title` is omitted, `tabLabel` is used as the fallback.
@@ -291,11 +282,7 @@ The same `namespace` isolates both framework preferences and extension preferenc
 #### 3. Read or update extension preferences in business pages
 
 ```ts
-import {
-  getCustomPreferences,
-  updateCustomPreferences,
-  usePreferences,
-} from '@vben/preferences';
+import { getCustomPreferences, updateCustomPreferences, usePreferences } from '@vben/preferences';
 
 interface ProjectPreferencesExtension {
   defaultTableSize: number;
@@ -363,8 +350,7 @@ const defaultPreferences: Preferences = {
     contentPaddingLeft: 0,
     contentPaddingRight: 0,
     contentPaddingTop: 0,
-    defaultAvatar:
-      'https://unpkg.com/@vbenjs/static-source@0.1.7/source/avatar-v1.webp',
+    defaultAvatar: 'https://unpkg.com/@vbenjs/static-source@0.1.7/source/avatar-v1.webp',
     defaultHomePath: '/dashboard/analytics',
     dynamicTitle: true,
     enableCheckUpdates: true,

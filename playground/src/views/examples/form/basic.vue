@@ -37,15 +37,11 @@ function encodeBasicFormValues(values: Readonly<BasicFormValues>) {
 
 type BasicSubmitValues = ReturnType<typeof encodeBasicFormValues>;
 
-function decodeBasicFormValues(
-  values: Readonly<BasicSubmitValues>,
-): BasicFormValues {
+function decodeBasicFormValues(values: Readonly<BasicSubmitValues>): BasicFormValues {
   const { endTime, startTime, ...formValues } = values;
   return {
     ...formValues,
-    ...(startTime && endTime
-      ? { rangePicker: [dayjs(startTime), dayjs(endTime)] }
-      : {}),
+    ...(startTime && endTime ? { rangePicker: [dayjs(startTime), dayjs(endTime)] } : {}),
   };
 }
 
@@ -280,9 +276,7 @@ const [BaseForm, baseFormApi] = useVbenForm({
           default: () => ['我已阅读并同意'],
         };
       },
-      rules: z
-        .boolean()
-        .refine((v) => v, { message: '为什么不同意？勾上它！' }),
+      rules: z.boolean().refine((v) => v, { message: '为什么不同意？勾上它！' }),
     },
     {
       component: 'Mentions',
@@ -313,18 +307,14 @@ const [BaseForm, baseFormApi] = useVbenForm({
         class: 'w-auto',
       },
       fieldName: 'switch',
-      help: () =>
-        ['这是一个多行帮助信息', '第二行', '第三行'].map((v) => h('p', v)),
+      help: () => ['这是一个多行帮助信息', '第二行', '第三行'].map((v) => h('p', v)),
       label: '开关',
     },
     {
       component: 'DatePicker',
       dependencies: {
         resolve: ({ values }) => ({
-          help: () =>
-            [`这是一个可输出其他字段值的帮助信息${values.rate}`].map((value) =>
-              h('p', value),
-            ),
+          help: () => [`这是一个可输出其他字段值的帮助信息${values.rate}`].map((value) => h('p', value)),
         }),
         triggerFields: ['rate'],
       },
@@ -551,9 +541,7 @@ function handleSetFormValue() {
   >
     <template #description>
       <div class="text-muted-foreground">
-        <p>
-          表单组件基础示例，请注意，该页面用到的参数代码会添加一些简单注释，方便理解，请仔细查看。
-        </p>
+        <p>表单组件基础示例，请注意，该页面用到的参数代码会添加一些简单注释，方便理解，请仔细查看。</p>
       </div>
     </template>
     <template #extra>

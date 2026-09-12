@@ -25,7 +25,4 @@ function viteFormFieldSlotMigrationWarningPlugin(): Plugin {
   };
 }
 
-export {
-  FORM_FIELD_SLOT_MIGRATION_WARNING,
-  viteFormFieldSlotMigrationWarningPlugin,
-};
+export { FORM_FIELD_SLOT_MIGRATION_WARNING, viteFormFieldSlotMigrationWarningPlugin };

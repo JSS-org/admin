@@ -5,13 +5,7 @@ import { find, insert, rows, seedId } from './core';
 import { coupons } from './coupons';
 import { marketing } from './marketing';
 import { reset } from './state';
-function call(
-  username: string,
-  method: string,
-  path: string,
-  body = {},
-  key?: string,
-) {
+function call(username: string, method: string, path: string, body = {}, key?: string) {
   const req = {
     actor: authenticate(login(username, '123456').accessToken),
     method,
@@ -69,11 +63,7 @@ describe('coupon quotas and bulk management', () => {
       ),
     ).toThrow('不可访问');
     expect(rows('couponBatches')).toHaveLength(0);
-    expect(
-      rows('couponQuotas').every(
-        (q) => q.reservedCount === 0 && q.issuedCount === 0,
-      ),
-    ).toBe(true);
+    expect(rows('couponQuotas').every((q) => q.reservedCount === 0 && q.issuedCount === 0)).toBe(true);
   });
   it('consumes only successful recipients, releases personal limit failures, and hides foreign targets', () => {
     allocate();
@@ -86,21 +76,11 @@ describe('coupon quotas and bulk management', () => {
     };
     const first = call('hq', 'POST', '/coupon-batches', body, 'issue');
     expect(first.successCount).toBe(2);
-    expect(call('hq', 'POST', '/coupon-batches', body, 'issue').id).toBe(
-      first.id,
-    );
+    expect(call('hq', 'POST', '/coupon-batches', body, 'issue').id).toBe(first.id);
     expect(rows('memberCoupons')).toHaveLength(2);
-    expect(
-      call('store1', 'GET', `/coupon-batches/${first.id}`).recipientCount,
-    ).toBe(1);
-    expect(
-      call('hq', 'POST', '/coupon-batches', body, 'again').failureCount,
-    ).toBe(2);
-    expect(
-      rows('couponQuotas').every(
-        (q) => q.reservedCount === 0 && q.issuedCount === 1,
-      ),
-    ).toBe(true);
+    expect(call('store1', 'GET', `/coupon-batches/${first.id}`).recipientCount).toBe(1);
+    expect(call('hq', 'POST', '/coupon-batches', body, 'again').failureCount).toBe(2);
+    expect(rows('couponQuotas').every((q) => q.reservedCount === 0 && q.issuedCount === 1)).toBe(true);
     expect(call('store1', 'GET', '/member-coupons').total).toBe(1);
   });
   it('returns full gift codes only on first generation and refuses future-client redemption', () => {
@@ -113,9 +93,7 @@ describe('coupon quotas and bulk management', () => {
     };
     const first = call('hq', 'POST', '/gift-code-batches', body, 'gift');
     expect(first.plainCodes).toHaveLength(2);
-    expect(
-      call('hq', 'POST', '/gift-code-batches', body, 'gift').plainCodes,
-    ).toBeUndefined();
+    expect(call('hq', 'POST', '/gift-code-batches', body, 'gift').plainCodes).toBeUndefined();
     const detail = call('hq', 'GET', `/gift-code-batches/${first.id}`);
     expect(detail.codes[0].codeDigest).toBeUndefined();
     expect(detail.codes[0].codeMasked).toMatch(/^\*{4}/);

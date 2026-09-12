@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import type {
-  TipTapProps,
-  ToolbarAction,
-  ToolbarMenuItem,
-  VbenTiptapChangeEvent,
-} from './types';
+import type { TipTapProps, ToolbarAction, ToolbarMenuItem, VbenTiptapChangeEvent } from './types';
 
 import { computed, onBeforeUnmount, reactive, watch } from 'vue';
 
@@ -38,14 +33,10 @@ const emit = defineEmits<{
 }>();
 const modelValue = defineModel<string>({ default: '' });
 const contentMinHeight = computed(() =>
-  typeof props.minHeight === 'number'
-    ? `${props.minHeight}px`
-    : props.minHeight,
+  typeof props.minHeight === 'number' ? `${props.minHeight}px` : props.minHeight,
 );
 const contentMaxHeight = computed(() =>
-  typeof props.maxHeight === 'number'
-    ? `${props.maxHeight}px`
-    : props.maxHeight,
+  typeof props.maxHeight === 'number' ? `${props.maxHeight}px` : props.maxHeight,
 );
 const tiptapContentClass = cn(
   'vben-tiptap-content vben-tiptap__content',
@@ -85,9 +76,7 @@ const toolbarGroups = computed<ToolbarAction[][]>(() => {
   const effectiveImageUpload = props.extensions ? undefined : props.imageUpload;
   return createToolbarGroups(effectiveImageUpload);
 });
-const previewContent = computed(
-  () => editor.value?.getHTML() ?? modelValue.value,
-);
+const previewContent = computed(() => editor.value?.getHTML() ?? modelValue.value);
 const [PreviewModal, previewModalApi] = useVbenModal({
   footer: false,
   fullscreenButton: false,
@@ -170,11 +159,7 @@ onBeforeUnmount(() => {
       v-if="toolbar"
       class="sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b border-border p-2 backdrop-blur-[14px]"
     >
-      <div
-        v-for="(group, groupIndex) in toolbarGroups"
-        :key="groupIndex"
-        class="flex items-center gap-1"
-      >
+      <div v-for="(group, groupIndex) in toolbarGroups" :key="groupIndex" class="flex items-center gap-1">
         <template v-for="action in group" :key="action.label">
           <VbenPopover
             v-if="action.menu || action.palette"
@@ -194,19 +179,11 @@ onBeforeUnmount(() => {
               >
                 <template v-if="action.triggerText">
                   <span class="text-xs font-semibold tracking-wide">
-                    {{
-                      typeof action.triggerText === 'function'
-                        ? action.triggerText(editor)
-                        : action.triggerText
-                    }}
+                    {{ typeof action.triggerText === 'function' ? action.triggerText(editor) : action.triggerText }}
                   </span>
                   <ChevronDown class="size-4 opacity-70" />
                 </template>
-                <component
-                  v-else-if="action.icon"
-                  :is="action.icon"
-                  class="size-4"
-                />
+                <component v-else-if="action.icon" :is="action.icon" class="size-4" />
                 <span
                   v-if="getActionIndicatorColor(action)"
                   :style="{ backgroundColor: getActionIndicatorColor(action) }"
@@ -214,10 +191,7 @@ onBeforeUnmount(() => {
                 ></span>
               </VbenIconButton>
             </template>
-            <div
-              v-if="action.palette"
-              class="flex max-w-52 flex-wrap items-center gap-2"
-            >
+            <div v-if="action.palette" class="flex max-w-52 flex-wrap items-center gap-2">
               <button
                 v-for="color in action.palette.colors"
                 :key="color"
@@ -227,10 +201,7 @@ onBeforeUnmount(() => {
                 type="button"
                 @click="applyPaletteColor(action, color)"
               >
-                <Check
-                  v-if="getPaletteCurrentColor(action) === color"
-                  class="size-4 text-white drop-shadow-sm"
-                />
+                <Check v-if="getPaletteCurrentColor(action) === color" class="size-4 text-white drop-shadow-sm" />
               </button>
               <button
                 v-if="action.palette.clear"
@@ -254,10 +225,7 @@ onBeforeUnmount(() => {
                   {{ item.shortLabel }}
                 </span>
                 <span class="flex-1">{{ item.label }}</span>
-                <Check
-                  v-if="isMenuItemActive(item)"
-                  class="size-4 text-primary"
-                />
+                <Check v-if="isMenuItemActive(item)" class="size-4 text-primary" />
               </button>
             </div>
           </VbenPopover>
@@ -278,10 +246,7 @@ onBeforeUnmount(() => {
             ></span>
           </VbenIconButton>
         </template>
-        <div
-          v-if="groupIndex < toolbarGroups.length - 1"
-          class="ml-1 h-5 w-px bg-border"
-        ></div>
+        <div v-if="groupIndex < toolbarGroups.length - 1" class="ml-1 h-5 w-px bg-border"></div>
       </div>
       <div v-if="previewable" class="ml-auto flex items-center">
         <VbenIconButton
@@ -302,19 +267,14 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <EditorContent v-if="editor" :editor="editor" class="p-4" />
-    <PreviewModal
-      v-if="previewable"
-      :title="$t('ui.tiptap.toolbar.preview')"
-      class="w-4/5"
-    >
+    <PreviewModal v-if="previewable" :title="$t('ui.tiptap.toolbar.preview')" class="w-4/5">
       <Preview :content="previewContent" :min-height="320" />
     </PreviewModal>
   </div>
 </template>
 
 <style scoped>
-.vben-tiptap
-  :deep(.vben-tiptap__content p.is-editor-empty:first-child::before) {
+.vben-tiptap :deep(.vben-tiptap__content p.is-editor-empty:first-child::before) {
   float: left;
   height: 0;
   color: hsl(var(--input-placeholder));

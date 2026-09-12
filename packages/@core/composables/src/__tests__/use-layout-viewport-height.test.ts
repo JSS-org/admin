@@ -32,9 +32,7 @@ function mountViewportHeight() {
 }
 
 function getViewportHeightVar() {
-  return document.documentElement.style.getPropertyValue(
-    CSS_VARIABLE_LAYOUT_VIEWPORT_HEIGHT,
-  );
+  return document.documentElement.style.getPropertyValue(CSS_VARIABLE_LAYOUT_VIEWPORT_HEIGHT);
 }
 
 async function flushAnimationFrame() {
@@ -47,9 +45,7 @@ afterEach(() => {
   activeApp?.unmount();
   activeApp = undefined;
   document.body.innerHTML = '';
-  document.documentElement.style.removeProperty(
-    CSS_VARIABLE_LAYOUT_VIEWPORT_HEIGHT,
-  );
+  document.documentElement.style.removeProperty(CSS_VARIABLE_LAYOUT_VIEWPORT_HEIGHT);
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -65,10 +61,7 @@ describe('useLayoutViewportHeight', () => {
 
     expect(getViewportHeightVar()).toBe('');
     expect(resizeObserver).not.toHaveBeenCalled();
-    expect(addEventListener).not.toHaveBeenCalledWith(
-      'resize',
-      expect.any(Function),
-    );
+    expect(addEventListener).not.toHaveBeenCalledWith('resize', expect.any(Function));
   });
 
   it('writes innerHeight when dvh is unsupported', () => {

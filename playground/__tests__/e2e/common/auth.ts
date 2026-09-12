@@ -27,9 +27,7 @@ export async function authLogin(page: Page) {
   const startX = Math.round(actionBoundingBox.x + actionBoundingBox.width / 2);
   const startY = Math.round(actionBoundingBox.y + actionBoundingBox.height / 2);
 
-  const targetX = Math.round(
-    sliderCaptchaBox.x + sliderCaptchaBox.width - actionBoundingBox.width / 2,
-  );
+  const targetX = Math.round(sliderCaptchaBox.x + sliderCaptchaBox.width - actionBoundingBox.width / 2);
   const targetY = startY;
 
   // 模拟鼠标拖动

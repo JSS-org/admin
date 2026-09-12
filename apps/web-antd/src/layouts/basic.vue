@@ -22,12 +22,7 @@ async function handleLogout() {
   <BasicLayout @logout="handleLogout">
     <template #user-dropdown>
       <div class="admin-account">
-        <Tooltip
-          v-if="isDevelopment"
-          :title="
-            isMock ? '模拟数据，重启服务后恢复示例数据' : '当前为开发环境'
-          "
-        >
+        <Tooltip v-if="isDevelopment" :title="isMock ? '模拟数据，重启服务后恢复示例数据' : '当前为开发环境'">
           <span tabindex="0" class="admin-environment">
             {{ isMock ? '开发 · Mock' : '开发环境' }}
           </span>

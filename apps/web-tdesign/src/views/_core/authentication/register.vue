@@ -87,9 +87,5 @@ async function handleSubmit(value: Recordable<any>) {
 </script>
 
 <template>
-  <AuthenticationRegister
-    :form-schema="formSchema"
-    :loading="loading"
-    @submit="handleSubmit"
-  />
+  <AuthenticationRegister :form-schema="formSchema" :loading="loading" @submit="handleSubmit" />
 </template>

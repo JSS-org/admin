@@ -32,15 +32,11 @@ const emit = defineEmits<{
 const formData = ref<SystemMenuApi.SystemMenu>();
 const titleSuffix = ref<string>();
 
-type MenuDrawerData =
-  | SystemMenuApi.SystemMenu
-  | { pid?: SystemMenuApi.SystemMenu['pid'] };
+type MenuDrawerData = SystemMenuApi.SystemMenu | { pid?: SystemMenuApi.SystemMenu['pid'] };
 type MenuSubmitValues = Omit<SystemMenuApi.SystemMenu, 'children' | 'id'>;
 type MenuFormValues = MenuSubmitValues & { linkSrc?: string };
 
-function encodeMenuFormValues(
-  values: Readonly<MenuFormValues>,
-): MenuSubmitValues {
+function encodeMenuFormValues(values: Readonly<MenuFormValues>): MenuSubmitValues {
   const { linkSrc, ...formValues } = values;
   if (values.type === 'link') {
     const meta = { ...values.meta, link: linkSrc };
@@ -61,9 +57,7 @@ function encodeMenuFormValues(
   return formValues;
 }
 
-function decodeMenuFormValues(
-  values: Readonly<MenuSubmitValues>,
-): MenuFormValues {
+function decodeMenuFormValues(values: Readonly<MenuSubmitValues>): MenuFormValues {
   let linkSrc: string | undefined;
   if (values.type === 'link') {
     linkSrc = values.meta?.link;
@@ -99,11 +93,7 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
           return !(await isMenuNameExists(value, formData.value?.id));
         },
         {
-          error: (issue) =>
-            $t('ui.formRules.alreadyExists', [
-              $t('system.menu.menuName'),
-              issue.input,
-            ]),
+          error: (issue) => $t('ui.formRules.alreadyExists', [$t('system.menu.menuName'), issue.input]),
         },
       ),
   },
@@ -131,13 +121,7 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
     label: $t('system.menu.parent'),
     renderComponentContent() {
       return {
-        treeTitleRender({
-          label,
-          meta,
-        }: {
-          label: string;
-          meta: Recordable<any>;
-        }) {
+        treeTitleRender({ label, meta }: { label: string; meta: Recordable<any> }) {
           const coms = [];
           if (!label) return '';
           if (meta?.icon) {
@@ -183,11 +167,7 @@ const schema: VbenFormSchema<MenuFormValues>[] = [
           return !(await isMenuPathExists(value, formData.value?.id));
         },
         {
-          error: (issue) =>
-            $t('ui.formRules.alreadyExists', [
-              $t('system.menu.path'),
-              issue.input,
-            ]),
+          error: (issue) => $t('ui.formRules.alreadyExists', [$t('system.menu.path'), issue.input]),
         },
       ),
   },
@@ -490,9 +470,7 @@ const [Drawer, drawerApi] = useVbenDrawer<MenuDrawerData>({
       if (data && 'id' in data) {
         formData.value = data;
         await formApi.setSubmitValues(data);
-        titleSuffix.value = formData.value.meta?.title
-          ? $t(formData.value.meta.title)
-          : '';
+        titleSuffix.value = formData.value.meta?.title ? $t(formData.value.meta.title) : '';
       } else {
         formData.value = undefined;
         formApi.reset();
@@ -511,9 +489,7 @@ async function onSubmit() {
     drawerApi.lock();
     const data = await formApi.getValues();
     try {
-      await (formData.value?.id
-        ? updateMenu(formData.value.id, data)
-        : createMenu(data));
+      await (formData.value?.id ? updateMenu(formData.value.id, data) : createMenu(data));
       drawerApi.close();
       emit('success');
     } finally {

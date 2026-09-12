@@ -3,12 +3,7 @@ import type { Recordable } from '@vben/types';
 
 import { reactive, ref } from 'vue';
 
-import {
-  Page,
-  VbenButton,
-  VbenButtonGroup,
-  VbenCheckButtonGroup,
-} from '@vben/common-ui';
+import { Page, VbenButton, VbenButtonGroup, VbenCheckButtonGroup } from '@vben/common-ui';
 import { LoaderCircle, Square, SquareCheckBig } from '@vben/icons';
 
 import { Button, Card, message } from 'antdv-next';
@@ -152,41 +147,23 @@ function onBtnClick(value: any) {
       <p class="mt-4">按钮组：</p>
       <div class="mt-2 flex flex-col gap-2">
         <VbenButtonGroup v-bind="compProps" border>
-          <VbenButton
-            v-for="btn in options"
-            :key="btn.value"
-            variant="link"
-            @click="onBtnClick(btn.value)"
-          >
+          <VbenButton v-for="btn in options" :key="btn.value" variant="link" @click="onBtnClick(btn.value)">
             {{ btn.label }}
           </VbenButton>
         </VbenButtonGroup>
         <VbenButtonGroup v-bind="compProps" border>
-          <VbenButton
-            v-for="btn in options"
-            :key="btn.value"
-            variant="outline"
-            @click="onBtnClick(btn.value)"
-          >
+          <VbenButton v-for="btn in options" :key="btn.value" variant="outline" @click="onBtnClick(btn.value)">
             {{ btn.label }}
           </VbenButton>
         </VbenButtonGroup>
       </div>
       <p class="mt-4">单选：{{ radioValue }}</p>
       <div class="mt-2 flex flex-col gap-2">
-        <VbenCheckButtonGroup
-          v-model="radioValue"
-          :options="options"
-          v-bind="compProps"
-        />
+        <VbenCheckButtonGroup v-model="radioValue" :options="options" v-bind="compProps" />
       </div>
       <p class="mt-4">单选插槽：{{ radioValue }}</p>
       <div class="mt-2 flex flex-col gap-2">
-        <VbenCheckButtonGroup
-          v-model="radioValue"
-          :options="options"
-          v-bind="compProps"
-        >
+        <VbenCheckButtonGroup v-model="radioValue" :options="options" v-bind="compProps">
           <template #option="{ label, value, data }">
             <div class="flex items-center">
               <span>{{ label }}</span>
@@ -198,21 +175,11 @@ function onBtnClick(value: any) {
       </div>
       <p class="mt-4">多选{{ checkValue }}</p>
       <div class="mt-2 flex flex-col gap-2">
-        <VbenCheckButtonGroup
-          v-model="checkValue"
-          multiple
-          :options="options"
-          v-bind="compProps"
-        />
+        <VbenCheckButtonGroup v-model="checkValue" multiple :options="options" v-bind="compProps" />
       </div>
       <p class="mt-4">自定义图标{{ checkValue }}</p>
       <div class="mt-2 flex flex-col gap-2">
-        <VbenCheckButtonGroup
-          v-model="checkValue"
-          multiple
-          :options="options"
-          v-bind="compProps"
-        >
+        <VbenCheckButtonGroup v-model="checkValue" multiple :options="options" v-bind="compProps">
           <template #icon="{ loading, checked }">
             <LoaderCircle class="animate-spin" v-if="loading" />
             <SquareCheckBig v-else-if="checked" />

@@ -39,9 +39,7 @@ export type BeforeCloseScope = {
 };
 
 export type AlertProps = {
-  beforeClose?: (
-    scope: BeforeCloseScope,
-  ) => boolean | Promise<boolean | undefined> | undefined;
+  beforeClose?: (scope: BeforeCloseScope) => boolean | Promise<boolean | undefined> | undefined;
   bordered?: boolean;
   buttonAlign?: 'center' | 'end' | 'start';
   cancelText?: string;
@@ -65,8 +63,7 @@ export type PromptProps<T = any> = {
   }) => boolean | Promise<boolean | undefined> | undefined;
   component?: Component;
   componentProps?: Recordable<any>;
-  componentSlots?:
-    (() => any) | Recordable<unknown> | VNode | VNodeArrayChildren;
+  componentSlots?: (() => any) | Recordable<unknown> | VNode | VNodeArrayChildren;
   defaultValue?: T;
   modelPropName?: string;
 } & Omit<AlertProps, 'beforeClose'>;

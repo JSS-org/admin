@@ -1,10 +1,6 @@
 import type { Router, RouteRecordRaw } from 'vue-router';
 
-import type {
-  ExRouteRecordRaw,
-  MenuRecordRaw,
-  RouteMeta,
-} from '@vben-core/typings';
+import type { ExRouteRecordRaw, MenuRecordRaw, RouteMeta } from '@vben-core/typings';
 
 import { filterTree, mapTree, sortTree } from '@vben-core/shared/utils';
 
@@ -14,10 +10,7 @@ import { filterTree, mapTree, sortTree } from '@vben-core/shared/utils';
  * @param router - Vue Router 实例
  * @returns 生成的菜单列表
  */
-function generateMenus(
-  routes: RouteRecordRaw[],
-  router: Router,
-): MenuRecordRaw[] {
+function generateMenus(routes: RouteRecordRaw[], router: Router): MenuRecordRaw[] {
   // 将路由列表转换为一个以 name 为键的对象映射
   const finalRoutesMap: { [key: string]: string } = Object.fromEntries(
     router.getRoutes().map(({ name, path }) => [name, path]),
@@ -27,12 +20,7 @@ function generateMenus(
     // 获取最终的路由路径
     const path = finalRoutesMap[route.name as string] ?? route.path ?? '';
 
-    const {
-      meta = {} as RouteMeta,
-      name: routeName,
-      redirect,
-      children = [],
-    } = route;
+    const { meta = {} as RouteMeta, name: routeName, redirect, children = [] } = route;
     const {
       activeIcon,
       badge,
@@ -50,9 +38,7 @@ function generateMenus(
     const name = (title || routeName || '') as string;
 
     // 处理子菜单
-    const resultChildren = hideChildrenInMenu
-      ? []
-      : ((children as MenuRecordRaw[]) ?? []);
+    const resultChildren = hideChildrenInMenu ? [] : ((children as MenuRecordRaw[]) ?? []);
 
     // 设置子菜单的父子关系
     if (resultChildren.length > 0) {

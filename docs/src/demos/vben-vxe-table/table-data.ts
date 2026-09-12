@@ -240,8 +240,7 @@ export const MOCK_API_DATA = [
     category: 'Games',
     color: 'silver',
     currency: 'SOS',
-    description:
-      'Carbonite web goalkeeper gloves are ergonomically designed to give easy fit',
+    description: 'Carbonite web goalkeeper gloves are ergonomically designed to give easy fit',
     id: 'bafab694-3801-452c-b102-9eb519bd1143',
     imageUrl: 'https://avatars.githubusercontent.com/u/89827115',
     imageUrl2: 'https://avatars.githubusercontent.com/u/55952747',

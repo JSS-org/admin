@@ -21,11 +21,7 @@ import type {
 
 import type { Component } from 'vue';
 
-import type {
-  ApiComponentSharedProps,
-  BaseFormComponentType,
-  IconPickerProps,
-} from '@vben/common-ui';
+import type { ApiComponentSharedProps, BaseFormComponentType, IconPickerProps } from '@vben/common-ui';
 import type { Recordable } from '@vben/types';
 
 import { defineAsyncComponent, defineComponent, h, ref } from 'vue';
@@ -150,10 +146,7 @@ const withDefaultPlaceholder = (
     name: component.name,
     inheritAttrs: false,
     setup: (props: any, { attrs, expose, slots }) => {
-      const placeholder =
-        props?.placeholder ||
-        attrs?.placeholder ||
-        $t(`ui.placeholder.${type}`);
+      const placeholder = props?.placeholder || attrs?.placeholder || $t(`ui.placeholder.${type}`);
       // 透传组件暴露的方法
       const innerRef = ref();
       expose(
@@ -165,12 +158,7 @@ const withDefaultPlaceholder = (
           },
         ),
       );
-      return () =>
-        h(
-          component,
-          { ...componentProps, placeholder, ...props, ...attrs, ref: innerRef },
-          slots,
-        );
+      return () => h(component, { ...componentProps, placeholder, ...props, ...attrs, ref: innerRef }, slots);
     },
   });
 };
@@ -257,17 +245,10 @@ async function initComponentAdapter() {
       } else {
         const { options, isButton } = attrs;
         if (Array.isArray(options)) {
-          defaultSlot = () =>
-            options.map((option) =>
-              h(isButton ? ElCheckboxButton : ElCheckbox, option),
-            );
+          defaultSlot = () => options.map((option) => h(isButton ? ElCheckboxButton : ElCheckbox, option));
         }
       }
-      return h(
-        ElCheckboxGroup,
-        { ...props, ...attrs },
-        { ...slots, default: defaultSlot },
-      );
+      return h(ElCheckboxGroup, { ...props, ...attrs }, { ...slots, default: defaultSlot });
     },
     // 自定义默认按钮
     DefaultButton: (props, { attrs, slots }) => {
@@ -292,17 +273,10 @@ async function initComponentAdapter() {
       } else {
         const { options } = attrs;
         if (Array.isArray(options)) {
-          defaultSlot = () =>
-            options.map((option) =>
-              h(attrs.isButton ? ElRadioButton : ElRadio, option),
-            );
+          defaultSlot = () => options.map((option) => h(attrs.isButton ? ElRadioButton : ElRadio, option));
         }
       }
-      return h(
-        ElRadioGroup,
-        { ...props, ...attrs },
-        { ...slots, default: defaultSlot },
-      );
+      return h(ElRadioGroup, { ...props, ...attrs }, { ...slots, default: defaultSlot });
     },
     Select: (props, { attrs, slots }) => {
       return h(ElSelectV2, { ...props, attrs }, slots);

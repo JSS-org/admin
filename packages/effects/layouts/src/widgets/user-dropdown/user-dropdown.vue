@@ -11,21 +11,9 @@ import { computed, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 
 import { onSupportLanguagesChange } from '@vben/constants';
 import { useHoverToggle, useRefresh } from '@vben/hooks';
-import {
-  createIconifyIcon,
-  Languages,
-  LockKeyhole,
-  LogOut,
-  RotateCw,
-  Search,
-  Settings,
-} from '@vben/icons';
+import { createIconifyIcon, Languages, LockKeyhole, LogOut, RotateCw, Search, Settings } from '@vben/icons';
 import { $t, loadLocaleMessages } from '@vben/locales';
-import {
-  preferences,
-  updatePreferences,
-  usePreferences,
-} from '@vben/preferences';
+import { preferences, updatePreferences, usePreferences } from '@vben/preferences';
 import { useAccessStore } from '@vben/stores';
 import { isWindowsOs } from '@vben/utils';
 
@@ -140,10 +128,7 @@ const refTimezone = useTemplateRef('refTimezone');
 const refNotification = useTemplateRef('refNotification');
 
 const TimezoneIcon = createIconifyIcon('fluent-mdl2:world-clock');
-const [openPopover, hoverWatcher] = useHoverToggle(
-  [refTrigger, refContent],
-  () => props.hoverDelay,
-);
+const [openPopover, hoverWatcher] = useHoverToggle([refTrigger, refContent], () => props.hoverDelay);
 
 watch(
   () => props.trigger === 'hover' || props.trigger === 'both',
@@ -160,55 +145,37 @@ watch(
 );
 
 const showLockInDropdown = computed(
-  () =>
-    preferences.widget.lockScreen &&
-    preferences.widget.lockScreenButtonPosition === 'user-dropdown',
+  () => preferences.widget.lockScreen && preferences.widget.lockScreenButtonPosition === 'user-dropdown',
 );
 
-const showLogoutInDropdown = computed(
-  () => preferences.widget.logoutButtonPosition === 'user-dropdown',
-);
+const showLogoutInDropdown = computed(() => preferences.widget.logoutButtonPosition === 'user-dropdown');
 
 const showGlobalSearchInDropdown = computed(
-  () =>
-    preferences.widget.globalSearch &&
-    preferences.widget.globalSearchButtonPosition === 'user-dropdown',
+  () => preferences.widget.globalSearch && preferences.widget.globalSearchButtonPosition === 'user-dropdown',
 );
 
 const showThemeToggleInDropdown = computed(
-  () =>
-    preferences.widget.themeToggle &&
-    preferences.widget.themeToggleButtonPosition === 'user-dropdown',
+  () => preferences.widget.themeToggle && preferences.widget.themeToggleButtonPosition === 'user-dropdown',
 );
 
 const showLanguageToggleInDropdown = computed(
-  () =>
-    preferences.widget.languageToggle &&
-    preferences.widget.languageToggleButtonPosition === 'user-dropdown',
+  () => preferences.widget.languageToggle && preferences.widget.languageToggleButtonPosition === 'user-dropdown',
 );
 
 const showTimezoneInDropdown = computed(
-  () =>
-    preferences.widget.timezone &&
-    preferences.widget.timezoneButtonPosition === 'user-dropdown',
+  () => preferences.widget.timezone && preferences.widget.timezoneButtonPosition === 'user-dropdown',
 );
 
 const showFullscreenInDropdown = computed(
-  () =>
-    preferences.widget.fullscreen &&
-    preferences.widget.fullscreenButtonPosition === 'user-dropdown',
+  () => preferences.widget.fullscreen && preferences.widget.fullscreenButtonPosition === 'user-dropdown',
 );
 
 const showNotificationInDropdown = computed(
-  () =>
-    preferences.widget.notification &&
-    preferences.widget.notificationButtonPosition === 'user-dropdown',
+  () => preferences.widget.notification && preferences.widget.notificationButtonPosition === 'user-dropdown',
 );
 
 const showRefreshInDropdown = computed(
-  () =>
-    preferences.widget.refresh &&
-    preferences.widget.refreshButtonPosition === 'user-dropdown',
+  () => preferences.widget.refresh && preferences.widget.refreshButtonPosition === 'user-dropdown',
 );
 
 const hasAnyInDropdown = computed(
@@ -337,12 +304,7 @@ if (preferences.shortcutKeys.enable) {
 </script>
 
 <template>
-  <LockModal
-    v-if="showLockInDropdown"
-    :avatar="avatar"
-    :text="text"
-    @submit="handleSubmitLock"
-  />
+  <LockModal v-if="showLockInDropdown" :avatar="avatar" :text="text" @submit="handleSubmitLock" />
 
   <LogoutModal
     v-if="showLogoutInDropdown"
@@ -373,36 +335,20 @@ if (preferences.shortcutKeys.enable) {
     :show-button="false"
   />
 
-  <TimezoneButton
-    v-if="showTimezoneInDropdown"
-    ref="refTimezone"
-    :show-button="false"
-  />
+  <TimezoneButton v-if="showTimezoneInDropdown" ref="refTimezone" :show-button="false" />
 
   <DropdownMenu v-model:open="openPopover" :modal="false">
     <DropdownMenuTrigger ref="refTrigger" :disabled="props.trigger === 'hover'">
       <div class="mr-2 ml-1 cursor-pointer rounded-full p-1.5 hover:bg-accent">
         <div class="flex-center hover:text-accent-foreground">
-          <VbenAvatar
-            :alt="text"
-            :src="avatar"
-            class="size-8"
-            :dot="avatarDot"
-            :dot-class="avatarDotClass"
-          />
+          <VbenAvatar :alt="text" :src="avatar" class="size-8" :dot="avatarDot" :dot-class="avatarDotClass" />
         </div>
       </div>
     </DropdownMenuTrigger>
     <DropdownMenuContent class="mr-2 min-w-60 p-0 pb-1">
       <div ref="refContent">
         <DropdownMenuLabel class="flex items-center p-3">
-          <VbenAvatar
-            :alt="text"
-            :src="avatar"
-            class="size-12"
-            :dot="avatarDot"
-            :dot-class="avatarDotClass"
-          />
+          <VbenAvatar :alt="text" :src="avatar" class="size-12" :dot="avatarDot" :dot-class="avatarDotClass" />
           <div class="ml-2 w-full">
             <div
               v-if="tagText || text || $slots.tagText"
@@ -410,11 +356,7 @@ if (preferences.shortcutKeys.enable) {
             >
               {{ text }}
               <slot name="tagText">
-                <Badge
-                  v-if="tagText"
-                  variant="secondary"
-                  class="ml-2 text-green-400"
-                >
+                <Badge v-if="tagText" variant="secondary" class="ml-2 text-green-400">
                   {{ tagText }}
                 </Badge>
               </slot>
@@ -447,9 +389,7 @@ if (preferences.shortcutKeys.enable) {
               <LockKeyhole class="size-4" />
             </VbenIconButton>
             {{ $t('ui.widgets.lockScreen.title') }}
-            <DropdownMenuShortcut v-if="enableLockScreenShortcutKey">
-              {{ altView }} L
-            </DropdownMenuShortcut>
+            <DropdownMenuShortcut v-if="enableLockScreenShortcutKey"> {{ altView }} L </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator v-if="showLogoutInDropdown" />
           <DropdownMenuItem
@@ -461,9 +401,7 @@ if (preferences.shortcutKeys.enable) {
               <LogOut class="size-4" />
             </VbenIconButton>
             {{ $t('common.logout') }}
-            <DropdownMenuShortcut v-if="enableLogoutShortcutKey">
-              {{ altView }} Q
-            </DropdownMenuShortcut>
+            <DropdownMenuShortcut v-if="enableLogoutShortcutKey"> {{ altView }} Q </DropdownMenuShortcut>
           </DropdownMenuItem>
         </template>
         <template
@@ -514,9 +452,7 @@ if (preferences.shortcutKeys.enable) {
               @select="(e: Event) => handleLocaleChange(e, lang.value)"
             >
               <span
-                :class="
-                  lang.value === preferences.app.locale ? 'bg-foreground' : ''
-                "
+                :class="lang.value === preferences.app.locale ? 'bg-foreground' : ''"
                 class="mr-2 size-1.5 rounded-full"
               ></span>
               {{ lang.label }}
@@ -559,9 +495,7 @@ if (preferences.shortcutKeys.enable) {
             {{ $t('preferences.widget.refresh') }}
           </DropdownMenuItem>
         </template>
-        <DropdownMenuSeparator
-          v-if="hasAnyInDropdown || preferencesButtonPosition.userDropdown"
-        />
+        <DropdownMenuSeparator v-if="hasAnyInDropdown || preferencesButtonPosition.userDropdown" />
         <DropdownMenuItem
           v-if="preferencesButtonPosition.userDropdown"
           class="mx-1 flex cursor-pointer items-center rounded-sm py-1 leading-8"

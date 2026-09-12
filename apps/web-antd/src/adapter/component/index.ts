@@ -33,11 +33,7 @@ import type { RangePickerProps } from 'ant-design-vue/es/date-picker';
 
 import type { Component, Ref } from 'vue';
 
-import type {
-  ApiComponentSharedProps,
-  BaseFormComponentType,
-  IconPickerProps,
-} from '@vben/common-ui';
+import type { ApiComponentSharedProps, BaseFormComponentType, IconPickerProps } from '@vben/common-ui';
 import type { Sortable } from '@vben/hooks';
 import type { Recordable } from '@vben/types';
 
@@ -55,12 +51,7 @@ import {
   watch,
 } from 'vue';
 
-import {
-  ApiComponent,
-  globalShareState,
-  IconPicker,
-  VCropper,
-} from '@vben/common-ui';
+import { ApiComponent, globalShareState, IconPicker, VCropper } from '@vben/common-ui';
 import { useSortable } from '@vben/hooks';
 import { IconifyIcon } from '@vben/icons';
 import { $t } from '@vben/locales';
@@ -78,58 +69,30 @@ type AdapterUploadProps = UploadProps & {
   onHandleChange?: (event: UploadChangeParam) => void;
 };
 
-const AutoComplete = defineAsyncComponent(
-  () => import('ant-design-vue/es/auto-complete'),
-);
+const AutoComplete = defineAsyncComponent(() => import('ant-design-vue/es/auto-complete'));
 const Button = defineAsyncComponent(() => import('ant-design-vue/es/button'));
-const Checkbox = defineAsyncComponent(
-  () => import('ant-design-vue/es/checkbox'),
-);
-const CheckboxGroup = defineAsyncComponent(() =>
-  import('ant-design-vue/es/checkbox').then((res) => res.CheckboxGroup),
-);
-const DatePicker = defineAsyncComponent(
-  () => import('ant-design-vue/es/date-picker'),
-);
+const Checkbox = defineAsyncComponent(() => import('ant-design-vue/es/checkbox'));
+const CheckboxGroup = defineAsyncComponent(() => import('ant-design-vue/es/checkbox').then((res) => res.CheckboxGroup));
+const DatePicker = defineAsyncComponent(() => import('ant-design-vue/es/date-picker'));
 const Divider = defineAsyncComponent(() => import('ant-design-vue/es/divider'));
 const Input = defineAsyncComponent(() => import('ant-design-vue/es/input'));
-const InputNumber = defineAsyncComponent(
-  () => import('ant-design-vue/es/input-number'),
-);
-const InputPassword = defineAsyncComponent(() =>
-  import('ant-design-vue/es/input').then((res) => res.InputPassword),
-);
-const Mentions = defineAsyncComponent(
-  () => import('ant-design-vue/es/mentions'),
-);
+const InputNumber = defineAsyncComponent(() => import('ant-design-vue/es/input-number'));
+const InputPassword = defineAsyncComponent(() => import('ant-design-vue/es/input').then((res) => res.InputPassword));
+const Mentions = defineAsyncComponent(() => import('ant-design-vue/es/mentions'));
 const Radio = defineAsyncComponent(() => import('ant-design-vue/es/radio'));
-const RadioGroup = defineAsyncComponent(() =>
-  import('ant-design-vue/es/radio').then((res) => res.RadioGroup),
-);
-const RangePicker = defineAsyncComponent(() =>
-  import('ant-design-vue/es/date-picker').then((res) => res.RangePicker),
-);
+const RadioGroup = defineAsyncComponent(() => import('ant-design-vue/es/radio').then((res) => res.RadioGroup));
+const RangePicker = defineAsyncComponent(() => import('ant-design-vue/es/date-picker').then((res) => res.RangePicker));
 const Rate = defineAsyncComponent(() => import('ant-design-vue/es/rate'));
 const Select = defineAsyncComponent(() => import('ant-design-vue/es/select'));
 const Space = defineAsyncComponent(() => import('ant-design-vue/es/space'));
 const Switch = defineAsyncComponent(() => import('ant-design-vue/es/switch'));
-const Textarea = defineAsyncComponent(() =>
-  import('ant-design-vue/es/input').then((res) => res.Textarea),
-);
-const TimePicker = defineAsyncComponent(
-  () => import('ant-design-vue/es/time-picker'),
-);
-const TreeSelect = defineAsyncComponent(
-  () => import('ant-design-vue/es/tree-select'),
-);
-const Cascader = defineAsyncComponent(
-  () => import('ant-design-vue/es/cascader'),
-);
+const Textarea = defineAsyncComponent(() => import('ant-design-vue/es/input').then((res) => res.Textarea));
+const TimePicker = defineAsyncComponent(() => import('ant-design-vue/es/time-picker'));
+const TreeSelect = defineAsyncComponent(() => import('ant-design-vue/es/tree-select'));
+const Cascader = defineAsyncComponent(() => import('ant-design-vue/es/cascader'));
 const Upload = defineAsyncComponent(() => import('ant-design-vue/es/upload'));
 const Image = defineAsyncComponent(() => import('ant-design-vue/es/image'));
-const PreviewGroup = defineAsyncComponent(() =>
-  import('ant-design-vue/es/image').then((res) => res.ImagePreviewGroup),
-);
+const PreviewGroup = defineAsyncComponent(() => import('ant-design-vue/es/image').then((res) => res.ImagePreviewGroup));
 
 const withDefaultPlaceholder = (
   component: Component,
@@ -140,10 +103,7 @@ const withDefaultPlaceholder = (
     name: component.name,
     inheritAttrs: false,
     setup: (props: any, { attrs, expose, slots }) => {
-      const placeholder =
-        props?.placeholder ||
-        attrs?.placeholder ||
-        $t(`ui.placeholder.${type}`);
+      const placeholder = props?.placeholder || attrs?.placeholder || $t(`ui.placeholder.${type}`);
       // 透传组件暴露的方法
       const innerRef = ref();
       expose(
@@ -155,25 +115,12 @@ const withDefaultPlaceholder = (
           },
         ),
       );
-      return () =>
-        h(
-          component,
-          { ...componentProps, placeholder, ...props, ...attrs, ref: innerRef },
-          slots,
-        );
+      return () => h(component, { ...componentProps, placeholder, ...props, ...attrs, ref: innerRef }, slots);
     },
   });
 };
 
-const IMAGE_EXTENSIONS = new Set([
-  'bmp',
-  'gif',
-  'jpeg',
-  'jpg',
-  'png',
-  'svg',
-  'webp',
-]);
+const IMAGE_EXTENSIONS = new Set(['bmp', 'gif', 'jpeg', 'jpg', 'png', 'svg', 'webp']);
 
 /**
  * 检查是否为图片文件
@@ -233,11 +180,7 @@ function getBase64(file: File): Promise<string> {
 /**
  * 预览图片
  */
-async function previewImage(
-  file: UploadFile,
-  visible: Ref<boolean>,
-  fileList: Ref<UploadProps['fileList']>,
-) {
+async function previewImage(file: UploadFile, visible: Ref<boolean>, fileList: Ref<UploadProps['fileList']>) {
   // 非图片文件直接打开链接
   if (!isImageFile(file)) {
     const url = file.url || file.preview;
@@ -249,10 +192,7 @@ async function previewImage(
     return;
   }
 
-  const [ImageComponent, PreviewGroupComponent] = await Promise.all([
-    Image,
-    PreviewGroup,
-  ]);
+  const [ImageComponent, PreviewGroupComponent] = await Promise.all([Image, PreviewGroup]);
 
   // 过滤图片文件并生成预览
   const imageFiles = (unref(fileList) || []).filter((f) => isImageFile(f));
@@ -414,26 +354,16 @@ const withPreviewUpload = () => {
   return defineComponent({
     name: Upload.name,
     emits: ['update:modelValue'],
-    setup(
-      props: any,
-      { attrs, slots, emit }: { attrs: any; emit: any; slots: any },
-    ) {
+    setup(props: any, { attrs, slots, emit }: { attrs: any; emit: any; slots: any }) {
       const previewVisible = ref<boolean>(false);
       const placeholder = attrs?.placeholder || $t('ui.placeholder.upload');
       const listType = attrs?.listType || attrs?.['list-type'] || 'text';
-      const fileList = ref<UploadProps['fileList']>(
-        attrs?.fileList || attrs?.['file-list'] || [],
-      );
+      const fileList = ref<UploadProps['fileList']>(attrs?.fileList || attrs?.['file-list'] || []);
 
       const maxSize = computed(() => attrs?.maxSize ?? attrs?.['max-size']);
-      const aspectRatio = computed(
-        () => attrs?.aspectRatio ?? attrs?.['aspect-ratio'],
-      );
+      const aspectRatio = computed(() => attrs?.aspectRatio ?? attrs?.['aspect-ratio']);
 
-      const handleBeforeUpload = async (
-        file: UploadFile,
-        originFileList: Array<File>,
-      ) => {
+      const handleBeforeUpload = async (file: UploadFile, originFileList: Array<File>) => {
         // 文件大小限制
         if (maxSize.value && (file.size || 0) / 1024 / 1024 > maxSize.value) {
           message.error($t('ui.formRules.sizeLimit', [maxSize.value]));
@@ -442,12 +372,7 @@ const withPreviewUpload = () => {
         }
 
         // 图片裁剪处理
-        if (
-          attrs.crop &&
-          !attrs.multiple &&
-          originFileList[0] &&
-          isImageFile(file)
-        ) {
+        if (attrs.crop && !attrs.multiple && originFileList[0] && isImageFile(file)) {
           file.status = 'removed';
           const blob = await cropImage(originFileList[0], aspectRatio.value);
           if (!blob) {
@@ -466,13 +391,8 @@ const withPreviewUpload = () => {
         } catch (error) {
           console.error(error);
         }
-        fileList.value = event.fileList.filter(
-          (file) => file.status !== 'removed',
-        );
-        emit(
-          'update:modelValue',
-          event.fileList?.length ? fileList.value : undefined,
-        );
+        fileList.value = event.fileList.filter((file) => file.status !== 'removed');
+        emit('update:modelValue', event.fileList?.length ? fileList.value : undefined);
       };
 
       const handlePreview = async (file: UploadFile) => {
@@ -482,15 +402,11 @@ const withPreviewUpload = () => {
 
       const renderUploadButton = () => {
         if (attrs.disabled) return null;
-        return isEmpty(slots)
-          ? createDefaultUploadSlots(listType, placeholder)
-          : slots;
+        return isEmpty(slots) ? createDefaultUploadSlots(listType, placeholder) : slots;
       };
 
       // 拖拽排序
-      const draggable = computed(
-        () => (attrs.draggable ?? false) && !attrs.disabled,
-      );
+      const draggable = computed(() => (attrs.draggable ?? false) && !attrs.disabled);
       const uploadId = `upload-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
       const sortableInstance = ref<null | Sortable>(null);
 
@@ -519,9 +435,7 @@ const withPreviewUpload = () => {
         await nextTick();
         await new Promise((resolve) => setTimeout(resolve, 100));
 
-        const container = document.querySelector(
-          `[data-upload-id="${uploadId}"] .ant-upload-list`,
-        ) as HTMLElement;
+        const container = document.querySelector(`[data-upload-id="${uploadId}"] .ant-upload-list`) as HTMLElement;
 
         if (!container) {
           if (retryCount < 5) {
@@ -534,15 +448,10 @@ const withPreviewUpload = () => {
           animation: 300,
           delay: 400,
           delayOnTouchOnly: true,
-          filter:
-            '.ant-upload-select, .ant-upload-list-item-error, .ant-upload-list-item-uploading',
+          filter: '.ant-upload-select, .ant-upload-list-item-error, .ant-upload-list-item-uploading',
           onEnd: (evt) => {
             const { oldIndex, newIndex } = evt;
-            if (
-              oldIndex === undefined ||
-              newIndex === undefined ||
-              oldIndex === newIndex
-            ) {
+            if (oldIndex === undefined || newIndex === undefined || oldIndex === newIndex) {
               return;
             }
 

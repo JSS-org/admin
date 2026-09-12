@@ -1,19 +1,10 @@
-import type {
-  VxeGridListeners,
-  VxeGridPropTypes,
-  VxeGridProps as VxeTableGridProps,
-  VxeUIExport,
-} from 'vxe-table';
+import type { VxeGridListeners, VxeGridPropTypes, VxeGridProps as VxeTableGridProps, VxeUIExport } from 'vxe-table';
 
 import type { Ref } from 'vue';
 
 import type { ClassType, DeepPartial } from '@vben/types';
 
-import type {
-  BaseFormComponentType,
-  FormValues,
-  VbenFormProps,
-} from '@vben-core/form-ui';
+import type { BaseFormComponentType, FormValues, VbenFormProps } from '@vben-core/form-ui';
 
 import type { VxeGridApi } from './api';
 import type { ViewedRowOptions } from './viewed-row';
@@ -104,9 +95,7 @@ export type ExtendedVxeGridApi<
   TSubmitValues extends FormValues = TFormValues,
 > = VxeGridApi<D, F, P, TFormValues, TSubmitValues> & {
   useStore: <S = NoInfer<VxeGridProps<D, F, P, TFormValues, TSubmitValues>>>(
-    selector?: (
-      state: NoInfer<VxeGridProps<D, F, P, TFormValues, TSubmitValues>>,
-    ) => S,
+    selector?: (state: NoInfer<VxeGridProps<D, F, P, TFormValues, TSubmitValues>>) => S,
   ) => Readonly<Ref<S>>;
 };
 

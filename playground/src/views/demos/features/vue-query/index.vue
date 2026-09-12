@@ -24,11 +24,7 @@ const showCaching = refAutoReset(true, 1000);
       <Card title="错误重试">
         <QueryRetries />
       </Card>
-      <Card
-        title="并发和缓存"
-        v-spinning="!showCaching"
-        :styles="{ body: { minHeight: '330px' } }"
-      >
+      <Card title="并发和缓存" v-spinning="!showCaching" :styles="{ body: { minHeight: '330px' } }">
         <template #extra>
           <Button @click="showCaching = false">重新加载</Button>
         </template>

@@ -83,9 +83,7 @@ describe('vben alert', () => {
 
   it('closes without confirming when the cancel button is clicked', async () => {
     const { onConfirm, onUpdateOpen, state } = await mountAlert();
-    const button = [...document.querySelectorAll('button')].find(
-      (element) => element.textContent?.trim() === 'Cancel',
-    );
+    const button = [...document.querySelectorAll('button')].find((element) => element.textContent?.trim() === 'Cancel');
 
     expect(button).toBeInstanceOf(HTMLElement);
     if (!(button instanceof HTMLElement)) return;
@@ -100,9 +98,7 @@ describe('vben alert', () => {
   it('closes when Escape is pressed', async () => {
     const { onConfirm, onUpdateOpen, state } = await mountAlert();
 
-    document.dispatchEvent(
-      new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }),
-    );
+    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
     await nextTick();
 
     expect(onConfirm).not.toHaveBeenCalled();

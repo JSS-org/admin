@@ -19,12 +19,7 @@ import {
 import { publint } from 'publint';
 import { formatMessage } from 'publint/utils';
 
-const CACHE_FILE = join(
-  'node_modules',
-  '.cache',
-  'publint',
-  '.pkglintcache.json',
-);
+const CACHE_FILE = join('node_modules', '.cache', 'publint', '.pkglintcache.json');
 
 interface PubLintCommandOptions {
   /**
@@ -90,9 +85,7 @@ async function expandRelativePath(relativePath: string, pkgDir: string) {
     return [relativePath];
   }
 
-  return matches.map((match) =>
-    match.startsWith('./') ? match : `./${match}`,
-  );
+  return matches.map((match) => (match.startsWith('./') ? match : `./${match}`));
 }
 
 /**
@@ -100,15 +93,10 @@ async function expandRelativePath(relativePath: string, pkgDir: string) {
  * filesystem as well as package.json, so a build can change its result without
  * changing the package metadata.
  */
-async function getPackageHash(
-  pkgJson: Record<string, unknown>,
-  pkgDir: string,
-) {
+async function getPackageHash(pkgJson: Record<string, unknown>, pkgDir: string) {
   const declaredPaths = [...collectRelativePaths(pkgJson)];
   const expandedPaths = await Promise.all(
-    declaredPaths.map((relativePath) =>
-      expandRelativePath(relativePath, pkgDir),
-    ),
+    declaredPaths.map((relativePath) => expandRelativePath(relativePath, pkgDir)),
   );
   const relativePaths = expandedPaths.flat().toSorted();
   const fileStates = await Promise.all(
@@ -116,13 +104,7 @@ async function getPackageHash(
       const targetPath = resolve(pkgDir, relativePath);
       try {
         const target = await stat(targetPath);
-        return [
-          relativePath,
-          true,
-          target.isDirectory(),
-          target.size,
-          target.mtimeMs,
-        ] as const;
+        return [relativePath, true, target.isDirectory(), target.size, target.mtimeMs] as const;
       } catch {
         return [relativePath, false] as const;
       }
@@ -144,9 +126,7 @@ async function readCache(cacheFile: string) {
       return {};
     }
     const cache = JSON.parse(content);
-    return cache && typeof cache === 'object' && !Array.isArray(cache)
-      ? cache
-      : {};
+    return cache && typeof cache === 'object' && !Array.isArray(cache) ? cache : {};
   } catch {
     return {};
   }
@@ -241,9 +221,7 @@ function printResult(
         // No default
       }
       const ruleUrl = `https://publint.dev/rules#${message.code.toLocaleLowerCase()}`;
-      consola.log(
-        `  ${formatMessage(message, pkgJson)}${colors.dim(` ${ruleUrl}`)}`,
-      );
+      consola.log(`  ${formatMessage(message, pkgJson)}${colors.dim(` ${ruleUrl}`)}`);
     }
   }
 

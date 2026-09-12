@@ -48,14 +48,14 @@ The precedence is explicit generic, connected component inference, then `unknown
 
 ## Key Props
 
-| Prop | Description | Type |
-| --- | --- | --- |
-| `appendToMain` | mount inside the main content area instead of `body` | `boolean` |
-| `connectedComponent` | connect an inner component to the modal wrapper | `Component` |
-| `animationType` | modal enter/leave animation | `'slide' \| 'scale'` |
-| `fullscreenButton` | show or hide the fullscreen toggle | `boolean` |
-| `overlayBlur` | blur amount for the overlay | `number` |
-| `submitting` | lock modal interactions while submitting | `boolean` |
+| Prop                 | Description                                          | Type                 |
+| -------------------- | ---------------------------------------------------- | -------------------- |
+| `appendToMain`       | mount inside the main content area instead of `body` | `boolean`            |
+| `connectedComponent` | connect an inner component to the modal wrapper      | `Component`          |
+| `animationType`      | modal enter/leave animation                          | `'slide' \| 'scale'` |
+| `fullscreenButton`   | show or hide the fullscreen toggle                   | `boolean`            |
+| `overlayBlur`        | blur amount for the overlay                          | `number`             |
+| `submitting`         | lock modal interactions while submitting             | `boolean`            |
 
 ## Events
 

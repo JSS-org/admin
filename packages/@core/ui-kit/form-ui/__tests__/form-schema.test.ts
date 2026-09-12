@@ -105,12 +105,7 @@ describe('form group schema', () => {
   it('flattens groups into field schemas while keeping arrays intact', () => {
     const fields = getFormFieldSchemas(schema);
 
-    expect(fields.map((item) => item.fieldName)).toEqual([
-      'name',
-      'email',
-      'phone',
-      'tags',
-    ]);
+    expect(fields.map((item) => item.fieldName)).toEqual(['name', 'email', 'phone', 'tags']);
     expect(fields[3]).toBe(schema[2]);
   });
 
@@ -122,10 +117,7 @@ describe('form group schema', () => {
 
     expect(updated[0]).toBe(schema[0]);
     expect(updated[1]).toMatchObject({
-      children: [
-        { fieldName: 'email' },
-        { fieldName: 'phone', label: 'Phone' },
-      ],
+      children: [{ fieldName: 'email' }, { fieldName: 'phone', label: 'Phone' }],
       name: 'contact',
       type: 'group',
     });

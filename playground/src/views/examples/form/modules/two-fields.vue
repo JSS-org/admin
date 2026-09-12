@@ -14,10 +14,7 @@ function handlePhoneChange(value: string | undefined) {
 }
 
 function handleTypeChange(value: SelectValue) {
-  modelValue.value = [
-    typeof value === 'string' ? value : undefined,
-    modelValue.value[1],
-  ];
+  modelValue.value = [typeof value === 'string' ? value : undefined, modelValue.value[1]];
 }
 </script>
 <template>

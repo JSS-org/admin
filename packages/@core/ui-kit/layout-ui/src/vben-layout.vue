@@ -13,20 +13,11 @@ import {
 } from '@vben-core/composables';
 import { IconifyIcon } from '@vben-core/icons';
 import { VbenIconButton } from '@vben-core/shadcn-ui';
-import {
-  ELEMENT_ID_LAYOUT_SCROLL,
-  ELEMENT_ID_MAIN_CONTENT,
-} from '@vben-core/shared/constants';
+import { ELEMENT_ID_LAYOUT_SCROLL, ELEMENT_ID_MAIN_CONTENT } from '@vben-core/shared/constants';
 
 import { useEventListener, useScroll } from '@vueuse/core';
 
-import {
-  LayoutContent,
-  LayoutFooter,
-  LayoutHeader,
-  LayoutSidebar,
-  LayoutTabbar,
-} from './components';
+import { LayoutContent, LayoutFooter, LayoutHeader, LayoutSidebar, LayoutTabbar } from './components';
 import { resolveHeaderHiddenOnScroll } from './header-scroll-state';
 import { useLayout } from './hooks/use-layout';
 
@@ -111,28 +102,16 @@ useLayoutViewportHeight();
 const { setLayoutHeaderHeight } = useLayoutHeaderStyle();
 const { setLayoutFooterHeight } = useLayoutFooterStyle();
 
-const {
-  currentLayout,
-  isFullContent,
-  isHeaderMixedNav,
-  isHeaderNav,
-  isMixedNav,
-  isSidebarMixedNav,
-} = useLayout(props);
+const { currentLayout, isFullContent, isHeaderMixedNav, isHeaderNav, isMixedNav, isSidebarMixedNav } = useLayout(props);
 
 /**
  * 顶栏是否自动隐藏
  */
-const isHeaderAutoActive = computed(
-  () =>
-    props.headerMode === 'auto' && !isMixedNav.value && !isFullContent.value,
-);
+const isHeaderAutoActive = computed(() => props.headerMode === 'auto' && !isMixedNav.value && !isFullContent.value);
 
 const isHeaderOverlayModeActive = computed(
   () =>
-    (props.headerMode === 'auto' || props.headerMode === 'auto-scroll') &&
-    !isMixedNav.value &&
-    !isFullContent.value,
+    (props.headerMode === 'auto' || props.headerMode === 'auto-scroll') && !isMixedNav.value && !isFullContent.value,
 );
 
 const headerHasShadow = computed(() => scrollY.value > 20);
@@ -149,22 +128,15 @@ const headerWrapperHeight = computed(() => {
 });
 
 const getSideCollapseWidth = computed(() => {
-  const {
-    sidebarCollapseShowTitle,
-    sidebarExtraCollapsedWidth,
-    sideCollapseWidth,
-  } = props;
+  const { sidebarCollapseShowTitle, sidebarExtraCollapsedWidth, sideCollapseWidth } = props;
 
-  return sidebarCollapseShowTitle ||
-    isSidebarMixedNav.value ||
-    isHeaderMixedNav.value
+  return sidebarCollapseShowTitle || isSidebarMixedNav.value || isHeaderMixedNav.value
     ? sidebarExtraCollapsedWidth
     : sideCollapseWidth;
 });
 
 const activeSidebarCollapse = computed({
-  get: () =>
-    props.isMobile ? !mobileSidebarOpen.value : sidebarCollapse.value,
+  get: () => (props.isMobile ? !mobileSidebarOpen.value : sidebarCollapse.value),
   set: (value: boolean) => {
     if (props.isMobile) {
       mobileSidebarOpen.value = !value;
@@ -202,10 +174,7 @@ const getSidebarWidth = computed(() => {
 
   if (
     !sidebarEnableState.value ||
-    (sidebarHidden &&
-      !isSidebarMixedNav.value &&
-      !isMixedNav.value &&
-      !isHeaderMixedNav.value)
+    (sidebarHidden && !isSidebarMixedNav.value && !isMixedNav.value && !isHeaderMixedNav.value)
   ) {
     return width;
   }
@@ -246,12 +215,7 @@ const isSideMode = computed(
  */
 const headerFixed = computed(() => {
   const { headerMode } = props;
-  return (
-    isMixedNav.value ||
-    headerMode === 'fixed' ||
-    headerMode === 'auto-scroll' ||
-    headerMode === 'auto'
-  );
+  return isMixedNav.value || headerMode === 'fixed' || headerMode === 'auto-scroll' || headerMode === 'auto';
 });
 
 const showSidebar = computed(() => {
@@ -261,9 +225,7 @@ const showSidebar = computed(() => {
 /**
  * 遮罩可见性
  */
-const maskVisible = computed(
-  () => !activeSidebarCollapse.value && props.isMobile,
-);
+const maskVisible = computed(() => !activeSidebarCollapse.value && props.isMobile);
 
 const mainStyle = computed(() => {
   let width = '100%';
@@ -278,15 +240,11 @@ const mainStyle = computed(() => {
   ) {
     // fixed模式下生效
     const isSideNavEffective =
-      (isSidebarMixedNav.value || isHeaderMixedNav.value) &&
-      sidebarExpandOnHover.value &&
-      sidebarExtraVisible.value;
+      (isSidebarMixedNav.value || isHeaderMixedNav.value) && sidebarExpandOnHover.value && sidebarExtraVisible.value;
 
     if (isSideNavEffective) {
       const sideCollapseWidth = props.sidebarMixedWidth;
-      const sideWidth = sidebarExtraCollapse.value
-        ? props.sidebarExtraCollapsedWidth
-        : props.sidebarWidth;
+      const sideWidth = sidebarExtraCollapse.value ? props.sidebarExtraCollapsedWidth : props.sidebarWidth;
 
       // 100% - 侧边菜单混合宽度 - 菜单宽度
       sidebarAndExtraWidth = `${sideCollapseWidth + sideWidth}px`;
@@ -295,9 +253,7 @@ const mainStyle = computed(() => {
       let sidebarWidth = getSidebarWidth.value;
       if (sidebarExpandOnHovering.value && !sidebarExpandOnHover.value) {
         sidebarWidth =
-          isSidebarMixedNav.value || isHeaderMixedNav.value
-            ? props.sidebarMixedWidth
-            : getSideCollapseWidth.value;
+          isSidebarMixedNav.value || isHeaderMixedNav.value ? props.sidebarMixedWidth : getSideCollapseWidth.value;
       }
       sidebarAndExtraWidth = `${sidebarWidth}px`;
       width = `calc(100% - ${sidebarAndExtraWidth})`;
@@ -319,14 +275,10 @@ const tabbarStyle = computed((): CSSProperties => {
     width = '100%';
   } else if (sidebarEnable.value) {
     // 鼠标在侧边栏上时，且侧边栏展开时的宽度
-    const onHoveringWidth = sidebarExpandOnHover.value
-      ? props.sidebarWidth
-      : getSideCollapseWidth.value;
+    const onHoveringWidth = sidebarExpandOnHover.value ? props.sidebarWidth : getSideCollapseWidth.value;
 
     // 设置 marginLeft，根据侧边栏是否折叠来决定
-    marginLeft = activeSidebarCollapse.value
-      ? getSideCollapseWidth.value
-      : onHoveringWidth;
+    marginLeft = activeSidebarCollapse.value ? getSideCollapseWidth.value : onHoveringWidth;
 
     // 设置 tabbar 的宽度，计算方式为 100% 减去侧边栏的宽度
     width = `calc(100% - ${activeSidebarCollapse.value ? getSidebarWidth.value : onHoveringWidth}px)`;
@@ -393,9 +345,7 @@ const headerWrapperStyle = computed((): CSSProperties => {
     left: isMixedNav.value ? 0 : mainStyle.value.sidebarAndExtraWidth,
     position: fixed ? 'fixed' : 'static',
     top: 0,
-    transform: fixed
-      ? `translate3d(0, ${hidden ? '-100%' : '0'}, 0)`
-      : undefined,
+    transform: fixed ? `translate3d(0, ${hidden ? '-100%' : '0'}, 0)` : undefined,
     transitionDuration: fixed ? undefined : '0ms',
     width: mainStyle.value.width,
     willChange: fixed ? 'transform' : undefined,
@@ -487,12 +437,9 @@ watch(
   },
 );
 
-watch(
-  [() => props.headerMode, () => isMixedNav.value, () => isFullContent.value],
-  () => {
-    headerIsHidden.value = false;
-  },
-);
+watch([() => props.headerMode, () => isMixedNav.value, () => isFullContent.value], () => {
+  headerIsHidden.value = false;
+});
 
 useEventListener(mainRef, 'mousemove', handleHeaderMouseMove, {
   passive: true,
@@ -526,8 +473,7 @@ function updateHeaderVisibilityFromMouse(mouseY: null | number) {
   }
 
   const isInTriggerZone = mouseY <= HEADER_TRIGGER_DISTANCE;
-  const isInHeaderZone =
-    !headerIsHidden.value && mouseY <= headerWrapperHeight.value;
+  const isInHeaderZone = !headerIsHidden.value && mouseY <= headerWrapperHeight.value;
 
   headerIsHidden.value = !(isInTriggerZone || isInHeaderZone);
 }
@@ -538,11 +484,7 @@ function handleLayoutScroll() {
     return;
   }
 
-  if (
-    props.headerMode !== 'auto-scroll' ||
-    isMixedNav.value ||
-    isFullContent.value
-  ) {
+  if (props.headerMode !== 'auto-scroll' || isMixedNav.value || isFullContent.value) {
     return;
   }
   resolveHeaderVisibilityOnScroll();
@@ -601,9 +543,7 @@ const layoutStaticHeaderTarget = `#${idLayoutStaticHeader}`;
       :extra-width="sidebarExtraWidth"
       :fixed-extra="sidebarExpandOnHover"
       :header-height="sidebarHeaderHeight"
-      :extra-title-height="
-        isSidebarMixedNav || isHeaderMixedNav ? sidebarExtraTitleHeight : 0
-      "
+      :extra-title-height="isSidebarMixedNav || isHeaderMixedNav ? sidebarExtraTitleHeight : 0"
       :is-sidebar-mixed="isSidebarMixedNav || isHeaderMixedNav"
       :is-mobile="isMobile"
       :margin-top="sidebarMarginTop"
@@ -635,11 +575,7 @@ const layoutStaticHeaderTarget = `#${idLayoutStaticHeader}`;
       </template>
     </LayoutSidebar>
 
-    <div
-      ref="mainRef"
-      data-layout-region="main"
-      class="relative flex min-h-0 flex-1 flex-col overflow-hidden"
-    >
+    <div ref="mainRef" data-layout-region="main" class="relative flex min-h-0 flex-1 flex-col overflow-hidden">
       <Teleport defer :disabled="headerFixed" :to="layoutStaticHeaderTarget">
         <div
           data-layout-region="header"
@@ -675,21 +611,14 @@ const layoutStaticHeaderTarget = `#${idLayoutStaticHeader}`;
                 class="my-0 mr-1 rounded-md"
                 @click="handleHeaderToggle"
               >
-                <IconifyIcon
-                  v-if="isMobile ? !activeSidebarCollapse : showSidebar"
-                  icon="ep:fold"
-                />
+                <IconifyIcon v-if="isMobile ? !activeSidebarCollapse : showSidebar" icon="ep:fold" />
                 <IconifyIcon v-else icon="ep:expand" />
               </VbenIconButton>
             </template>
             <slot name="header"></slot>
           </LayoutHeader>
 
-          <LayoutTabbar
-            v-if="tabbarEnable"
-            :height="tabbarHeight"
-            :style="tabbarStyle"
-          >
+          <LayoutTabbar v-if="tabbarEnable" :height="tabbarHeight" :style="tabbarStyle">
             <slot name="tabbar"></slot>
           </LayoutTabbar>
         </div>

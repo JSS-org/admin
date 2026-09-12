@@ -2,16 +2,7 @@ import type { ComputedRef, MaybeRefOrGetter, Ref } from 'vue';
 
 import type { FormLabelWidthContext } from '../types';
 
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  onUpdated,
-  ref,
-  toValue,
-  watch,
-} from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, onUpdated, ref, toValue, watch } from 'vue';
 
 import { isString } from '@vben-core/shared/utils';
 
@@ -65,24 +56,17 @@ export interface ResolveLabelStyleInput {
   labelWidth: number | string | undefined;
 }
 
-export function resolveLabelStyle(
-  input: ResolveLabelStyleInput,
-): Record<string, string> {
-  const { labelWidth, labelClass, isVertical, autoLabelWidth, computedWidth } =
-    input;
+export function resolveLabelStyle(input: ResolveLabelStyleInput): Record<string, string> {
+  const { labelWidth, labelClass, isVertical, autoLabelWidth, computedWidth } = input;
 
   if (labelClass?.includes('w-') || isVertical) {
     return {};
   }
 
   if (labelWidth === 'auto' && autoLabelWidth) {
-    const marginWidth = Math.max(
-      0,
-      Number.parseInt(autoLabelWidth, 10) - computedWidth,
-    );
+    const marginWidth = Math.max(0, Number.parseInt(autoLabelWidth, 10) - computedWidth);
     const labelPosition = labelClass === 'justify-start' ? 'left' : 'right';
-    const marginPosition =
-      labelPosition === 'left' ? 'marginRight' : 'marginLeft';
+    const marginPosition = labelPosition === 'left' ? 'marginRight' : 'marginLeft';
     return {
       width: 'auto',
       [marginPosition]: `${marginWidth}px`,

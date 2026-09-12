@@ -3,18 +3,7 @@ import type { GymRow } from '#/api/gym';
 
 import { computed, onMounted, ref } from 'vue';
 
-import {
-  Alert,
-  Button,
-  Form,
-  FormItem,
-  Input,
-  InputNumber,
-  message,
-  Select,
-  Space,
-  Table,
-} from 'ant-design-vue';
+import { Alert, Button, Form, FormItem, Input, InputNumber, message, Select, Space, Table } from 'ant-design-vue';
 
 import { gymApi } from '#/api/gym';
 
@@ -42,8 +31,7 @@ async function all(path: string) {
   }
 }
 async function loadRules() {
-  if (storeId.value)
-    rules.value = await all(`stores/${storeId.value}/settlement-rules`);
+  if (storeId.value) rules.value = await all(`stores/${storeId.value}/settlement-rules`);
 }
 onMounted(async () => {
   if (props.resource === 'settlement-rules') {
@@ -67,8 +55,7 @@ function edit(row?: Record<string, any>) {
 async function save() {
   busy.value = true;
   try {
-    const { cycleUnit, cycleValue, effectiveFrom, effectiveTo, items } =
-      form.value;
+    const { cycleUnit, cycleValue, effectiveFrom, effectiveTo, items } = form.value;
     const body = {
       cycleUnit,
       cycleValue,
@@ -117,10 +104,7 @@ const scopeFilter = computed({
 <template>
   <div class="gym-view">
     <Page v-if="resource === 'settlement-rules'" title="分账规则">
-      <Alert
-        message="有效期含开始日、不含结束日。只有渠道已绑定账户可以启用；启用版本不可修改。"
-        type="info"
-      />
+      <Alert message="有效期含开始日、不含结束日。只有渠道已绑定账户可以启用；启用版本不可修改。" type="info" />
       <FilterBar
         v-model="scopeFilter"
         :keyword="false"
@@ -137,9 +121,7 @@ const scopeFilter = computed({
         @search="loadRules"
       />
       <div class="gym-toolbar">
-        <Button type="primary" :disabled="!storeId" @click="edit()">
-          新增版本
-        </Button>
+        <Button type="primary" :disabled="!storeId" @click="edit()"> 新增版本 </Button>
       </div>
       <Table
         row-key="id"
@@ -156,11 +138,8 @@ const scopeFilter = computed({
       >
         <template #bodyCell="{ column, record }">
           <Space v-if="column.key === 'action'">
-            <Button @click="edit(record)">
-              {{ record.status === 'draft' ? '编辑' : '查看' }}
-</Button><Button v-if="record.status === 'draft'" @click="activate(record)">
-              启用
-            </Button>
+            <Button @click="edit(record)"> {{ record.status === 'draft' ? '编辑' : '查看' }} </Button
+            ><Button v-if="record.status === 'draft'" @click="activate(record)"> 启用 </Button>
           </Space>
         </template>
       </Table>
@@ -191,11 +170,7 @@ const scopeFilter = computed({
           <FormItem label="失效日期（不含）">
             <Input v-model:value="form.effectiveTo" type="date" />
           </FormItem>
-          <FormItem
-            v-for="(item, index) in form.items"
-            :key="index"
-            :label="`接收账户 ${Number(index) + 1} / 比例`"
-          >
+          <FormItem v-for="(item, index) in form.items" :key="index" :label="`接收账户 ${Number(index) + 1} / 比例`">
             <Space>
               <Select
                 v-model:value="item.paymentAccountId"
@@ -206,12 +181,9 @@ const scopeFilter = computed({
                     value: a.id,
                   }))
                 "
-              /><InputNumber
-                v-model:value="item.ratio"
-                :min="0"
-                :max="1"
-                :step="0.01"
-              /><Button @click="form.items.splice(Number(index), 1)">
+              /><InputNumber v-model:value="item.ratio" :min="0" :max="1" :step="0.01" /><Button
+                @click="form.items.splice(Number(index), 1)"
+              >
                 移除
               </Button>
             </Space>
@@ -266,10 +238,7 @@ const scopeFilter = computed({
       ]"
     >
       <template #toolbar>
-        <Alert
-          message="仅保存脱敏账号与凭据引用；真实支付渠道未配置。"
-          type="info"
-        />
+        <Alert message="仅保存脱敏账号与凭据引用；真实支付渠道未配置。" type="info" />
       </template>
       <template #actions="{ row }">
         <Button @click="bind(row)">渠道绑定</Button>
@@ -293,12 +262,7 @@ const scopeFilter = computed({
         { title: '状态', dataIndex: 'status' },
       ]"
     />
-    <AdminDrawer
-      v-model:open="showDetail"
-      title="分账明细"
-      :footer="null"
-      width="800px"
-    >
+    <AdminDrawer v-model:open="showDetail" title="分账明细" :footer="null" width="800px">
       <p>分账基数：{{ detail?.baseAmount }}；状态：{{ detail?.status }}</p>
       <Table
         row-key="id"

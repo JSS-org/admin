@@ -145,13 +145,7 @@ const handleCropWithSize = async () => {
 
 <template>
   <div>
-    <VCropper
-      ref="cropperRef"
-      :img="imageUrl"
-      :width="500"
-      :height="400"
-      aspect-ratio="1:1"
-    />
+    <VCropper ref="cropperRef" :img="imageUrl" :width="500" :height="400" aspect-ratio="1:1" />
     <button @click="handleCropBlob">Crop</button>
     <img v-if="croppedImage" :src="croppedImage" />
   </div>

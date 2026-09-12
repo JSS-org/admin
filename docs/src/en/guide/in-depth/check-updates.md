@@ -37,9 +37,7 @@ async function getVersionTag() {
       method: 'HEAD',
     });
 
-    return (
-      response.headers.get('etag') || response.headers.get('last-modified')
-    );
+    return response.headers.get('etag') || response.headers.get('last-modified');
   } catch {
     console.error('Failed to fetch version tag');
     return null;

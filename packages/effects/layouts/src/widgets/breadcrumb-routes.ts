@@ -12,10 +12,7 @@ type BreadcrumbRouteResolver = (path: string) => { matched: MatchedRoutes };
 /**
  * 解析用于渲染当前面包屑的路由匹配记录。
  */
-export function resolveBreadcrumbMatches(
-  route: BreadcrumbRoute,
-  resolveRoute: BreadcrumbRouteResolver,
-): MatchedRoutes {
+export function resolveBreadcrumbMatches(route: BreadcrumbRoute, resolveRoute: BreadcrumbRouteResolver): MatchedRoutes {
   const { activePath, breadcrumbUseActivePath } = route.meta;
 
   if (!breadcrumbUseActivePath || !activePath) {

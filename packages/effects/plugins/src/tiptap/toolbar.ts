@@ -1,10 +1,6 @@
 import type { Editor } from '@tiptap/vue-3';
 
-import type {
-  ImageUploadOptions,
-  ToolbarAction,
-  ToolbarMenuItem,
-} from './types';
+import type { ImageUploadOptions, ToolbarAction, ToolbarMenuItem } from './types';
 
 import {
   AlignCenter,
@@ -59,10 +55,8 @@ function createHeadingMenuItems(): ToolbarMenuItem[] {
       shortLabel: 'P',
     },
     ...headingLevels.map((level) => ({
-      action: (editor: Editor) =>
-        editor.chain().focus().toggleHeading({ level }).run(),
-      can: (editor: Editor) =>
-        editor.can().chain().focus().toggleHeading({ level }).run(),
+      action: (editor: Editor) => editor.chain().focus().toggleHeading({ level }).run(),
+      can: (editor: Editor) => editor.can().chain().focus().toggleHeading({ level }).run(),
       isActive: (editor: Editor) => editor.isActive('heading', { level }),
       label: $t(`ui.tiptap.toolbar.heading${level}`),
       shortLabel: `H${level}`,
@@ -75,9 +69,7 @@ function getHeadingTriggerText(editor?: Editor) {
     return 'P';
   }
 
-  const level = headingLevels.find((headingLevel) =>
-    editor?.isActive('heading', { level: headingLevel }),
-  );
+  const level = headingLevels.find((headingLevel) => editor?.isActive('heading', { level: headingLevel }));
 
   return level ? `H${level}` : 'H';
 }
@@ -159,9 +151,7 @@ async function handleImageAction(editor: Editor) {
   editor.chain().focus().setImage({ src: nextUrl }).run();
 }
 
-export function createToolbarGroups(
-  imageUpload?: ImageUploadOptions,
-): ToolbarAction[][] {
+export function createToolbarGroups(imageUpload?: ImageUploadOptions): ToolbarAction[][] {
   const headingMenuItems = createHeadingMenuItems();
 
   return [
@@ -179,8 +169,7 @@ export function createToolbarGroups(
         label: $t('ui.tiptap.toolbar.redo'),
       },
       {
-        action: (editor) =>
-          editor.chain().focus().clearNodes().unsetAllMarks().run(),
+        action: (editor) => editor.chain().focus().clearNodes().unsetAllMarks().run(),
         icon: RemoveFormatting,
         label: $t('ui.tiptap.toolbar.clear'),
       },
@@ -225,10 +214,8 @@ export function createToolbarGroups(
     [
       {
         action: () => {},
-        can: (editor) =>
-          headingMenuItems.some((item) => (item.can ? item.can(editor) : true)),
-        isActive: (editor) =>
-          headingMenuItems.some((item) => item.isActive?.(editor)),
+        can: (editor) => headingMenuItems.some((item) => (item.can ? item.can(editor) : true)),
+        isActive: (editor) => headingMenuItems.some((item) => item.isActive?.(editor)),
         label: $t('ui.tiptap.toolbar.heading'),
         menu: {
           items: headingMenuItems,
@@ -268,8 +255,7 @@ export function createToolbarGroups(
       {
         action: (editor) => handleLinkAction(editor),
         active: { name: 'link' },
-        can: (editor) =>
-          editor.can().chain().focus().extendMarkRange('link').run(),
+        can: (editor) => editor.can().chain().focus().extendMarkRange('link').run(),
         icon: Link2,
         label: $t('ui.tiptap.toolbar.link'),
       },
@@ -313,58 +299,48 @@ export function createToolbarGroups(
       {
         action: () => {},
         icon: Paintbrush,
-        indicatorColor: (editor) =>
-          editor.getAttributes('textStyle').color as string | undefined,
+        indicatorColor: (editor) => editor.getAttributes('textStyle').color as string | undefined,
         isActive: (editor) => Boolean(editor.getAttributes('textStyle').color),
         label: $t('ui.tiptap.toolbar.textColor'),
         palette: {
-          apply: (editor, color) =>
-            editor.chain().focus().setColor(color).run(),
+          apply: (editor, color) => editor.chain().focus().setColor(color).run(),
           clear: (editor) => editor.chain().focus().unsetColor().run(),
           colors: editorColorPresets,
-          currentColor: (editor) =>
-            editor.getAttributes('textStyle').color as string | undefined,
+          currentColor: (editor) => editor.getAttributes('textStyle').color as string | undefined,
         },
       },
       {
         action: () => {},
         icon: Highlighter,
-        indicatorColor: (editor) =>
-          (editor.getAttributes('highlight').color as string | undefined) ??
-          '#fef08a',
+        indicatorColor: (editor) => (editor.getAttributes('highlight').color as string | undefined) ?? '#fef08a',
         isActive: (editor) => editor.isActive('highlight'),
         label: $t('ui.tiptap.toolbar.highlightColor'),
         palette: {
-          apply: (editor, color) =>
-            editor.chain().focus().setHighlight({ color }).run(),
+          apply: (editor, color) => editor.chain().focus().setHighlight({ color }).run(),
           clear: (editor) => editor.chain().focus().unsetHighlight().run(),
           colors: editorHighlightPresets,
-          currentColor: (editor) =>
-            editor.getAttributes('highlight').color as string | undefined,
+          currentColor: (editor) => editor.getAttributes('highlight').color as string | undefined,
         },
       },
     ],
     [
       {
         action: (editor) => editor.chain().focus().setTextAlign('left').run(),
-        can: (editor) =>
-          editor.can().chain().focus().setTextAlign('left').run(),
+        can: (editor) => editor.can().chain().focus().setTextAlign('left').run(),
         icon: AlignLeft,
         isActive: (editor) => editor.isActive({ textAlign: 'left' }),
         label: $t('ui.tiptap.toolbar.alignLeft'),
       },
       {
         action: (editor) => editor.chain().focus().setTextAlign('center').run(),
-        can: (editor) =>
-          editor.can().chain().focus().setTextAlign('center').run(),
+        can: (editor) => editor.can().chain().focus().setTextAlign('center').run(),
         icon: AlignCenter,
         isActive: (editor) => editor.isActive({ textAlign: 'center' }),
         label: $t('ui.tiptap.toolbar.alignCenter'),
       },
       {
         action: (editor) => editor.chain().focus().setTextAlign('right').run(),
-        can: (editor) =>
-          editor.can().chain().focus().setTextAlign('right').run(),
+        can: (editor) => editor.can().chain().focus().setTextAlign('right').run(),
         icon: AlignRight,
         isActive: (editor) => editor.isActive({ textAlign: 'right' }),
         label: $t('ui.tiptap.toolbar.alignRight'),

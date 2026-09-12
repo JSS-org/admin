@@ -22,8 +22,7 @@ const layout = ref<FormLayout>('vertical');
 
 function getNumberValidator(key: string, limit?: [number?, number?]) {
   let validator = z.number({
-    error: (issue) =>
-      issue.input === undefined ? `${key} 值不能为空` : `${key} 值只能为数字`,
+    error: (issue) => (issue.input === undefined ? `${key} 值不能为空` : `${key} 值只能为数字`),
   });
 
   if (limit) {
@@ -55,8 +54,7 @@ const paramsSchema: CollapsibleParamSchema[] = [
   },
   {
     key: 'learning_rate',
-    description:
-      '学习率，代表每次更新数据的增量参数权重，学习率数值越大参数变化越大，对模型影响越大',
+    description: '学习率，代表每次更新数据的增量参数权重，学习率数值越大参数变化越大，对模型影响越大',
     option: {
       step: 1e-4,
       type: 'exponential',
@@ -66,8 +64,7 @@ const paramsSchema: CollapsibleParamSchema[] = [
   },
   {
     key: 'eval_steps',
-    description:
-      '验证步数，训练阶段针模型的验证间隔步长，用于阶段性评估模型训练准确率、训练损失',
+    description: '验证步数，训练阶段针模型的验证间隔步长，用于阶段性评估模型训练准确率、训练损失',
     option: {
       min: 1,
       max: 2_147_483_647,
@@ -179,10 +176,7 @@ const [BaseForm, baseFormApi] = useVbenForm({
         },
         trigger(values, __, controller) {
           // 访问 form 内 VbenCollapsibleParams 的实例
-          const paramsRef =
-            controller.getFieldComponentRef<typeof VbenCollapsibleParams>(
-              'params',
-            );
+          const paramsRef = controller.getFieldComponentRef<typeof VbenCollapsibleParams>('params');
           if (values.qat) {
             paramsRef?.updateValues?.({
               calib_steps: 10,
@@ -295,12 +289,7 @@ const [GroupForm, groupFormApi] = useVbenForm({
       type: 'group',
       name: 'advanced',
       title: '高级选项',
-      extra: () =>
-        h(
-          'span',
-          { class: 'text-muted-foreground text-xs' },
-          '默认折叠，校验失败时自动展开',
-        ),
+      extra: () => h('span', { class: 'text-muted-foreground text-xs' }, '默认折叠，校验失败时自动展开'),
       defaultCollapsed: true,
       children: [
         {
@@ -380,11 +369,7 @@ async function handleSubmitFormValue() {
 </script>
 
 <template>
-  <Page
-    auto-content-height
-    content-class="flex flex-col gap-4"
-    title="可折叠表单项"
-  >
+  <Page auto-content-height content-class="flex flex-col gap-4" title="可折叠表单项">
     <template #description>
       <div class="text-muted-foreground">
         <p>可折叠表单项、可折叠参数配置组件，以及 schema 分组折叠示例</p>
@@ -396,21 +381,10 @@ async function handleSubmitFormValue() {
     <Card title="基础示例">
       <template #extra>
         <div class="inline-flex items-center gap-4!">
-          <RadioGroup
-            :options="layouts"
-            option-type="button"
-            v-model:value="layout"
-            @change="onLayoutChange"
-          />
-          <Button type="primary" @click="handleSetFormValue">
-            设置表单值
-          </Button>
-          <Button type="primary" @click="handleSubmitFormValue">
-            提交表单
-          </Button>
-          <Button type="primary" @click="handleResetFormValue">
-            重置表单
-          </Button>
+          <RadioGroup :options="layouts" option-type="button" v-model:value="layout" @change="onLayoutChange" />
+          <Button type="primary" @click="handleSetFormValue"> 设置表单值 </Button>
+          <Button type="primary" @click="handleSubmitFormValue"> 提交表单 </Button>
+          <Button type="primary" @click="handleResetFormValue"> 重置表单 </Button>
         </div>
       </template>
       <div class="w-full overflow-hidden">
@@ -420,12 +394,8 @@ async function handleSubmitFormValue() {
     <Card title="分组折叠">
       <template #extra>
         <div class="inline-flex items-center gap-4!">
-          <Button type="primary" @click="handleSubmitGroupForm">
-            提交表单
-          </Button>
-          <Button type="primary" @click="handleResetGroupForm">
-            重置表单
-          </Button>
+          <Button type="primary" @click="handleSubmitGroupForm"> 提交表单 </Button>
+          <Button type="primary" @click="handleResetGroupForm"> 重置表单 </Button>
         </div>
       </template>
       <p class="text-muted-foreground mb-4 text-sm">

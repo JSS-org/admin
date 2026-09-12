@@ -13,10 +13,7 @@ const HOST_DEFAULT_MAX = 100;
 /**
  * 挂载受控 Progress，验证 reka-ui 原语暴露的 ARIA 订单与确定/不确定状态语义。
  */
-async function mountProgress(
-  modelValue: null | number,
-  max = HOST_DEFAULT_MAX,
-) {
+async function mountProgress(modelValue: null | number, max = HOST_DEFAULT_MAX) {
   const value = ref(modelValue);
   const Consumer = defineComponent(
     () => () =>

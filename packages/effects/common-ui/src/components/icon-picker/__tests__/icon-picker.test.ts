@@ -1,15 +1,7 @@
 import { DOMWrapper, mount } from '@vue/test-utils';
 import { defineComponent, h, markRaw, nextTick } from 'vue';
 
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  describe,
-  expect,
-  it,
-  vi,
-} from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import IconPicker from '../icon-picker.vue';
 
@@ -32,14 +24,7 @@ vi.mock('@iconify/vue', () => ({
 vi.mock('../icons', () => ({
   ICONS_MAP: {},
   fetchIconsData: vi.fn(async (prefix: string) =>
-    prefix === 'carbon'
-      ? [
-          'carbon:home',
-          'carbon:search',
-          'carbon:settings',
-          'carbon:user-profile',
-        ]
-      : [],
+    prefix === 'carbon' ? ['carbon:home', 'carbon:search', 'carbon:settings', 'carbon:user-profile'] : [],
   ),
 }));
 
@@ -63,8 +48,7 @@ afterAll(() => {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const gridIconCount = () =>
-  document.body.querySelector('.grid-cols-6')?.childElementCount ?? 0;
+const gridIconCount = () => document.body.querySelector('.grid-cols-6')?.childElementCount ?? 0;
 
 async function openIconPicker(wrapper: ReturnType<typeof mount>) {
   await wrapper.find('input').trigger('click');

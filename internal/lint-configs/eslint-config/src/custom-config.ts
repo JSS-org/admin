@@ -34,23 +34,19 @@ const customConfig: Linter.Config[] = [
           patterns: [
             {
               group: ['#/api/*'],
-              message:
-                'The #/api package cannot be imported, please use the @core package itself',
+              message: 'The #/api package cannot be imported, please use the @core package itself',
             },
             {
               group: ['#/layouts/*'],
-              message:
-                'The #/layouts package cannot be imported, please use the @core package itself',
+              message: 'The #/layouts package cannot be imported, please use the @core package itself',
             },
             {
               group: ['#/locales/*'],
-              message:
-                'The #/locales package cannot be imported, please use the @core package itself',
+              message: 'The #/locales package cannot be imported, please use the @core package itself',
             },
             {
               group: ['#/stores/*'],
-              message:
-                'The #/stores package cannot be imported, please use the @core package itself',
+              message: 'The #/stores package cannot be imported, please use the @core package itself',
             },
           ],
         },
@@ -68,8 +64,7 @@ const customConfig: Linter.Config[] = [
           patterns: [
             {
               group: ['@vben/*'],
-              message:
-                'The @core package cannot import the @vben package, please use the @core package itself',
+              message: 'The @core package cannot import the @vben package, please use the @core package itself',
             },
           ],
         },
@@ -116,8 +111,7 @@ const customConfig: Linter.Config[] = [
           patterns: [
             {
               group: ['@vben/*'],
-              message:
-                'The @vben package cannot be imported, please use the @core package itself',
+              message: 'The @vben package cannot be imported, please use the @core package itself',
             },
           ],
         },
@@ -147,6 +141,13 @@ const customConfig: Linter.Config[] = [
     files: ['packages/@core/base/shared/src/utils/inference.ts'],
     rules: {
       'vue/prefer-import-from-vue': 'off',
+    },
+  },
+  {
+    // 测试文件内常定义多个内联组件用于测试，放宽该规则
+    files: ['**/__tests__/**', '**/*.{test,spec,bench,benchmark}.{js,jsx,ts,tsx}'],
+    rules: {
+      'vue/one-component-per-file': 'off',
     },
   },
 ];

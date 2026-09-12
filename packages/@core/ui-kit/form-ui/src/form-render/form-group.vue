@@ -24,9 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const formRenderProps = injectRenderFormProps();
 
-const collapseOpen = ref(
-  props.schema.collapsible === false || !props.schema.defaultCollapsed,
-);
+const collapseOpen = ref(props.schema.collapsible === false || !props.schema.defaultCollapsed);
 
 const shouldCollapsible = computed(() => {
   return props.schema.collapsible !== false;
@@ -62,19 +60,11 @@ function toggleCollapsed() {
 
 <template>
   <div
-    :class="
-      cn(
-        'form-group col-span-full flex w-full flex-col',
-        { hidden: props.hidden },
-        props.schema.formItemClass,
-      )
-    "
+    :class="cn('form-group col-span-full flex w-full flex-col', { hidden: props.hidden }, props.schema.formItemClass)"
   >
     <VbenCollapsible v-model:open="collapseOpen" :show-trigger="false">
       <template #label>
-        <div
-          class="form-group-header mb-2 flex min-h-7 flex-1 items-center gap-2"
-        >
+        <div class="form-group-header mb-2 flex min-h-7 flex-1 items-center gap-2">
           <component
             :is="shouldCollapsible ? 'button' : 'div'"
             :aria-expanded="shouldCollapsible ? collapseOpen : undefined"
@@ -88,13 +78,8 @@ function toggleCollapsed() {
             class="form-group-trigger"
             @click="toggleCollapsed"
           >
-            <span
-              class="bg-primary h-3.5 w-[3px] flex-none rounded-full"
-            ></span>
-            <span
-              v-if="props.schema.title"
-              class="form-group-title text-sm font-medium leading-6"
-            >
+            <span class="bg-primary h-3.5 w-[3px] flex-none rounded-full"></span>
+            <span v-if="props.schema.title" class="form-group-title text-sm font-medium leading-6">
               <VbenRenderContent :content="props.schema.title" />
             </span>
             <ChevronsDown
@@ -102,12 +87,9 @@ function toggleCollapsed() {
               aria-hidden="true"
               :size="16"
               :class="
-                cn(
-                  'text-muted-foreground ml-auto flex-none transition-transform',
-                  {
-                    'rotate-180': collapseOpen,
-                  },
-                )
+                cn('text-muted-foreground ml-auto flex-none transition-transform', {
+                  'rotate-180': collapseOpen,
+                })
               "
             />
           </component>

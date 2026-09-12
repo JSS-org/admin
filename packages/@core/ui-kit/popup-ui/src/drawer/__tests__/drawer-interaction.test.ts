@@ -68,9 +68,7 @@ async function mountDrawer(options: MountOptions = {}) {
 }
 
 function buttonByText(text: string): HTMLElement | undefined {
-  return [...document.querySelectorAll('button')].find(
-    (element) => element.textContent?.trim() === text,
-  );
+  return [...document.querySelectorAll('button')].find((element) => element.textContent?.trim() === text);
 }
 
 function pressEscape() {
@@ -88,9 +86,7 @@ function pointerDownOverlay() {
   if (!(overlay instanceof HTMLElement)) {
     return false;
   }
-  overlay.dispatchEvent(
-    new PointerEvent('pointerdown', { bubbles: true, cancelable: true }),
-  );
+  overlay.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true }));
   return true;
 }
 

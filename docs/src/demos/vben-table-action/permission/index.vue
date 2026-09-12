@@ -20,9 +20,5 @@ const actions: ActionItem[] = [
 ];
 </script>
 <template>
-  <VbenTableAction
-    :actions="actions"
-    :has-permission="hasPermission"
-    align="start"
-  />
+  <VbenTableAction :actions="actions" :has-permission="hasPermission" align="start" />
 </template>

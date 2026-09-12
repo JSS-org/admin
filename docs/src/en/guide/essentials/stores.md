@@ -72,12 +72,12 @@ const { userInfo, userRoles } = storeToRefs(userStore);
 
 ::: details Exposed state and methods
 
-| Name | Description |
-| --- | --- |
-| `timezone` | Current timezone; initial value comes from `getCurrentTimezone()` |
-| `setTimezone(timezone)` | Set the timezone and sync it to the dayjs default timezone |
-| `getTimezoneOptions()` | Get the timezone option list; defaults to `DEFAULT_TIME_ZONE_OPTIONS` |
-| `$reset()` | Reset the timezone to `getCurrentTimezone()` |
+| Name                    | Description                                                           |
+| ----------------------- | --------------------------------------------------------------------- |
+| `timezone`              | Current timezone; initial value comes from `getCurrentTimezone()`     |
+| `setTimezone(timezone)` | Set the timezone and sync it to the dayjs default timezone            |
+| `getTimezoneOptions()`  | Get the timezone option list; defaults to `DEFAULT_TIME_ZONE_OPTIONS` |
+| `$reset()`              | Reset the timezone to `getCurrentTimezone()`                          |
 
 :::
 

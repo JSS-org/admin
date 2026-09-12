@@ -22,15 +22,9 @@ defineOptions({ name: 'App' });
 
 const { commonTokens } = useNaiveDesignTokens();
 
-const tokenLocale = computed(() =>
-  preferences.app.locale === 'zh-CN' ? zhCN : enUS,
-);
-const tokenDateLocale = computed(() =>
-  preferences.app.locale === 'zh-CN' ? dateZhCN : dateEnUS,
-);
-const tokenTheme = computed(() =>
-  preferences.theme.mode === 'dark' ? darkTheme : lightTheme,
-);
+const tokenLocale = computed(() => (preferences.app.locale === 'zh-CN' ? zhCN : enUS));
+const tokenDateLocale = computed(() => (preferences.app.locale === 'zh-CN' ? dateZhCN : dateEnUS));
+const tokenTheme = computed(() => (preferences.theme.mode === 'dark' ? darkTheme : lightTheme));
 
 const themeOverrides = computed((): GlobalThemeOverrides => {
   return {

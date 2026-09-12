@@ -43,9 +43,7 @@ interface SidebarPerformanceSummary {
 function median(values: number[]) {
   const sorted = [...values].toSorted((left, right) => left - right);
   const middle = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0
-    ? ((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2
-    : (sorted[middle] ?? 0);
+  return sorted.length % 2 === 0 ? ((sorted[middle - 1] ?? 0) + (sorted[middle] ?? 0)) / 2 : (sorted[middle] ?? 0);
 }
 
 async function startPerformanceWindow(page: Page) {
@@ -60,11 +58,9 @@ async function startPerformanceWindow(page: Page) {
       mainWidths: [],
     };
     const supportedTypes = PerformanceObserver.supportedEntryTypes;
-    const entryTypes = [
-      'layout-shift',
-      'long-animation-frame',
-      'longtask',
-    ].filter((type) => supportedTypes.includes(type));
+    const entryTypes = ['layout-shift', 'long-animation-frame', 'longtask'].filter((type) =>
+      supportedTypes.includes(type),
+    );
 
     if (entryTypes.length > 0) {
       state.observer = new PerformanceObserver((list) => {
@@ -75,12 +71,9 @@ async function startPerformanceWindow(page: Page) {
             state.longAnimationFrames.push(entry.duration);
           } else if (
             entry.entryType === 'layout-shift' &&
-            !(entry as PerformanceEntry & { hadRecentInput: boolean })
-              .hadRecentInput
+            !(entry as PerformanceEntry & { hadRecentInput: boolean }).hadRecentInput
           ) {
-            state.layoutShifts.push(
-              (entry as PerformanceEntry & { value: number }).value,
-            );
+            state.layoutShifts.push((entry as PerformanceEntry & { value: number }).value);
           }
         }
       });
@@ -112,9 +105,7 @@ async function stopPerformanceWindow(page: Page) {
     state.observer?.disconnect();
     delete window.__VBEN_LAYOUT_PERFORMANCE__;
 
-    const sortedFrames = [...state.animationFrames].toSorted(
-      (left, right) => left - right,
-    );
+    const sortedFrames = [...state.animationFrames].toSorted((left, right) => left - right);
     let mainWidthChanges = 0;
     for (const [index, value] of state.mainWidths.entries()) {
       const previous = state.mainWidths[index - 1];
@@ -128,31 +119,19 @@ async function stopPerformanceWindow(page: Page) {
       longAnimationFrameCount: state.longAnimationFrames.length,
       longTaskCount: state.longTasks.length,
       mainWidthChanges,
-      p95FrameMs:
-        sortedFrames[
-          Math.min(
-            sortedFrames.length - 1,
-            Math.floor(sortedFrames.length * 0.95),
-          )
-        ] ?? 0,
+      p95FrameMs: sortedFrames[Math.min(sortedFrames.length - 1, Math.floor(sortedFrames.length * 0.95))] ?? 0,
     };
   });
 }
 
-async function measureSidebarPerformance(
-  page: Page,
-): Promise<SidebarPerformanceSummary> {
+async function measureSidebarPerformance(page: Page): Promise<SidebarPerformanceSummary> {
   const session = await page.context().newCDPSession(page);
   await session.send('Performance.enable');
-  const trigger = page.locator(
-    '[data-layout-action="toggle-sidebar-collapse"]',
-  );
+  const trigger = page.locator('[data-layout-action="toggle-sidebar-collapse"]');
 
   async function readMetrics() {
     const response = await session.send('Performance.getMetrics');
-    return Object.fromEntries(
-      response.metrics.map((metric) => [metric.name, metric.value]),
-    );
+    return Object.fromEntries(response.metrics.map((metric) => [metric.name, metric.value]));
   }
 
   async function toggle() {
@@ -172,22 +151,15 @@ async function measureSidebarPerformance(
     const sampled = await stopPerformanceWindow(page);
     const after = await readMetrics();
     const collapsed =
-      (await page
-        .locator('[data-layout-region="layout"]')
-        .getAttribute('data-sidebar-collapsed')) === 'true';
+      (await page.locator('[data-layout-region="layout"]').getAttribute('data-sidebar-collapsed')) === 'true';
 
     runs.push({
       ...sampled,
       direction: collapsed ? 'collapse' : 'expand',
-      layoutDurationMs:
-        ((after.LayoutDuration ?? 0) - (before.LayoutDuration ?? 0)) * 1000,
-      recalcStyleDurationMs:
-        ((after.RecalcStyleDuration ?? 0) - (before.RecalcStyleDuration ?? 0)) *
-        1000,
-      scriptDurationMs:
-        ((after.ScriptDuration ?? 0) - (before.ScriptDuration ?? 0)) * 1000,
-      taskDurationMs:
-        ((after.TaskDuration ?? 0) - (before.TaskDuration ?? 0)) * 1000,
+      layoutDurationMs: ((after.LayoutDuration ?? 0) - (before.LayoutDuration ?? 0)) * 1000,
+      recalcStyleDurationMs: ((after.RecalcStyleDuration ?? 0) - (before.RecalcStyleDuration ?? 0)) * 1000,
+      scriptDurationMs: ((after.ScriptDuration ?? 0) - (before.ScriptDuration ?? 0)) * 1000,
+      taskDurationMs: ((after.TaskDuration ?? 0) - (before.TaskDuration ?? 0)) * 1000,
     });
   }
 

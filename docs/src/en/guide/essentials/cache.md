@@ -35,11 +35,11 @@ A strategy-pattern-based async storage solution that supports multiple backends 
 
 **Layer responsibilities:**
 
-| Layer | Responsibility |
-| --- | --- |
-| `StorageManager` | Namespace prefix isolation, TTL expiry checks, unified public API |
-| `IStorageDriver` | Pure KV storage abstraction interface |
-| Driver implementations | Talk to concrete storage engines, unaware of prefix or TTL |
+| Layer                  | Responsibility                                                    |
+| ---------------------- | ----------------------------------------------------------------- |
+| `StorageManager`       | Namespace prefix isolation, TTL expiry checks, unified public API |
+| `IStorageDriver`       | Pure KV storage abstraction interface                             |
+| Driver implementations | Talk to concrete storage engines, unaware of prefix or TTL        |
 
 ## Quick Start
 
@@ -182,15 +182,15 @@ const cache = new StorageManager({
 
 ### Driver comparison
 
-| Feature | LocalStorageDriver | IndexedDBDriver | MemoryStorageDriver |
-| --- | --- | --- | --- |
-| Persistence | ✅ | ✅ | ❌ |
-| Capacity | 5–10 MB | Hundreds of MB+ | Memory-bound |
-| Speed | Fast (sync) | Medium (async I/O) | Fastest |
-| Data type | JSON-serializable only | Structured clone | Any JS object |
-| Browser support | All modern browsers | All modern browsers | Any environment |
-| Blocks main thread | Yes | No | No |
-| Use case | Config, tokens, small data | Offline cache, big data | Tests, SSR |
+| Feature            | LocalStorageDriver         | IndexedDBDriver         | MemoryStorageDriver |
+| ------------------ | -------------------------- | ----------------------- | ------------------- |
+| Persistence        | ✅                         | ✅                      | ❌                  |
+| Capacity           | 5–10 MB                    | Hundreds of MB+         | Memory-bound        |
+| Speed              | Fast (sync)                | Medium (async I/O)      | Fastest             |
+| Data type          | JSON-serializable only     | Structured clone        | Any JS object       |
+| Browser support    | All modern browsers        | All modern browsers     | Any environment     |
+| Blocks main thread | Yes                        | No                      | No                  |
+| Use case           | Config, tokens, small data | Offline cache, big data | Tests, SSR          |
 
 ## API Reference
 
@@ -273,12 +273,7 @@ const cache = new StorageManager({
 ### Dynamic driver selection by environment
 
 ```ts
-import {
-  IndexedDBDriver,
-  LocalStorageDriver,
-  MemoryStorageDriver,
-  StorageManager,
-} from '@vben/utils';
+import { IndexedDBDriver, LocalStorageDriver, MemoryStorageDriver, StorageManager } from '@vben/utils';
 
 function createStorageManager(prefix: string) {
   // SSR environment uses the memory driver
@@ -355,10 +350,10 @@ The actual stored key is formatted as `{prefix}-{key}`. For example, `prefix = '
 
 A dual strategy of **lazy deletion + active cleanup**:
 
-| Strategy | When | Description |
-| --- | --- | --- |
-| Lazy deletion | On `getItem` | Checks expiry on read; deletes and returns the default if expired |
-| Active cleanup | On `clearExpiredItems` | Iterates all prefixed keys and deletes expired ones |
+| Strategy       | When                   | Description                                                       |
+| -------------- | ---------------------- | ----------------------------------------------------------------- |
+| Lazy deletion  | On `getItem`           | Checks expiry on read; deletes and returns the default if expired |
+| Active cleanup | On `clearExpiredItems` | Iterates all prefixed keys and deletes expired ones               |
 
 ## Notes
 

@@ -169,9 +169,7 @@ const [Modal, modalApi] = useVbenModal({
     <NCard title="基础表单" header-extra-class="gap-4">
       <template #header-extra>
         <NButton type="primary" @click="setFormValues">设置表单值</NButton>
-        <NButton type="primary" @click="modalApi.open()" class="ml-2">
-          打开弹窗
-        </NButton>
+        <NButton type="primary" @click="modalApi.open()" class="ml-2"> 打开弹窗 </NButton>
       </template>
       <Form />
     </NCard>

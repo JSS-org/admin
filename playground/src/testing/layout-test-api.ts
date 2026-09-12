@@ -1,10 +1,6 @@
 import type { Preferences } from '@vben/preferences';
 
-import {
-  getPreferences,
-  resetPreferences,
-  updatePreferences,
-} from '@vben/preferences';
+import { getPreferences, resetPreferences, updatePreferences } from '@vben/preferences';
 
 type PreferenceUpdates = Parameters<typeof updatePreferences>[0];
 

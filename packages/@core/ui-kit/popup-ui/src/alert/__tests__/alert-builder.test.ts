@@ -30,18 +30,14 @@ vi.mock('@vben-core/preferences', () => ({
  * 在当前 document 中查找文案匹配的按钮。
  */
 function findButtonByText(text: string) {
-  return [...document.querySelectorAll('button')].find(
-    (element) => element.textContent?.trim() === text,
-  );
+  return [...document.querySelectorAll('button')].find((element) => element.textContent?.trim() === text);
 }
 
 /**
  * 查找 AlertBuilder 挂载到 body 的容器元素（其内容包含指定文案）。
  */
 function findAlertContainer(content: string) {
-  return [...document.body.children].find((element) =>
-    element.textContent?.includes(content),
-  );
+  return [...document.body.children].find((element) => element.textContent?.includes(content));
 }
 
 afterEach(() => {
@@ -112,9 +108,7 @@ describe('imperative alert builder (AlertBuilder)', () => {
     expect(container).toBeInstanceOf(HTMLElement);
     if (!container) return;
 
-    document.dispatchEvent(
-      new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }),
-    );
+    document.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'Escape' }));
     await expect(promise).rejects.toThrow('dialog cancelled');
     await nextTick();
 

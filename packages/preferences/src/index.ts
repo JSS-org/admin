@@ -1,8 +1,4 @@
-import type {
-  CustomPreferencesRecord,
-  Preferences,
-  PreferencesExtension,
-} from '@vben-core/preferences';
+import type { CustomPreferencesRecord, Preferences, PreferencesExtension } from '@vben-core/preferences';
 import type { DeepPartial } from '@vben-core/typings';
 
 /**
@@ -16,9 +12,9 @@ function defineOverridesPreferences(preferences: DeepPartial<Preferences>) {
   return preferences;
 }
 
-function definePreferencesExtension<
-  TCustomPreferences extends object = CustomPreferencesRecord,
->(extension: PreferencesExtension<TCustomPreferences>) {
+function definePreferencesExtension<TCustomPreferences extends object = CustomPreferencesRecord>(
+  extension: PreferencesExtension<TCustomPreferences>,
+) {
   return extension;
 }
 
@@ -33,10 +29,6 @@ const appCopyrightPreferences = {
   settingShow: true,
 } satisfies DeepPartial<Preferences>['copyright'];
 
-export {
-  appCopyrightPreferences,
-  defineOverridesPreferences,
-  definePreferencesExtension,
-};
+export { appCopyrightPreferences, defineOverridesPreferences, definePreferencesExtension };
 
 export * from '@vben-core/preferences';

@@ -85,10 +85,7 @@ vi.mock('vxe-table', async () => {
         return () => {
           observedColumns.push(attrs.columns);
           observedToolbarConfigs.push(attrs.toolbarConfig);
-          return h('div', [
-            slots['toolbar-actions']?.({}),
-            slots['toolbar-tools']?.({}),
-          ]);
+          return h('div', [slots['toolbar-actions']?.({}), slots['toolbar-tools']?.({})]);
         };
       },
     }),
@@ -166,12 +163,7 @@ describe('vben vxe grid reactivity', () => {
       const Consumer = defineComponent(
         () => () =>
           h(VbenVxeGrid, { api } as any, {
-            [slotName]: () =>
-              h(
-                'span',
-                { 'data-slot-state': '' },
-                loading.value ? 'loading' : 'idle',
-              ),
+            [slotName]: () => h('span', { 'data-slot-state': '' }, loading.value ? 'loading' : 'idle'),
           }),
       );
       const host = document.createElement('div');
@@ -183,18 +175,14 @@ describe('vben vxe grid reactivity', () => {
         await nextTick();
         await nextTick();
 
-        expect(host.querySelector('[data-slot-state]')?.textContent).toBe(
-          'idle',
-        );
+        expect(host.querySelector('[data-slot-state]')?.textContent).toBe('idle');
         const initialToolbarConfig = observedToolbarConfigs.at(-1);
 
         loading.value = true;
         await nextTick();
         await nextTick();
 
-        expect(host.querySelector('[data-slot-state]')?.textContent).toBe(
-          'loading',
-        );
+        expect(host.querySelector('[data-slot-state]')?.textContent).toBe('loading');
         expect(observedToolbarConfigs.at(-1)).toBe(initialToolbarConfig);
       } finally {
         app.unmount();
@@ -209,9 +197,7 @@ describe('vben vxe grid reactivity', () => {
       pagerConfig: {},
     };
     const api = createGridApi();
-    const Consumer = defineComponent(
-      () => () => h(VbenVxeGrid, { api } as any),
-    );
+    const Consumer = defineComponent(() => () => h(VbenVxeGrid, { api } as any));
     const host = document.createElement('div');
     document.body.append(host);
     const app: App = createApp(Consumer);
@@ -245,9 +231,7 @@ describe('vben vxe grid reactivity', () => {
     };
     const commitProxy = vi.fn();
     const api = createGridApi(commitProxy);
-    const Consumer = defineComponent(
-      () => () => h(VbenVxeGrid, { api } as any),
-    );
+    const Consumer = defineComponent(() => () => h(VbenVxeGrid, { api } as any));
     const host = document.createElement('div');
     document.body.append(host);
     const app: App = createApp(Consumer);
@@ -261,14 +245,9 @@ describe('vben vxe grid reactivity', () => {
       expect(commitProxy).toHaveBeenCalledOnce();
       expect(commitProxy).toHaveBeenCalledWith('initial', {});
       const setStateCallOrder = api.setState.mock.invocationCallOrder[0];
-      const extendProxyCallOrder =
-        extendProxyOptionsMock.mock.invocationCallOrder[0];
+      const extendProxyCallOrder = extendProxyOptionsMock.mock.invocationCallOrder[0];
       const commitProxyCallOrder = commitProxy.mock.invocationCallOrder[0];
-      if (
-        setStateCallOrder === undefined ||
-        extendProxyCallOrder === undefined ||
-        commitProxyCallOrder === undefined
-      ) {
+      if (setStateCallOrder === undefined || extendProxyCallOrder === undefined || commitProxyCallOrder === undefined) {
         throw new Error('Expected all initialization calls to be recorded');
       }
       expect(setStateCallOrder).toBeLessThan(commitProxyCallOrder);

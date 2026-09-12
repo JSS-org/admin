@@ -273,12 +273,7 @@ const cache = new StorageManager({
 ### 根据环境动态选择 Driver
 
 ```ts
-import {
-  IndexedDBDriver,
-  LocalStorageDriver,
-  MemoryStorageDriver,
-  StorageManager,
-} from '@vben/utils';
+import { IndexedDBDriver, LocalStorageDriver, MemoryStorageDriver, StorageManager } from '@vben/utils';
 
 function createStorageManager(prefix: string) {
   // SSR 环境使用内存驱动
@@ -355,10 +350,10 @@ interface StorageItem<T> {
 
 采用**惰性删除 + 主动清理**双重策略：
 
-| 策略 | 触发时机 | 说明 |
-| --- | --- | --- |
-| 惰性删除 | 调用 `getItem` 时 | 读取时检查过期，过期则删除并返回默认值 |
-| 主动清理 | 调用 `clearExpiredItems` 时 | 遍历所有带前缀的 key，删除已过期项 |
+| 策略     | 触发时机                    | 说明                                   |
+| -------- | --------------------------- | -------------------------------------- |
+| 惰性删除 | 调用 `getItem` 时           | 读取时检查过期，过期则删除并返回默认值 |
+| 主动清理 | 调用 `clearExpiredItems` 时 | 遍历所有带前缀的 key，删除已过期项     |
 
 ## 注意事项
 

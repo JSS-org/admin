@@ -31,8 +31,8 @@ Pass the text through the default slot and limit the visual width with `maxWidth
 
 ## Events
 
-| Event | Description | Type |
-| --- | --- | --- |
+| Event          | Description                     | Type                          |
+| -------------- | ------------------------------- | ----------------------------- |
 | `expandChange` | fired when expand state changes | `(isExpand: boolean) => void` |
 
 ## Slots

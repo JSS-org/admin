@@ -24,8 +24,7 @@ function escapeRegExp(value: string): string {
  * 浏览器准备的 --tw-* 回退变量层，必须始终是最低优先级，否则其回退声明
  * 会覆盖工具类写入的变量。
  */
-const LAYER_ORDER_STATEMENT =
-  '@layer properties, theme, base, ant, antd, el, td, components, utilities;';
+const LAYER_ORDER_STATEMENT = '@layer properties, theme, base, ant, antd, el, td, components, utilities;';
 
 /**
  * 把指定包内的 css 包进 @layer：
@@ -43,9 +42,7 @@ const LAYER_ORDER_STATEMENT =
  * plugins: [viteCssLayerPlugin({ packageName: 'element-plus', layerName: 'el' })]
  * ```
  */
-export function viteCssLayerPlugin(
-  rules: CssLayerRule | CssLayerRule[],
-): Plugin {
+export function viteCssLayerPlugin(rules: CssLayerRule | CssLayerRule[]): Plugin {
   const list = Array.isArray(rules) ? rules : [rules];
   const matchers = list.map(({ layerName, packageName }) => ({
     layerName,
@@ -68,9 +65,7 @@ export function viteCssLayerPlugin(
           continue;
         }
         const css = file.source.toString();
-        const matched = matchers.some((m) =>
-          css.includes(`@layer ${m.layerName}`),
-        );
+        const matched = matchers.some((m) => css.includes(`@layer ${m.layerName}`));
         if (!matched) {
           continue;
         }

@@ -81,12 +81,8 @@ describe('vben modal', () => {
     expect(header).toBeInstanceOf(HTMLElement);
     if (!(header instanceof HTMLElement)) return;
 
-    vi.spyOn(mainContent, 'getBoundingClientRect').mockReturnValue(
-      new DOMRect(100, 100, 800, 600),
-    );
-    vi.spyOn(dialog, 'getBoundingClientRect').mockReturnValue(
-      new DOMRect(300, 200, 400, 300),
-    );
+    vi.spyOn(mainContent, 'getBoundingClientRect').mockReturnValue(new DOMRect(100, 100, 800, 600));
+    vi.spyOn(dialog, 'getBoundingClientRect').mockReturnValue(new DOMRect(300, 200, 400, 300));
 
     header.dispatchEvent(
       new MouseEvent('mousedown', {
@@ -145,12 +141,7 @@ describe('vben modal', () => {
 
   it('fires onClosed via the fallback when no animation event arrives', async () => {
     vi.useFakeTimers({
-      toFake: [
-        'cancelAnimationFrame',
-        'clearTimeout',
-        'requestAnimationFrame',
-        'setTimeout',
-      ],
+      toFake: ['cancelAnimationFrame', 'clearTimeout', 'requestAnimationFrame', 'setTimeout'],
     });
     try {
       const onClosed = vi.fn();
@@ -168,12 +159,7 @@ describe('vben modal', () => {
 
   it('emits closed exactly once when the animation event and the fallback both fire', async () => {
     vi.useFakeTimers({
-      toFake: [
-        'cancelAnimationFrame',
-        'clearTimeout',
-        'requestAnimationFrame',
-        'setTimeout',
-      ],
+      toFake: ['cancelAnimationFrame', 'clearTimeout', 'requestAnimationFrame', 'setTimeout'],
     });
     try {
       const onClosed = vi.fn();

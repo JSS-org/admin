@@ -25,11 +25,7 @@ export function useLayoutViewportHeight() {
     return;
   }
 
-  const viewportHeight = useCssVar(
-    CSS_VARIABLE_LAYOUT_VIEWPORT_HEIGHT,
-    document.documentElement,
-    { observe: false },
-  );
+  const viewportHeight = useCssVar(CSS_VARIABLE_LAYOUT_VIEWPORT_HEIGHT, document.documentElement, { observe: false });
 
   let frameId = 0;
 
@@ -53,11 +49,7 @@ export function useLayoutViewportHeight() {
   useEventListener(window, 'resize', scheduleApplyViewportHeight);
 
   if (window.visualViewport) {
-    useEventListener(
-      window.visualViewport,
-      'resize',
-      scheduleApplyViewportHeight,
-    );
+    useEventListener(window.visualViewport, 'resize', scheduleApplyViewportHeight);
   }
 
   onUnmounted(() => {

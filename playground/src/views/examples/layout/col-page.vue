@@ -4,15 +4,7 @@ import { reactive, ref } from 'vue';
 import { ColPage } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 
-import {
-  Alert,
-  Button,
-  Card,
-  Checkbox,
-  Slider,
-  Tag,
-  Tooltip,
-} from 'antdv-next';
+import { Alert, Button, Card, Checkbox, Slider, Tag, Tooltip } from 'antdv-next';
 
 const props = reactive({
   leftCollapsedWidth: 5,
@@ -49,11 +41,7 @@ const leftMaxWidth = ref(props.leftMaxWidth || 100);
           </Button>
         </Tooltip>
       </div>
-      <div
-        v-else
-        :style="{ minWidth: '200px' }"
-        class="mr-2 rounded-(--radius) border border-border bg-card p-2"
-      >
+      <div v-else :style="{ minWidth: '200px' }" class="mr-2 rounded-(--radius) border border-border bg-card p-2">
         <p>这里是左侧内容</p>
         <p>这里是左侧内容</p>
         <p>这里是左侧内容</p>
@@ -67,9 +55,7 @@ const leftMaxWidth = ref(props.leftMaxWidth || 100);
           <Checkbox v-model:checked="props.resizable">可拖动调整宽度</Checkbox>
           <Checkbox v-model:checked="props.splitLine">显示拖动分隔线</Checkbox>
           <Checkbox v-model:checked="props.splitHandle">显示拖动手柄</Checkbox>
-          <Checkbox v-model:checked="props.leftCollapsible">
-            左侧可折叠
-          </Checkbox>
+          <Checkbox v-model:checked="props.leftCollapsible"> 左侧可折叠 </Checkbox>
         </div>
         <div class="flex items-center gap-2">
           <span>左侧最小宽度百分比：</span>

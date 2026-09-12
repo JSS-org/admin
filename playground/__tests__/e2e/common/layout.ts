@@ -1,8 +1,6 @@
 import type { Page } from '@playwright/test';
 
-type PreferenceUpdates = Parameters<
-  NonNullable<Window['__VBEN_LAYOUT_TEST__']>['updatePreferences']
->[0];
+type PreferenceUpdates = Parameters<NonNullable<Window['__VBEN_LAYOUT_TEST__']>['updatePreferences']>[0];
 
 const LAYOUT_TYPES = [
   'sidebar-nav',
@@ -106,12 +104,8 @@ async function getLayoutMetrics(page: Page): Promise<LayoutMetrics> {
       const style = getComputedStyle(element);
       const visualWidth =
         selector === selectors.sidebar
-          ? Math.max(
-              ...[...element.children].map(
-                (child) => child.getBoundingClientRect().right,
-              ),
-              rect.left,
-            ) - rect.left
+          ? Math.max(...[...element.children].map((child) => child.getBoundingClientRect().right), rect.left) -
+            rect.left
           : rect.width;
       return {
         bottom: rect.bottom,
@@ -146,10 +140,7 @@ async function getLayoutMetrics(page: Page): Promise<LayoutMetrics> {
         scrollWidth: document.documentElement.scrollWidth,
       },
       regions: Object.fromEntries(
-        Object.entries(selectors).map(([name, selector]) => [
-          name,
-          getRegionMetrics(selector),
-        ]),
+        Object.entries(selectors).map(([name, selector]) => [name, getRegionMetrics(selector)]),
       ),
       scroll:
         layoutScroll instanceof HTMLElement
@@ -164,10 +155,5 @@ async function getLayoutMetrics(page: Page): Promise<LayoutMetrics> {
   });
 }
 
-export {
-  getLayoutMetrics,
-  LAYOUT_TYPES,
-  updateLayoutPreferences,
-  waitForLayoutSettled,
-};
+export { getLayoutMetrics, LAYOUT_TYPES, updateLayoutPreferences, waitForLayoutSettled };
 export type { LayoutMetrics, RegionMetrics };

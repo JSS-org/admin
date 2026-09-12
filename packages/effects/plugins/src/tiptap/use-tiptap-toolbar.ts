@@ -132,8 +132,7 @@ export function useTiptapToolbar(options: UseTiptapToolbarOptions) {
       'transition-[transform,color,background-color,border-color,box-shadow] duration-200 ease-out',
       'enabled:hover:border-border enabled:hover:-translate-y-px disabled:opacity-45',
       'enabled:hover:bg-accent enabled:hover:text-foreground',
-      isActionActive(action) &&
-        'bg-accent border-primary/30 shadow-primary text-primary',
+      isActionActive(action) && 'bg-accent border-primary/30 shadow-primary text-primary',
     );
   }
 
@@ -143,8 +142,7 @@ export function useTiptapToolbar(options: UseTiptapToolbarOptions) {
       'shadow-accent',
       'transition-[transform,box-shadow,border-color] duration-200 ease-out',
       'hover:-translate-y-px hover:scale-[1.04]',
-      getPaletteCurrentColor(action) === color &&
-        'border-primary shadow-primary',
+      getPaletteCurrentColor(action) === color && 'border-primary shadow-primary',
     );
   }
 

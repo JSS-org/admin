@@ -198,10 +198,7 @@ In some cases, we need to control the display of buttons with fine granularity. 
 The permission code is the code returned by the interface. The logic to determine whether a button is displayed is located under `src/store/auth`:
 
 ```ts
-const [fetchUserInfoResult, accessCodes] = await Promise.all([
-  fetchUserInfo(),
-  getAccessCodes(),
-]);
+const [fetchUserInfoResult, accessCodes] = await Promise.all([fetchUserInfo(), getAccessCodes()]);
 
 userInfo = fetchUserInfoResult;
 userStore.setUserInfo(userInfo);
@@ -235,9 +232,7 @@ const { accessMode, hasAccessByCodes } = useAccess();
     <Button> Visible to User account ["AC_1000001"] </Button>
   </AccessControl>
   <AccessControl :codes="['AC_100100', 'AC_100010']" type="code">
-    <Button>
-      Visible to Super & Admin account ["AC_100100","AC_1000001"]
-    </Button>
+    <Button> Visible to Super & Admin account ["AC_100100","AC_1000001"] </Button>
   </AccessControl>
 </template>
 ```
@@ -252,15 +247,9 @@ const { hasAccessByCodes } = useAccess();
 </script>
 
 <template>
-  <Button v-if="hasAccessByCodes(['AC_100100'])">
-    Visible to Super account ["AC_1000001"]
-  </Button>
-  <Button v-if="hasAccessByCodes(['AC_100030'])">
-    Visible to Admin account ["AC_100010"]
-  </Button>
-  <Button v-if="hasAccessByCodes(['AC_1000001'])">
-    Visible to User account ["AC_1000001"]
-  </Button>
+  <Button v-if="hasAccessByCodes(['AC_100100'])"> Visible to Super account ["AC_1000001"] </Button>
+  <Button v-if="hasAccessByCodes(['AC_100030'])"> Visible to Admin account ["AC_100010"] </Button>
+  <Button v-if="hasAccessByCodes(['AC_1000001'])"> Visible to User account ["AC_1000001"] </Button>
   <Button v-if="hasAccessByCodes(['AC_100100', 'AC_1000001'])">
     Visible to Super & Admin account ["AC_100100","AC_1000001"]
   </Button>
@@ -273,15 +262,9 @@ const { hasAccessByCodes } = useAccess();
 
 ```vue
 <template>
-  <Button class="mr-4" v-access:code="'AC_100100'">
-    Visible to Super account 'AC_100100'
-  </Button>
-  <Button class="mr-4" v-access:code="['AC_100030']">
-    Visible to Admin account ["AC_100010"]
-  </Button>
-  <Button class="mr-4" v-access:code="['AC_1000001']">
-    Visible to User account ["AC_1000001"]
-  </Button>
+  <Button class="mr-4" v-access:code="'AC_100100'"> Visible to Super account 'AC_100100' </Button>
+  <Button class="mr-4" v-access:code="['AC_100030']"> Visible to Admin account ["AC_100010"] </Button>
+  <Button class="mr-4" v-access:code="['AC_1000001']"> Visible to User account ["AC_1000001"] </Button>
   <Button class="mr-4" v-access:code="['AC_100100', 'AC_1000001']">
     Visible to Super & Admin account ["AC_100100","AC_1000001"]
   </Button>
@@ -328,9 +311,7 @@ const { hasAccessByRoles } = useAccess();
   <Button v-if="hasAccessByRoles(['super'])"> Visible to Super account </Button>
   <Button v-if="hasAccessByRoles(['admin'])"> Visible to Admin account </Button>
   <Button v-if="hasAccessByRoles(['user'])"> Visible to User account </Button>
-  <Button v-if="hasAccessByRoles(['super', 'admin'])">
-    Super & Visible to Admin account
-  </Button>
+  <Button v-if="hasAccessByRoles(['super', 'admin'])"> Super & Visible to Admin account </Button>
 </template>
 ```
 
@@ -340,17 +321,9 @@ const { hasAccessByRoles } = useAccess();
 
 ```vue
 <template>
-  <Button class="mr-4" v-access:role="'super'">
-    Visible to Super account
-  </Button>
-  <Button class="mr-4" v-access:role="['admin']">
-    Visible to Admin account
-  </Button>
-  <Button class="mr-4" v-access:role="['user']">
-    Visible to User account
-  </Button>
-  <Button class="mr-4" v-access:role="['super', 'admin']">
-    Super & Visible to Admin account
-  </Button>
+  <Button class="mr-4" v-access:role="'super'"> Visible to Super account </Button>
+  <Button class="mr-4" v-access:role="['admin']"> Visible to Admin account </Button>
+  <Button class="mr-4" v-access:role="['user']"> Visible to User account </Button>
+  <Button class="mr-4" v-access:role="['super', 'admin']"> Super & Visible to Admin account </Button>
 </template>
 ```

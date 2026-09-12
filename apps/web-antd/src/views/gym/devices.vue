@@ -5,18 +5,7 @@ import type { GymRow } from '#/api/gym';
 
 import { computed, ref, watch } from 'vue';
 
-import {
-  Alert,
-  Button,
-  Form,
-  FormItem,
-  Input,
-  message,
-  Select,
-  Space,
-  Table,
-  Upload,
-} from 'ant-design-vue';
+import { Alert, Button, Form, FormItem, Input, message, Select, Space, Table, Upload } from 'ant-design-vue';
 
 import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 
@@ -47,10 +36,7 @@ const store = {
   immutable: true,
 } satisfies Field;
 const title = computed(
-  () =>
-    ({ devices: '智能设备', equipment: '器械教学', blacklists: '全店黑名单' })[
-      props.resource
-    ] ?? '设备',
+  () => ({ devices: '智能设备', equipment: '器械教学', blacklists: '全店黑名单' })[props.resource] ?? '设备',
 );
 const code = computed(
   () =>
@@ -171,10 +157,8 @@ const columns = computed(() => {
 });
 function prepare(values: Record<string, any>, row?: GymRow) {
   const result = { ...values };
-  if (!row && props.resource !== 'blacklists')
-    Reflect.deleteProperty(result, 'status');
-  for (const key of ['startsAt', 'endsAt'])
-    if (result[key]) result[key] = new Date(result[key]).toISOString();
+  if (!row && props.resource !== 'blacklists') Reflect.deleteProperty(result, 'status');
+  for (const key of ['startsAt', 'endsAt']) if (result[key]) result[key] = new Date(result[key]).toISOString();
   return result;
 }
 function initial(row: GymRow) {
@@ -182,9 +166,7 @@ function initial(row: GymRow) {
   for (const key of ['startsAt', 'endsAt'])
     if (result[key]) {
       const time = new Date(result[key]);
-      result[key] = new Date(time.getTime() - time.getTimezoneOffset() * 60_000)
-        .toISOString()
-        .slice(0, 16);
+      result[key] = new Date(time.getTime() - time.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
     }
   return result;
 }
@@ -250,11 +232,8 @@ async function save() {
       result.value = await gymApi.post(
         `devices/${current.value.id}/commands`,
         {
-          command:
-            current.value.type === 'locker' ? 'open_locker' : 'open_door',
-          ...(current.value.type === 'locker'
-            ? { compartmentId: compartmentId.value }
-            : {}),
+          command: current.value.type === 'locker' ? 'open_locker' : 'open_door',
+          ...(current.value.type === 'locker' ? { compartmentId: compartmentId.value } : {}),
           reason: reason.value,
         },
         requestKey,
@@ -281,11 +260,7 @@ async function upload(file: File) {
   if (!current.value) return false;
   busy.value = true;
   try {
-    const data = await uploadGymFile(
-      file,
-      file.type.startsWith('video/') ? 'video' : 'image',
-      current.value.storeId,
-    );
+    const data = await uploadGymFile(file, file.type.startsWith('video/') ? 'video' : 'image', current.value.storeId);
     fileId.value = data.id;
     filename.value = file.name;
   } finally {
@@ -316,22 +291,12 @@ async function upload(file: File) {
             type="link"
             @click="open(row, 'compartments')"
           >
-            配置柜格
-</Button><Button
-            v-if="['door', 'locker'].includes(row.type)"
-            type="link"
-            @click="open(row, 'command')"
-          >
+            配置柜格 </Button
+          ><Button v-if="['door', 'locker'].includes(row.type)" type="link" @click="open(row, 'command')">
             远程操作 / 记录
           </Button>
         </template>
-        <Button
-          v-if="resource === 'equipment'"
-          type="link"
-          @click="open(row, 'tutorials')"
-        >
-          教学资料
-        </Button>
+        <Button v-if="resource === 'equipment'" type="link" @click="open(row, 'tutorials')"> 教学资料 </Button>
         <Button
           v-if="resource === 'blacklists' && !row.revokedAt && canGym(code)"
           type="link"
@@ -363,14 +328,8 @@ async function upload(file: File) {
               { label: '停用', value: 'inactive' },
             ]"
             style="min-width: 120px"
-          /><Button danger @click="compartments.splice(index, 1)">
-            移除
-          </Button>
-</Space><Button
-          @click="compartments.push({ number: '', status: 'available' })"
-        >
-          增加柜格
-        </Button>
+          /><Button danger @click="compartments.splice(index, 1)"> 移除 </Button> </Space
+        ><Button @click="compartments.push({ number: '', status: 'available' })"> 增加柜格 </Button>
       </template>
       <template v-if="mode === 'command'">
         <Alert
@@ -424,22 +383,14 @@ async function upload(file: File) {
       </template>
       <template v-if="mode === 'tutorials'">
         <Form v-if="canGym('equipment:write')" layout="vertical">
-          <FormItem label="教学标题">
-            <Input v-model:value="tutorialTitle" />
-</FormItem><FormItem label="说明">
-            <Input.TextArea v-model:value="instructions" />
-</FormItem><FormItem label="图片/视频">
-            <Upload
-              :before-upload="upload"
-              :show-upload-list="false"
-              accept=".png,.jpg,.jpeg,.mp4"
-            >
+          <FormItem label="教学标题"> <Input v-model:value="tutorialTitle" /> </FormItem
+          ><FormItem label="说明"> <Input.TextArea v-model:value="instructions" /> </FormItem
+          ><FormItem label="图片/视频">
+            <Upload :before-upload="upload" :show-upload-list="false" accept=".png,.jpg,.jpeg,.mp4">
               <Button :loading="busy">上传教学文件</Button>
             </Upload>
-            {{ filename }}
-</FormItem><Button type="primary" :loading="busy" @click="save">
-            保存教学
-          </Button>
+            {{ filename }} </FormItem
+          ><Button type="primary" :loading="busy" @click="save"> 保存教学 </Button>
         </Form>
         <Table
           :data-source="tutorials"
@@ -453,20 +404,15 @@ async function upload(file: File) {
         >
           <template #bodyCell="{ column, record }">
             <Space v-if="column.dataIndex === 'actions'">
-              <Button type="link" @click="openGymFile(record.fileId)">
-                查看
-</Button><Button
+              <Button type="link" @click="openGymFile(record.fileId)"> 查看 </Button
+              ><Button
                 v-if="canGym('equipment:write')"
                 type="link"
                 @click="
                   async () => {
-                    await gymApi.patch(
-                      `equipment/${current?.id}/tutorials/${record.id}`,
-                      {
-                        status:
-                          record.status === 'active' ? 'inactive' : 'active',
-                      },
-                    );
+                    await gymApi.patch(`equipment/${current?.id}/tutorials/${record.id}`, {
+                      status: record.status === 'active' ? 'inactive' : 'active',
+                    });
                     if (current) await open(current, 'tutorials');
                   }
                 "

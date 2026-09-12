@@ -33,9 +33,7 @@ const imageUpload: ImageUploadOptions = {
         onProgress?.(Math.round(progress));
         if (progress >= 100) {
           // 上传完成后返回 mock URL
-          resolve(
-            `https://picsum.photos/seed/${Date.now()}/640/${Math.round((640 * ((file.size % 3) + 2)) / 4)}`,
-          );
+          resolve(`https://picsum.photos/seed/${Date.now()}/640/${Math.round((640 * ((file.size % 3) + 2)) / 4)}`);
         }
       }, 300);
     }),
@@ -48,9 +46,7 @@ const imageUpload: ImageUploadOptions = {
 <template>
   <Page title="Tiptap 富文本">
     <template #description>
-      <div class="mt-2 text-foreground/80">
-        统一封装后的富文本编辑器，适合在各个 app 中直接复用。
-      </div>
+      <div class="mt-2 text-foreground/80">统一封装后的富文本编辑器，适合在各个 app 中直接复用。</div>
     </template>
 
     <Card class="mb-5" title="编辑器">
@@ -58,10 +54,7 @@ const imageUpload: ImageUploadOptions = {
         <span class="text-sm">启用图片上传：</span>
         <Switch v-model:checked="enableUpload" />
       </div>
-      <VbenTiptap
-        v-model="content"
-        :image-upload="enableUpload ? imageUpload : undefined"
-      />
+      <VbenTiptap v-model="content" :image-upload="enableUpload ? imageUpload : undefined" />
     </Card>
 
     <Card class="mb-5" title="富文本预览">

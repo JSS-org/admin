@@ -2,10 +2,7 @@ import type { CSSProperties } from 'vue';
 
 import { computed, ref } from 'vue';
 
-import {
-  CSS_VARIABLE_LAYOUT_FOOTER_HEIGHT,
-  CSS_VARIABLE_LAYOUT_HEADER_HEIGHT,
-} from '@vben-core/shared/constants';
+import { CSS_VARIABLE_LAYOUT_FOOTER_HEIGHT, CSS_VARIABLE_LAYOUT_HEADER_HEIGHT } from '@vben-core/shared/constants';
 
 import { useCssVar } from '@vueuse/core';
 

@@ -72,12 +72,12 @@ const { userInfo, userRoles } = storeToRefs(userStore);
 
 ::: details 暴露的状态与方法
 
-| 名称 | 说明 |
-| --- | --- |
-| `timezone` | 当前时区，初始值取自 `getCurrentTimezone()` |
-| `setTimezone(timezone)` | 设置时区，并同步到 dayjs 默认时区 |
-| `getTimezoneOptions()` | 获取时区选项列表，默认来自 `DEFAULT_TIME_ZONE_OPTIONS` |
-| `$reset()` | 重置时区到 `getCurrentTimezone()` |
+| 名称                    | 说明                                                   |
+| ----------------------- | ------------------------------------------------------ |
+| `timezone`              | 当前时区，初始值取自 `getCurrentTimezone()`            |
+| `setTimezone(timezone)` | 设置时区，并同步到 dayjs 默认时区                      |
+| `getTimezoneOptions()`  | 获取时区选项列表，默认来自 `DEFAULT_TIME_ZONE_OPTIONS` |
+| `$reset()`              | 重置时区到 `getCurrentTimezone()`                      |
 
 :::
 

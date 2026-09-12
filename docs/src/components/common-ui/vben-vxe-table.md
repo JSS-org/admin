@@ -68,11 +68,7 @@ setupVbenVxeTable({
     vxeUI.renderer.add('CellLink', {
       renderTableDefault(renderOpts) {
         const { props } = renderOpts;
-        return h(
-          Button,
-          { size: 'small', type: 'link' },
-          { default: () => props?.text },
-        );
+        return h(Button, { size: 'small', type: 'link' }, { default: () => props?.text });
       },
     });
   },
@@ -133,11 +129,7 @@ vxeUI.renderer.add('CellImage', {
 vxeUI.renderer.add('CellLink', {
   renderTableDefault(renderOpts) {
     const { props } = renderOpts;
-    return h(
-      Button,
-      { size: 'small', type: 'link' },
-      { default: () => props?.text },
-    );
+    return h(Button, { size: 'small', type: 'link' }, { default: () => props?.text });
   },
 });
 ```
@@ -222,17 +214,17 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
 所有属性都通过 `useVbenVxeGrid` 的第一个参数传入。
 
-| 属性名 | 描述 | 类型 | 版本要求 |
-| --- | --- | --- | --- |
-| tableTitle | 表格标题 | `string` | - |
-| tableTitleHelp | 表格标题帮助信息 | `string` | - |
-| class | 外层容器的 class | `string` | - |
-| gridClass | `vxe-grid` 的 class | `string` | - |
-| gridOptions | `vxe-grid` 配置 | `DeepPartial<VxeTableGridOptions>` | - |
-| gridEvents | `vxe-grid` 事件 | `DeepPartial<VxeGridListeners>` | - |
-| formOptions | 搜索表单配置 | `VbenFormProps` | - |
-| showSearchForm | 是否显示搜索表单 | `boolean` | - |
-| separator | 搜索表单与表格主体之间的分隔条 | `boolean \| SeparatorOptions` | `>5.5.4` |
+| 属性名         | 描述                           | 类型                               | 版本要求 |
+| -------------- | ------------------------------ | ---------------------------------- | -------- |
+| tableTitle     | 表格标题                       | `string`                           | -        |
+| tableTitleHelp | 表格标题帮助信息               | `string`                           | -        |
+| class          | 外层容器的 class               | `string`                           | -        |
+| gridClass      | `vxe-grid` 的 class            | `string`                           | -        |
+| gridOptions    | `vxe-grid` 配置                | `DeepPartial<VxeTableGridOptions>` | -        |
+| gridEvents     | `vxe-grid` 事件                | `DeepPartial<VxeGridListeners>`    | -        |
+| formOptions    | 搜索表单配置                   | `VbenFormProps`                    | -        |
+| showSearchForm | 是否显示搜索表单               | `boolean`                          | -        |
+| separator      | 搜索表单与表格主体之间的分隔条 | `boolean \| SeparatorOptions`      | `>5.5.4` |
 
 ## Slots
 

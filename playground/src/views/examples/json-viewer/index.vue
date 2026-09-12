@@ -20,10 +20,7 @@ function handleCopied(_event: JsonViewerAction) {
 }
 </script>
 <template>
-  <Page
-    title="Json Viewer"
-    description="一个渲染 JSON 结构数据的组件，支持复制、展开等，简单易用"
-  >
+  <Page title="Json Viewer" description="一个渲染 JSON 结构数据的组件，支持复制、展开等，简单易用">
     <Card title="默认配置">
       <JsonViewer :value="json1" />
     </Card>
@@ -40,12 +37,7 @@ function handleCopied(_event: JsonViewerAction) {
       />
     </Card>
     <Card title="预览模式" class="mt-4">
-      <JsonViewer
-        :value="json2"
-        copyable
-        preview-mode
-        :show-array-index="false"
-      />
+      <JsonViewer :value="json2" copyable preview-mode :show-array-index="false" />
     </Card>
   </Page>
 </template>

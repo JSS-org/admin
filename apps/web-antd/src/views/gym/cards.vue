@@ -88,8 +88,8 @@ const fields: Field[] = [
               }
             "
           >
-            新版本
-</Button><Button
+            新版本 </Button
+          ><Button
             type="link"
             @click="
               async () => {

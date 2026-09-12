@@ -1,14 +1,5 @@
 import { seedContent } from './content-state';
-import {
-  fileContents,
-  find,
-  insert,
-  now,
-  passwordHash,
-  rows,
-  seedId,
-  tables,
-} from './core';
+import { fileContents, find, insert, now, passwordHash, rows, seedId, tables } from './core';
 import { seedDevices } from './devices-state';
 import { seedGovernance } from './governance-state';
 import { seedMarketing } from './marketing-state';
@@ -48,8 +39,8 @@ export const modules = {
   settlement: ['manage', 'read'],
   payroll: ['templates', 'read', 'calculate', 'confirm'],
 };
-export const permissionCodes = Object.entries(modules).flatMap(
-  ([name, actions]) => actions.map((action) => `${name}:${action}`),
+export const permissionCodes = Object.entries(modules).flatMap(([name, actions]) =>
+  actions.map((action) => `${name}:${action}`),
 );
 export const storeCodes = [
   'stores:read',

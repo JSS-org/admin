@@ -184,12 +184,7 @@ function syncFormState() {
     <Card title="labelWidth: auto">
       <template #extra>
         <Space wrap>
-          <RadioGroup
-            v-model:value="layout"
-            :options="layouts"
-            option-type="button"
-            @change="syncFormState"
-          />
+          <RadioGroup v-model:value="layout" :options="layouts" option-type="button" @change="syncFormState" />
           <RadioGroup
             v-model:value="labelWidthMode"
             :options="labelWidthModes"

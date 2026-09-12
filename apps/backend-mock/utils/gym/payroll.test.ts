@@ -4,13 +4,7 @@ import { authenticate, login } from './auth';
 import { find, rows, seedId } from './core';
 import { payroll } from './payroll';
 import { reset } from './state';
-function call(
-  username: string,
-  method: string,
-  path: string,
-  body = {},
-  query = {},
-) {
+function call(username: string, method: string, path: string, body = {}, query = {}) {
   return payroll({
     actor: authenticate(login(username, '123456').accessToken),
     method,
@@ -32,16 +26,10 @@ it('calculates auditable payroll and freezes confirmed runs', () => {
   expect(run.items[0].cardCommission).toBe('49.75');
   expect(run.items[0].ptCommission).toBe('200.00');
   expect(run.netAmount).toBe('4299.75');
-  expect(
-    call('store1', 'POST', '/payrolls', { storeId: seedId(1), month }).id,
-  ).toBe(run.id);
-  expect(() => call('store2', 'GET', `/payrolls/${run.id}`)).toThrow(
-    '不可访问',
-  );
+  expect(call('store1', 'POST', '/payrolls', { storeId: seedId(1), month }).id).toBe(run.id);
+  expect(() => call('store2', 'GET', `/payrolls/${run.id}`)).toThrow('不可访问');
   call('store1', 'PATCH', `/payrolls/${run.id}`, { status: 'confirmed' });
-  expect(() =>
-    call('store1', 'POST', `/payrolls/${run.id}/calculations`),
-  ).toThrow('不能重算');
+  expect(() => call('store1', 'POST', `/payrolls/${run.id}/calculations`)).toThrow('不能重算');
   expect(() =>
     call('hq', 'PATCH', `/employee-salary-assignments/${seedId(925)}`, {
       effectiveTo: `${month}-15`,
@@ -53,9 +41,7 @@ it('preserves prior payroll if an employee is missing a valid template', () => {
   const run = call('hq', 'POST', '/payrolls', { storeId: seedId(1), month });
   const itemId = run.items[0].id;
   find('employeeSalaryAssignments', seedId(925)).effectiveTo = `${month}-15`;
-  expect(() => call('hq', 'POST', `/payrolls/${run.id}/calculations`)).toThrow(
-    '整月',
-  );
+  expect(() => call('hq', 'POST', `/payrolls/${run.id}/calculations`)).toThrow('整月');
   expect(call('hq', 'GET', `/payrolls/${run.id}`).items[0].id).toBe(itemId);
 });
 it('validates template rules and blocks overlapping employee assignments', () => {

@@ -9,15 +9,7 @@ import { computed, toRaw, unref, useSlots } from 'vue';
 import { createContext } from '@vben-core/shadcn-ui';
 import { isString, mergeWithArrayOverride, set } from '@vben-core/shared/utils';
 
-import {
-  object,
-  ZodIntersection,
-  ZodNumber,
-  ZodObject,
-  ZodString,
-  string as zodString,
-  ZodStringFormat,
-} from 'zod';
+import { object, ZodIntersection, ZodNumber, ZodObject, ZodString, string as zodString, ZodStringFormat } from 'zod';
 import { getDefaultsForSchema } from 'zod-defaults';
 
 import { getFormFieldSchemas } from './form-render/schema';
@@ -28,12 +20,9 @@ type ExtendFormProps = VbenFormProps & {
 };
 
 export const [injectFormProps, provideFormProps] =
-  createContext<[ComputedRef<ExtendFormProps> | ExtendFormProps, FormActions]>(
-    'VbenFormProps',
-  );
+  createContext<[ComputedRef<ExtendFormProps> | ExtendFormProps, FormActions]>('VbenFormProps');
 
-export const [injectComponentRefMap, provideComponentRefMap] =
-  createContext<Map<string, unknown>>('ComponentRefMap');
+export const [injectComponentRefMap, provideComponentRefMap] = createContext<Map<string, unknown>>('ComponentRefMap');
 
 /**
  * Rebuild the schema used by zod-defaults, replacing native format nodes that
@@ -48,19 +37,14 @@ function normalizeSchemaForDefaults(rule: ZodType): ZodType {
 
   if (rawRule instanceof ZodObject) {
     const shape = Object.fromEntries(
-      Object.entries(rawRule.shape).map(([key, value]) => [
-        key,
-        normalizeSchemaForDefaults(value as ZodType),
-      ]),
+      Object.entries(rawRule.shape).map(([key, value]) => [key, normalizeSchemaForDefaults(value as ZodType)]),
     );
     return object(shape);
   }
 
   if (rawRule instanceof ZodIntersection) {
     const { left, right } = (rawRule as any).def;
-    return normalizeSchemaForDefaults(left as ZodType).and(
-      normalizeSchemaForDefaults(right as ZodType),
-    );
+    return normalizeSchemaForDefaults(left as ZodType).and(normalizeSchemaForDefaults(right as ZodType));
   }
 
   if (rawRule.constructor.name === 'ZodDefault') {
@@ -75,9 +59,7 @@ function normalizeSchemaForDefaults(rule: ZodType): ZodType {
   return rawRule;
 }
 
-export function useFormInitial(
-  props: ComputedRef<VbenFormProps> | VbenFormProps,
-) {
+export function useFormInitial(props: ComputedRef<VbenFormProps> | VbenFormProps) {
   const slots = useSlots();
   const initialValues = generateInitialValues();
 

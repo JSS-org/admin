@@ -101,9 +101,7 @@ const configs: Record<string, { title: string; columns: string[][] }> = {
     ],
   },
 };
-const config = computed(
-  () => configs[props.resource] ?? { title: '售卡设置', columns: [] },
-);
+const config = computed(() => configs[props.resource] ?? { title: '售卡设置', columns: [] });
 const columns = computed(() =>
   config.value.columns.map(([title = '', dataIndex = '']) => ({
     title,
@@ -161,8 +159,7 @@ const cardOptions = computed(() =>
   cards.value
     .filter(
       (c) =>
-        tab.value !== 'subscription-settings' ||
-        (c.kind === 'period' && c.durationDays >= 28 && c.durationDays <= 31),
+        tab.value !== 'subscription-settings' || (c.kind === 'period' && c.durationDays >= 28 && c.durationDays <= 31),
     )
     .map((c) => ({ label: `${c.name} v${c.version}`, value: c.id })),
 );
@@ -234,11 +231,7 @@ const scopeFilter = computed({
 <template>
   <div class="gym-view">
     <Page v-if="resource === 'settings'" title="在线售卡与核销设置">
-      <Alert
-        type="info"
-        message="当前为Mock配置，不会向支付渠道发起扣款。"
-        class="mb-4"
-      />
+      <Alert type="info" message="当前为Mock配置，不会向支付渠道发起扣款。" class="mb-4" />
       <FilterBar
         v-model="scopeFilter"
         :keyword="false"
@@ -265,16 +258,12 @@ const scopeFilter = computed({
           <Checkbox v-model:checked="settings.enabled">启用</Checkbox>
         </FormItem>
         <FormItem v-if="tab === 'online-sales-settings'" label="合同">
-          <Checkbox v-model:checked="settings.contractRequired">
-            要求签署合同
-          </Checkbox>
+          <Checkbox v-model:checked="settings.contractRequired"> 要求签署合同 </Checkbox>
         </FormItem>
         <template v-if="tab === 'verification-settings'">
           <FormItem label="入场要求">
-            <Checkbox v-model:checked="settings.requireCheckin">
-              核销前须签到
-            </Checkbox>
-</FormItem><FormItem label="支持渠道">
+            <Checkbox v-model:checked="settings.requireCheckin"> 核销前须签到 </Checkbox> </FormItem
+          ><FormItem label="支持渠道">
             <Select
               v-model:value="settings.supportedChannels"
               mode="multiple"
@@ -284,23 +273,17 @@ const scopeFilter = computed({
                 { label: '美团', value: 'meituan' },
                 { label: '抖音', value: 'douyin' },
               ]"
-            />
-</FormItem><Space>
-            <FormItem label="允许开始时间">
-              <Input
-                v-model:value="settings.allowedStart"
-                type="time"
-              />
-</FormItem><FormItem label="允许结束时间">
+            /> </FormItem
+          ><Space>
+            <FormItem label="允许开始时间"> <Input v-model:value="settings.allowedStart" type="time" /> </FormItem
+            ><FormItem label="允许结束时间">
               <Input v-model:value="settings.allowedEnd" type="time" />
             </FormItem>
           </Space>
         </template>
         <template v-else>
           <div
-            v-for="(item, index) in tab === 'online-sales-settings'
-              ? settings.offers
-              : settings.items"
+            v-for="(item, index) in tab === 'online-sales-settings' ? settings.offers : settings.items"
             :key="index"
             class="mb-4"
           >
@@ -310,52 +293,34 @@ const scopeFilter = computed({
                   v-model:value="item.cardTemplateId"
                   :options="cardOptions"
                   style="min-width: 220px"
-                />
-</FormItem><FormItem label="售价（元）">
-                <Input
-                  v-if="tab === 'online-sales-settings'"
-                  v-model:value="item.salePrice"
-                /><Input v-else v-model:value="item.price" />
-</FormItem><Checkbox v-model:checked="item.enabled">启用</Checkbox><Button
+                /> </FormItem
+              ><FormItem label="售价（元）">
+                <Input v-if="tab === 'online-sales-settings'" v-model:value="item.salePrice" /><Input
+                  v-else
+                  v-model:value="item.price"
+                /> </FormItem
+              ><Checkbox v-model:checked="item.enabled">启用</Checkbox
+              ><Button
                 danger
-                @click="
-                  (tab === 'online-sales-settings'
-                    ? settings.offers
-                    : settings.items
-                  ).splice(index, 1)
-                "
+                @click="(tab === 'online-sales-settings' ? settings.offers : settings.items).splice(index, 1)"
               >
                 移除
               </Button>
             </Space>
             <Space v-if="tab === 'subscription-settings'" wrap>
               <FormItem label="每月扣款日（空为授权日）">
-                <InputNumber
-                  v-model:value="item.billingDay"
-                  :min="1"
-                  :max="28"
-                />
-</FormItem><FormItem label="提前通知天数">
-                <InputNumber
-                  v-model:value="item.renewalNoticeDays"
-                  :min="0"
-                  :max="30"
-                />
-</FormItem><FormItem label="宽限天数">
-                <InputNumber
-                  v-model:value="item.graceDays"
-                  :min="0"
-                  :max="30"
-                />
+                <InputNumber v-model:value="item.billingDay" :min="1" :max="28" /> </FormItem
+              ><FormItem label="提前通知天数">
+                <InputNumber v-model:value="item.renewalNoticeDays" :min="0" :max="30" /> </FormItem
+              ><FormItem label="宽限天数">
+                <InputNumber v-model:value="item.graceDays" :min="0" :max="30" />
               </FormItem>
             </Space>
           </div>
           <Button class="mb-4" @click="addSetting">增加卡种配置</Button>
         </template>
         <FormItem>
-          <Button type="primary" :loading="busy" @click="saveSettings">
-            保存设置
-          </Button>
+          <Button type="primary" :loading="busy" @click="saveSettings"> 保存设置 </Button>
         </FormItem>
       </Form>
     </Page>
@@ -396,14 +361,9 @@ const scopeFilter = computed({
           :message="`期间净实收 ${data.summary.netAmount} 元，收款订单 ${data.summary.orderCount} 笔。按支付与退款实际发生时间统计。`"
         />
       </template>
-      <template
-        v-if="['self-service-card-orders', 'subscriptions'].includes(resource)"
-        #actions="{ row }"
-      >
+      <template v-if="['self-service-card-orders', 'subscriptions'].includes(resource)" #actions="{ row }">
         <Button
-          v-if="
-            ['self-service-card-orders', 'subscriptions'].includes(resource)
-          "
+          v-if="['self-service-card-orders', 'subscriptions'].includes(resource)"
           type="link"
           @click="details(row)"
         >
@@ -411,19 +371,10 @@ const scopeFilter = computed({
         </Button>
       </template>
     </ResourcePage>
-    <AdminDrawer
-      v-model:open="visible"
-      title="记录详情"
-      :footer="null"
-      :width="900"
-    >
+    <AdminDrawer v-model:open="visible" title="记录详情" :footer="null" :width="900">
       <template v-if="current">
         <Descriptions :column="2" bordered>
-          <DescriptionsItem
-            v-for="column in columns"
-            :key="column.dataIndex"
-            :label="column.title"
-          >
+          <DescriptionsItem v-for="column in columns" :key="column.dataIndex" :label="column.title">
             {{ current[column.dataIndex] ?? '—' }}
           </DescriptionsItem>
         </Descriptions>

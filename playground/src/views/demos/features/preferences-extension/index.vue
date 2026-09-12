@@ -4,10 +4,7 @@ import type { PlaygroundPreferencesExtension } from '#/preferences';
 import { computed } from 'vue';
 
 import { Page } from '@vben/common-ui';
-import {
-  getCustomPreferences,
-  updateCustomPreferences,
-} from '@vben/preferences';
+import { getCustomPreferences, updateCustomPreferences } from '@vben/preferences';
 
 import { Alert, Button, Card, Space, Tag } from 'antdv-next';
 
@@ -22,8 +19,7 @@ interface DemoTaskItem {
 
 type HighlightTone = PlaygroundPreferencesExtension['highlightTone'];
 
-const playgroundPreferences =
-  getCustomPreferences<PlaygroundPreferencesExtension>();
+const playgroundPreferences = getCustomPreferences<PlaygroundPreferencesExtension>();
 
 const demoTasks: DemoTaskItem[] = [
   { id: 1, owner: 'Luna', priority: 'P0', title: '同步租户配置到缓存' },
@@ -77,14 +73,10 @@ const formattedPlaygroundPreferences = computed(() => {
   return JSON.stringify(playgroundPreferences, null, 2);
 });
 
-const preClasses =
-  'mt-4 overflow-auto rounded-lg border border-border bg-muted p-4 text-sm';
+const preClasses = 'mt-4 overflow-auto rounded-lg border border-border bg-muted p-4 text-sm';
 
 function applyPreset(type: 'compact' | 'focus' | 'review') {
-  const presetMap: Record<
-    typeof type,
-    Partial<PlaygroundPreferencesExtension>
-  > = {
+  const presetMap: Record<typeof type, Partial<PlaygroundPreferencesExtension>> = {
     compact: {
       defaultVisibleRows: 3,
       enableQuickActions: false,
@@ -131,10 +123,7 @@ function getPriorityColor(priority: DemoTaskItem['priority']) {
       </div>
     </template>
 
-    <Card
-      class="mb-5"
-      :title="$t('demos.preferencesExtensionDemo.currentConfig')"
-    >
+    <Card class="mb-5" :title="$t('demos.preferencesExtensionDemo.currentConfig')">
       <Alert :type="toneConfig.alertType" show-icon>
         <template #title>
           {{
@@ -171,11 +160,7 @@ function getPriorityColor(priority: DemoTaskItem['priority']) {
           </Tag>
         </div>
 
-        <Space
-          v-if="playgroundPreferences.enableQuickActions"
-          wrap
-          class="mb-4"
-        >
+        <Space v-if="playgroundPreferences.enableQuickActions" wrap class="mb-4">
           <Button type="primary">
             {{ $t('demos.preferencesExtensionDemo.quickActions.create') }}
           </Button>
@@ -199,9 +184,7 @@ function getPriorityColor(priority: DemoTaskItem['priority']) {
             <div>
               <div class="font-medium">{{ task.title }}</div>
               <div class="text-sm text-foreground/60">
-                {{ $t('demos.preferencesExtensionDemo.owner') }}：{{
-                  task.owner
-                }}
+                {{ $t('demos.preferencesExtensionDemo.owner') }}：{{ task.owner }}
               </div>
             </div>
             <Tag :color="getPriorityColor(task.priority)">

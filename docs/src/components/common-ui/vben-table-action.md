@@ -115,11 +115,7 @@ function hasPermission(auth?: string | string[]) {
 </script>
 
 <template>
-  <VbenTableAction
-    v-bind="useActions(row, onActionClick)"
-    :has-permission="hasPermission"
-    align="center"
-  />
+  <VbenTableAction v-bind="useActions(row, onActionClick)" :has-permission="hasPermission" align="center" />
 </template>
 ```
 
@@ -157,9 +153,9 @@ function hasPermission(auth?: string | string[]) {
 
 ### TableActionPopConfirm
 
-| 属性名 | 描述 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| title | 提示标题 | `string` | `'Are you sure?'` |
-| okText | 确认按钮文案 | `string` | `'OK'` |
-| cancelText | 取消按钮文案 | `string` | `'Cancel'` |
-| confirm | 确认回调；未提供时回退到 `action.onClick` | `() => void` | - |
+| 属性名     | 描述                                      | 类型         | 默认值            |
+| ---------- | ----------------------------------------- | ------------ | ----------------- |
+| title      | 提示标题                                  | `string`     | `'Are you sure?'` |
+| okText     | 确认按钮文案                              | `string`     | `'OK'`            |
+| cancelText | 取消按钮文案                              | `string`     | `'Cancel'`        |
+| confirm    | 确认回调；未提供时回退到 `action.onClick` | `() => void` | -                 |

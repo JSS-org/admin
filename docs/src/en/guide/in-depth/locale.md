@@ -128,10 +128,7 @@ If you need to add a new language pack, follow these steps (taking `zh-TW` Tradi
   ```ts
   import { setSupportLanguages, SUPPORT_LANGUAGES } from '@vben/constants';
 
-  setSupportLanguages([
-    ...SUPPORT_LANGUAGES,
-    { label: '繁體中文', value: 'zh-TW' },
-  ]);
+  setSupportLanguages([...SUPPORT_LANGUAGES, { label: '繁體中文', value: 'zh-TW' }]);
   ```
 
 - If the application uses third-party libraries such as dayjs or component libraries, add the corresponding language pack branches in the locale loading logic of `src/locales/index.ts`.

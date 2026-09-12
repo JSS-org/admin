@@ -8,23 +8,14 @@ import './state';
 
 export function actorFor(account: Row): Actor {
   if (account.status !== 'active') fail('账号已停用', 401);
-  if (
-    account.employeeId &&
-    find('employees', account.employeeId).status !== 'active'
-  )
-    fail('员工已离职或停用', 401);
-  const assignments = account.assignments.filter(
-    (a: Row) => find('roles', a.roleId).status === 'active',
-  );
+  if (account.employeeId && find('employees', account.employeeId).status !== 'active') fail('员工已离职或停用', 401);
+  const assignments = account.assignments.filter((a: Row) => find('roles', a.roleId).status === 'active');
   const roles: Row[] = assignments.map((a: Row) => find('roles', a.roleId));
   const storePermissions: Record<string, string[]> = {};
   for (const a of assignments)
     if (a.storeId)
       storePermissions[a.storeId] = [
-        ...new Set([
-          ...(storePermissions[a.storeId] ?? []),
-          ...find('roles', a.roleId).permissionCodes,
-        ]),
+        ...new Set([...(storePermissions[a.storeId] ?? []), ...find('roles', a.roleId).permissionCodes]),
       ];
   return {
     id: account.id,
@@ -32,17 +23,9 @@ export function actorFor(account: Row): Actor {
     realName: account.realName,
     roles: [...new Set(roles.map((r) => r.scopeType))],
     scopeType: roles.some((r) => r.scopeType === 'hq') ? 'hq' : 'store',
-    storeIds: [
-      ...new Set(assignments.map((a: Row) => a.storeId).filter(Boolean)),
-    ] as string[],
+    storeIds: [...new Set(assignments.map((a: Row) => a.storeId).filter(Boolean))] as string[],
     codes: [...new Set(roles.flatMap((r) => r.permissionCodes))],
-    globalCodes: [
-      ...new Set(
-        roles
-          .filter((r) => r.scopeType === 'hq')
-          .flatMap((r) => r.permissionCodes),
-      ),
-    ],
+    globalCodes: [...new Set(roles.filter((r) => r.scopeType === 'hq').flatMap((r) => r.permissionCodes))],
     storePermissions,
   };
 }
@@ -50,8 +33,7 @@ export function login(username: unknown, password: unknown) {
   const name = str(username, '用户名', 64);
   const secret = str(password, '密码', 128);
   const account = rows('accounts').find((a) => a.username === name);
-  if (!account || !checkPassword(secret, account.passwordHash))
-    fail('用户名或密码错误', 401);
+  if (!account || !checkPassword(secret, account.passwordHash)) fail('用户名或密码错误', 401);
   actorFor(account);
   return newSession(account.id);
 }
@@ -66,18 +48,13 @@ function newSession(accountId: string) {
   });
 }
 export function authenticate(token: string): Actor {
-  const session = rows('sessions').find(
-    (s) => s.accessToken === token && !s.revokedAt && s.expiresAt > Date.now(),
-  );
+  const session = rows('sessions').find((s) => s.accessToken === token && !s.revokedAt && s.expiresAt > Date.now());
   if (!session) fail('登录已过期，请重新登录', 401);
   return actorFor(find('accounts', session.accountId));
 }
 export function refresh(token: string) {
   const session = rows('sessions').find(
-    (s) =>
-      s.refreshToken === token &&
-      !s.revokedAt &&
-      s.refreshExpiresAt > Date.now(),
+    (s) => s.refreshToken === token && !s.revokedAt && s.refreshExpiresAt > Date.now(),
   );
   if (!session) fail('登录已过期，请重新登录', 401);
   actorFor(find('accounts', session.accountId));

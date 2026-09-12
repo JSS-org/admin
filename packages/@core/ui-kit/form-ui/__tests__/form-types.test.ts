@@ -36,16 +36,10 @@ interface AccountSubmitValues {
 describe('form public types', () => {
   it('keeps the compatibility alias and stable method signatures', () => {
     expectTypeOf<FormActions>().toEqualTypeOf<FormContextApi>();
-    expectTypeOf<FormActions['setFieldValue']>()
-      .parameter(0)
-      .toMatchTypeOf<string>();
-    expectTypeOf<
-      FormActions['validate']
-    >().returns.resolves.toEqualTypeOf<FormValidationResult>();
+    expectTypeOf<FormActions['setFieldValue']>().parameter(0).toMatchTypeOf<string>();
+    expectTypeOf<FormActions['validate']>().returns.resolves.toEqualTypeOf<FormValidationResult>();
     expectTypeOf<Parameters<FormActions['validate']>>().toEqualTypeOf<[]>();
-    expectTypeOf<Parameters<FormActions['validateField']>>().toEqualTypeOf<
-      [fieldName: string]
-    >();
+    expectTypeOf<Parameters<FormActions['validateField']>>().toEqualTypeOf<[fieldName: string]>();
   });
 
   it('accepts both new and deprecated rule registration options', () => {
@@ -60,9 +54,7 @@ describe('form public types', () => {
       resolve({ actions, controller, schema, values }) {
         expectTypeOf(values).toEqualTypeOf<Readonly<AccountFormValues>>();
         expectTypeOf(actions).toEqualTypeOf<FormActions<AccountFormValues>>();
-        expectTypeOf(controller).toEqualTypeOf<
-          ExtendedFormApi<AccountFormValues>
-        >();
+        expectTypeOf(controller).toEqualTypeOf<ExtendedFormApi<AccountFormValues>>();
         expectTypeOf(schema.fieldName).toEqualTypeOf<string | undefined>();
         return { disabled: !values.email, rules: null };
       },
@@ -80,21 +72,13 @@ describe('form public types', () => {
       validateOn: ['blur', 'change'],
     };
 
-    expectTypeOf(resolveDependencies).toMatchTypeOf<
-      FormItemDependencies<AccountFormValues>
-    >();
-    expectTypeOf(legacyDependencies).toMatchTypeOf<
-      FormItemDependencies<AccountFormValues>
-    >();
+    expectTypeOf(resolveDependencies).toMatchTypeOf<FormItemDependencies<AccountFormValues>>();
+    expectTypeOf(legacyDependencies).toMatchTypeOf<FormItemDependencies<AccountFormValues>>();
     expectTypeOf(fieldOptions).toMatchTypeOf<FormFieldOptions>();
   });
 
   it('propagates form value types through public APIs and callbacks', () => {
-    const options: VbenFormProps<
-      BaseFormComponentType,
-      Record<never, never>,
-      AccountFormValues
-    > = {
+    const options: VbenFormProps<BaseFormComponentType, Record<never, never>, AccountFormValues> = {
       handleSubmit(values, rawValues) {
         expectTypeOf(values).toEqualTypeOf<AccountFormValues>();
         expectTypeOf(rawValues).toEqualTypeOf<Readonly<AccountFormValues>>();
@@ -113,30 +97,20 @@ describe('form public types', () => {
       contextApi: FormContextApi<AccountFormValues>,
       typedFormApi: ExtendedFormApi<AccountFormValues>,
     ) {
-      expectTypeOf(
-        typedFormApi.getValues(),
-      ).resolves.toEqualTypeOf<AccountFormValues>();
-      expectTypeOf(
-        typedFormApi.getRawValues(),
-      ).resolves.toEqualTypeOf<AccountFormValues>();
+      expectTypeOf(typedFormApi.getValues()).resolves.toEqualTypeOf<AccountFormValues>();
+      expectTypeOf(typedFormApi.getRawValues()).resolves.toEqualTypeOf<AccountFormValues>();
       expectTypeOf(typedFormApi.getValueSnapshot()).resolves.toEqualTypeOf<{
         rawValues: Readonly<AccountFormValues>;
         values: AccountFormValues;
       }>();
-      expectTypeOf(typedFormApi.setValues)
-        .parameter(0)
-        .toEqualTypeOf<FormValuePatch<AccountFormValues>>();
-      expectTypeOf<
-        FormValuePatch<AccountFormValues>['profile']
-      >().toEqualTypeOf<undefined | { nickname?: string }>();
-      expectTypeOf<FormValuePatch<AccountFormValues>['roles']>().toEqualTypeOf<
-        string[] | undefined
-      >();
+      expectTypeOf(typedFormApi.setValues).parameter(0).toEqualTypeOf<FormValuePatch<AccountFormValues>>();
+      expectTypeOf<FormValuePatch<AccountFormValues>['profile']>().toEqualTypeOf<undefined | { nickname?: string }>();
+      expectTypeOf<FormValuePatch<AccountFormValues>['roles']>().toEqualTypeOf<string[] | undefined>();
       expectTypeOf(typedFormApi.form.values).toEqualTypeOf<AccountFormValues>();
       expectTypeOf(contextApi.getFieldValue('email')).toEqualTypeOf<string>();
-      expectTypeOf(
-        contextApi.useSelector((state) => state.values.profile.nickname),
-      ).toEqualTypeOf<Readonly<import('vue').Ref<string>>>();
+      expectTypeOf(contextApi.useSelector((state) => state.values.profile.nickname)).toEqualTypeOf<
+        Readonly<import('vue').Ref<string>>
+      >();
     }
 
     expectTypeOf(assertContextApi).toBeFunction();
@@ -147,19 +121,11 @@ describe('form public types', () => {
     type DefaultSlot = NonNullable<FormSlots['default']>;
     type DefaultSlotProps = Parameters<DefaultSlot>[0];
 
-    expectTypeOf<
-      EmailSlotProps['field']['state']['value']
-    >().toEqualTypeOf<string>();
+    expectTypeOf<EmailSlotProps['field']['state']['value']>().toEqualTypeOf<string>();
     expectTypeOf<EmailSlotProps['values']>().toEqualTypeOf<AccountFormValues>();
-    expectTypeOf<
-      EmailSlotProps['componentProps']['modelValue']
-    >().toEqualTypeOf<string | undefined>();
-    expectTypeOf<EmailSlotProps['formApi']>().toEqualTypeOf<
-      ExtendedFormApi<AccountFormValues>
-    >();
-    expectTypeOf<
-      DefaultSlotProps['values']
-    >().toEqualTypeOf<AccountFormValues>();
+    expectTypeOf<EmailSlotProps['componentProps']['modelValue']>().toEqualTypeOf<string | undefined>();
+    expectTypeOf<EmailSlotProps['formApi']>().toEqualTypeOf<ExtendedFormApi<AccountFormValues>>();
+    expectTypeOf<DefaultSlotProps['values']>().toEqualTypeOf<AccountFormValues>();
 
     const [WideForm] = useVbenForm<Record<string, unknown>>({ schema: [] });
     type WideFormSlots = InstanceType<typeof WideForm>['$slots'];
@@ -168,16 +134,10 @@ describe('form public types', () => {
 
     expectTypeOf<WideFieldSlotProps>().not.toBeAny();
     expectTypeOf<WideFieldSlotProps['modelValue']>().toEqualTypeOf<unknown>();
-    expectTypeOf<
-      WideFieldSlotProps['field']['state']['value']
-    >().toEqualTypeOf<unknown>();
-    expectTypeOf<
-      WideFieldSlotProps['componentField']['modelValue']
-    >().toEqualTypeOf<unknown>();
+    expectTypeOf<WideFieldSlotProps['field']['state']['value']>().toEqualTypeOf<unknown>();
+    expectTypeOf<WideFieldSlotProps['componentField']['modelValue']>().toEqualTypeOf<unknown>();
     expectTypeOf<WideFieldSlotProps['name']>().toBeString();
-    expectTypeOf<WideFieldSlotProps['values']>().toEqualTypeOf<
-      Record<string, unknown>
-    >();
+    expectTypeOf<WideFieldSlotProps['values']>().toEqualTypeOf<Record<string, unknown>>();
   });
 
   it('keeps form and submit values distinct with a codec', () => {
@@ -223,18 +183,12 @@ describe('form public types', () => {
       AccountSubmitValues
     >(options);
 
-    expectTypeOf(
-      formApi.getValues(),
-    ).resolves.toEqualTypeOf<AccountSubmitValues>();
-    expectTypeOf(
-      formApi.getRawValues(),
-    ).resolves.toEqualTypeOf<AccountFormValues>();
+    expectTypeOf(formApi.getValues()).resolves.toEqualTypeOf<AccountSubmitValues>();
+    expectTypeOf(formApi.getRawValues()).resolves.toEqualTypeOf<AccountFormValues>();
     expectTypeOf(formApi.getValueSnapshot()).resolves.toEqualTypeOf<
       FormValueSnapshot<AccountFormValues, AccountSubmitValues>
     >();
-    expectTypeOf(formApi.setSubmitValues)
-      .parameter(0)
-      .toEqualTypeOf<AccountSubmitValues>();
+    expectTypeOf(formApi.setSubmitValues).parameter(0).toEqualTypeOf<AccountSubmitValues>();
   });
 
   it('infers submit values from an inline codec', () => {
@@ -266,12 +220,8 @@ describe('form public types', () => {
       schema: [],
     });
 
-    expectTypeOf(
-      formApi.getValues(),
-    ).resolves.toEqualTypeOf<AccountSubmitValues>();
-    expectTypeOf(
-      formApi.getRawValues(),
-    ).resolves.toEqualTypeOf<AccountFormValues>();
+    expectTypeOf(formApi.getValues()).resolves.toEqualTypeOf<AccountSubmitValues>();
+    expectTypeOf(formApi.getRawValues()).resolves.toEqualTypeOf<AccountFormValues>();
   });
 
   it('discriminates group schemas from field schemas by type', () => {
@@ -287,26 +237,14 @@ describe('form public types', () => {
       ],
     });
 
-    expectTypeOf<FormSchema>().toEqualTypeOf<
-      FormFieldSchema | FormGroupSchema
-    >();
+    expectTypeOf<FormSchema>().toEqualTypeOf<FormFieldSchema | FormGroupSchema>();
     expectTypeOf<FormGroupSchema['fieldName']>().toEqualTypeOf<undefined>();
     expectTypeOf<FormGroupSchema['component']>().toEqualTypeOf<undefined>();
-    expectTypeOf<FormGroupSchema['children']>().toEqualTypeOf<
-      FormFieldSchema[]
-    >();
+    expectTypeOf<FormGroupSchema['children']>().toEqualTypeOf<FormFieldSchema[]>();
     // updateSchema 只接受字段更新，分组本身不可被更新
     expectTypeOf(formApi.updateSchema)
       .parameter(0)
-      .toEqualTypeOf<
-        Partial<
-          FormFieldSchema<
-            BaseFormComponentType,
-            Record<never, never>,
-            AccountFormValues
-          >
-        >[]
-      >();
+      .toEqualTypeOf<Partial<FormFieldSchema<BaseFormComponentType, Record<never, never>, AccountFormValues>>[]>();
 
     // @ts-expect-error 分组不能声明 fieldName
     const invalidGroup: FormSchema = {
@@ -326,11 +264,7 @@ describe('form public types', () => {
   });
 
   it('exposes canonical names alongside deprecated aliases', () => {
-    expectTypeOf<FormContextApi['reset']>().toEqualTypeOf<
-      FormContextApi['resetForm']
-    >();
-    expectTypeOf<FormContextApi['submit']>().toEqualTypeOf<
-      FormContextApi['submitForm']
-    >();
+    expectTypeOf<FormContextApi['reset']>().toEqualTypeOf<FormContextApi['resetForm']>();
+    expectTypeOf<FormContextApi['submit']>().toEqualTypeOf<FormContextApi['submitForm']>();
   });
 });

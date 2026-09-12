@@ -6,19 +6,7 @@ import { reactive } from 'vue';
 import { CountTo, Page, TransitionPresetsKeys } from '@vben/common-ui';
 import { IconifyIcon } from '@vben/icons';
 
-import {
-  Button,
-  Card,
-  Col,
-  Form,
-  FormItem,
-  Input,
-  InputNumber,
-  message,
-  Row,
-  Select,
-  Switch,
-} from 'antdv-next';
+import { Button, Card, Col, Form, FormItem, Input, InputNumber, message, Row, Select, Switch } from 'antdv-next';
 
 const props = reactive<CountToProps & { transition: TransitionPresets }>({
   decimal: '.',
@@ -50,8 +38,7 @@ const props = reactive<CountToProps & { transition: TransitionPresets }>({
 });
 
 function changeNumber() {
-  props.endVal =
-    Math.floor(Math.random() * 100_000_000) / 10 ** (props.decimals || 0);
+  props.endVal = Math.floor(Math.random() * 100_000_000) / 10 ** (props.decimals || 0);
 }
 
 function openDocumentation() {
@@ -77,12 +64,8 @@ function onFinished() {
 <template>
   <Page title="CountTo" description="数字滚动动画组件。使用">
     <template #description>
-      <span>
-        使用useTransition封装的数字滚动动画组件，每次改变当前值都会产生过渡动画。
-      </span>
-      <Button type="link" @click="openDocumentation">
-        查看useTransition文档
-      </Button>
+      <span> 使用useTransition封装的数字滚动动画组件，每次改变当前值都会产生过渡动画。 </span>
+      <Button type="link" @click="openDocumentation"> 查看useTransition文档 </Button>
     </template>
     <Card title="基本用法">
       <div class="flex-center w-full pb-4">
@@ -97,11 +80,7 @@ function onFinished() {
           </Col>
           <Col :span="8">
             <FormItem label="当前值" name="endVal">
-              <InputNumber
-                v-model:value="props.endVal"
-                class="w-full"
-                :precision="props.decimals"
-              >
+              <InputNumber v-model:value="props.endVal" class="w-full" :precision="props.decimals">
                 <template #addonAfter>
                   <IconifyIcon
                     v-tippy="`设置一个随机值`"
@@ -131,11 +110,7 @@ function onFinished() {
 
           <Col :span="8">
             <FormItem label="小数位数" name="decimals">
-              <InputNumber
-                v-model:value="props.decimals"
-                :min="0"
-                :precision="0"
-              />
+              <InputNumber v-model:value="props.decimals" :min="0" :precision="0" />
             </FormItem>
           </Col>
           <Col :span="8">
@@ -152,9 +127,7 @@ function onFinished() {
             <FormItem label="动画" name="transition">
               <Select
                 v-model:value="props.transition"
-                :options="
-                  TransitionPresetsKeys.map((p) => ({ label: p, value: p }))
-                "
+                :options="TransitionPresetsKeys.map((p) => ({ label: p, value: p }))"
               />
             </FormItem>
           </Col>

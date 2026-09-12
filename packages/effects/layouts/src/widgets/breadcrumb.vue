@@ -29,16 +29,13 @@ const route = useRoute();
 const router = useRouter();
 
 const breadcrumbs = computed((): IBreadcrumb[] => {
-  const matched = resolveBreadcrumbMatches(route, (path) =>
-    router.resolve(path),
-  );
+  const matched = resolveBreadcrumbMatches(route, (path) => router.resolve(path));
 
   const resultBreadcrumb: IBreadcrumb[] = [];
 
   for (const match of matched) {
     const { meta, path } = match;
-    const { hideChildrenInMenu, hideInBreadcrumb, icon, name, title } =
-      meta || {};
+    const { hideChildrenInMenu, hideInBreadcrumb, icon, name, title } = meta || {};
     if (hideInBreadcrumb || hideChildrenInMenu || !path) {
       continue;
     }

@@ -18,9 +18,7 @@ const props = withDefaults(
 );
 const emit = defineEmits<{ ok: [] }>();
 const open = defineModel<boolean>('open', { default: false });
-const drawerWidth = computed(() =>
-  typeof props.width === 'number' ? `${props.width}px` : props.width,
-);
+const drawerWidth = computed(() => (typeof props.width === 'number' ? `${props.width}px` : props.width));
 
 function close() {
   if (!props.confirmLoading) open.value = false;
@@ -44,14 +42,7 @@ function close() {
     <template v-if="footer !== null" #footer>
       <div class="gym-drawer-actions">
         <Button :disabled="confirmLoading" @click="close">取消</Button>
-        <Button
-          v-bind="okButtonProps"
-          type="primary"
-          :loading="confirmLoading"
-          @click="emit('ok')"
-        >
-          确定
-        </Button>
+        <Button v-bind="okButtonProps" type="primary" :loading="confirmLoading" @click="emit('ok')"> 确定 </Button>
       </div>
     </template>
   </Drawer>

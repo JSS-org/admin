@@ -52,10 +52,7 @@ function flatten<T = Recordable<any>, P = number | string>(
       value: item,
     };
     result.push(val);
-    if (val.hasChildren)
-      result.push(
-        ...flatten(children, childrenField, level + 1, id, [...parents, id]),
-      );
+    if (val.hasChildren) result.push(...flatten(children, childrenField, level + 1, id, [...parents, id]));
   });
   return result;
 }
@@ -102,9 +99,7 @@ function updateTreeValue() {
       // 点击半选祖先时会被视为取消选择，误移除祖先及其所有后代。半选节点仅保留在 modelValue 返回值中。
       if (props.includeIndeterminate && props.multiple) {
         const excludedKeys = computeIndeterminateKeysInSelection(enabledIds);
-        treeValue.value = enabledItems.filter(
-          (item) => !excludedKeys.has(get(item.value, props.valueField)),
-        );
+        treeValue.value = enabledItems.filter((item) => !excludedKeys.has(get(item.value, props.valueField)));
       } else {
         treeValue.value = enabledItems;
       }
@@ -131,10 +126,7 @@ if (flattenData.value.length > 0) {
 }
 
 // 初始化：展开 — defaultExpandedLevel 优先，否则使用 defaultExpandedKeys
-if (
-  props.defaultExpandedLevel !== undefined &&
-  props.defaultExpandedLevel > 0
-) {
+if (props.defaultExpandedLevel !== undefined && props.defaultExpandedLevel > 0) {
   expandToLevel(props.defaultExpandedLevel);
 } else {
   expanded.value = props.defaultExpandedKeys ?? [];
@@ -158,10 +150,7 @@ watch(
     const currentTreeData = JSON.stringify(props.treeData);
     if (lastTreeData !== currentTreeData) {
       lastTreeData = currentTreeData;
-      if (
-        props.defaultExpandedLevel !== undefined &&
-        props.defaultExpandedLevel > 0
-      ) {
+      if (props.defaultExpandedLevel !== undefined && props.defaultExpandedLevel > 0) {
         expandToLevel(props.defaultExpandedLevel);
       }
     }
@@ -188,10 +177,7 @@ function updateModelValue(val: Arrayable<Recordable<any>>) {
     modelValue.value = mergeIndeterminate(selectedIds);
   } else {
     // 单选模式下取消选择时 val 为 null/undefined，需要同步清空
-    modelValue.value =
-      val && !get(val, props.disabledField)
-        ? get(val, props.valueField)
-        : undefined;
+    modelValue.value = val && !get(val, props.disabledField) ? get(val, props.valueField) : undefined;
   }
 }
 
@@ -288,8 +274,7 @@ function onSelect(item: FlattenedItem<Recordable<any>>, isSelected: boolean) {
   if (props.checkStrictly && props.multiple && props.autoCheckParent) {
     // 获取当前节点在 flattenData 中的记录以读取 parents
     const flatItem = flattenData.value.find(
-      (i) =>
-        get(i.value, props.valueField) === get(item.value, props.valueField),
+      (i) => get(i.value, props.valueField) === get(item.value, props.valueField),
     );
 
     if (isSelected) {
@@ -300,10 +285,7 @@ function onSelect(item: FlattenedItem<Recordable<any>>, isSelected: boolean) {
           return parentItem && !get(parentItem, props.disabledField);
         })
         ?.forEach((p) => {
-          if (
-            Array.isArray(modelValue.value) &&
-            !modelValue.value.includes(p)
-          ) {
+          if (Array.isArray(modelValue.value) && !modelValue.value.includes(p)) {
             modelValue.value.push(p);
           }
         });
@@ -321,9 +303,7 @@ function onSelect(item: FlattenedItem<Recordable<any>>, isSelected: boolean) {
               i.parentId === p &&
               i.id !== item._id &&
               Array.isArray(modelValue.value) &&
-              (modelValue.value as (number | string)[]).includes(
-                get(i.value, props.valueField) as number | string,
-              ),
+              (modelValue.value as (number | string)[]).includes(get(i.value, props.valueField) as number | string),
           );
           if (!hasSelectedChild) {
             const index = (modelValue.value as (number | string)[]).indexOf(p);
@@ -338,9 +318,7 @@ function onSelect(item: FlattenedItem<Recordable<any>>, isSelected: boolean) {
   // 或 includeIndeterminate 需合并半选节点时创建新引用
   if (props.multiple && Array.isArray(modelValue.value)) {
     if (props.includeIndeterminate) {
-      modelValue.value = mergeIndeterminate(
-        modelValue.value as (number | string)[],
-      );
+      modelValue.value = mergeIndeterminate(modelValue.value as (number | string)[]);
     } else if (props.checkStrictly) {
       modelValue.value = [...modelValue.value];
     }
@@ -349,15 +327,8 @@ function onSelect(item: FlattenedItem<Recordable<any>>, isSelected: boolean) {
 }
 
 /** 计算给定选中列表中，处于半选（indeterminate）状态的节点 key */
-function computeIndeterminateKeys(
-  selectedIds: (number | string)[],
-): (number | string)[] {
-  if (
-    !props.multiple ||
-    selectedIds.length === 0 ||
-    flattenData.value.length === 0
-  )
-    return [];
+function computeIndeterminateKeys(selectedIds: (number | string)[]): (number | string)[] {
+  if (!props.multiple || selectedIds.length === 0 || flattenData.value.length === 0) return [];
 
   const selectedSet = new Set(selectedIds);
   // 统计每个祖先节点下有多少个选中后代
@@ -389,15 +360,9 @@ function computeIndeterminateKeys(
  * 与 computeIndeterminateKeys 不同，它基于后代选中数量统计，适用于 modelValue 已合并半选节点的场景，
  * 用于从传给 Reka UI 的内部选择中剔除半选节点，并用于补充复选框的半选状态展示。
  */
-function computeIndeterminateKeysInSelection(
-  selectedIds: (number | string)[],
-): Set<number | string> {
+function computeIndeterminateKeysInSelection(selectedIds: (number | string)[]): Set<number | string> {
   const result = new Set<number | string>();
-  if (
-    !props.multiple ||
-    selectedIds.length === 0 ||
-    flattenData.value.length === 0
-  ) {
+  if (!props.multiple || selectedIds.length === 0 || flattenData.value.length === 0) {
     return result;
   }
 
@@ -410,10 +375,7 @@ function computeIndeterminateKeysInSelection(
     for (const parentId of node.parents) {
       totalDescendants.set(parentId, (totalDescendants.get(parentId) ?? 0) + 1);
       if (selectedSet.has(nodeId)) {
-        selectedDescendants.set(
-          parentId,
-          (selectedDescendants.get(parentId) ?? 0) + 1,
-        );
+        selectedDescendants.set(parentId, (selectedDescendants.get(parentId) ?? 0) + 1);
       }
     }
   }
@@ -434,21 +396,13 @@ const indeterminateKeys = computed(() => {
   if (!props.multiple || !props.includeIndeterminate) {
     return new Set<number | string>();
   }
-  const ids = Array.isArray(modelValue.value)
-    ? (modelValue.value as (number | string)[])
-    : [];
+  const ids = Array.isArray(modelValue.value) ? (modelValue.value as (number | string)[]) : [];
   return computeIndeterminateKeysInSelection(ids);
 });
 
 /** 根据 includeIndeterminate 配置，将半选节点合并到选中列表 */
-function mergeIndeterminate(
-  selectedIds: (number | string)[],
-): (number | string)[] {
-  if (
-    !props.includeIndeterminate ||
-    !props.multiple ||
-    selectedIds.length === 0
-  ) {
+function mergeIndeterminate(selectedIds: (number | string)[]): (number | string)[] {
+  if (!props.includeIndeterminate || !props.multiple || selectedIds.length === 0) {
     return selectedIds;
   }
   const indeterminate = computeIndeterminateKeys(selectedIds);
@@ -490,20 +444,10 @@ defineExpose({
       )
     "
   >
-    <div
-      :class="
-        cn('my-0.5 flex w-full items-center p-1', bordered ? 'border-b' : '')
-      "
-      v-if="$slots.header"
-    >
+    <div :class="cn('my-0.5 flex w-full items-center p-1', bordered ? 'border-b' : '')" v-if="$slots.header">
       <slot name="header"> </slot>
     </div>
-    <div
-      :class="
-        cn('my-0.5 flex w-full items-center p-1', bordered ? 'border-b' : '')
-      "
-      v-if="treeData.length > 0"
-    >
+    <div :class="cn('my-0.5 flex w-full items-center p-1', bordered ? 'border-b' : '')" v-if="treeData.length > 0">
       <div
         class="flex size-5 flex-1 cursor-pointer items-center"
         @click="() => (expanded?.length > 0 ? collapseAll() : expandAll())"
@@ -527,13 +471,7 @@ defineExpose({
     <TransitionGroup :name="transition ? 'fade' : ''">
       <TreeItem
         v-for="item in flattenItems"
-        v-slot="{
-          isExpanded,
-          isSelected,
-          isIndeterminate,
-          handleSelect,
-          handleToggle,
-        }"
+        v-slot="{ isExpanded, isSelected, isIndeterminate, handleSelect, handleToggle }"
         :key="item._id"
         :class="
           cn('cursor-pointer', getNodeClass?.(item), {
@@ -570,17 +508,12 @@ defineExpose({
         class="tree-node focus:ring-grass8 my-0.5 rounded outline-hidden"
       >
         <!-- 内容行通过 paddingLeft 控制缩进，不受 TreeItem 自身的渲染行为影响 -->
-        <div
-          class="flex items-center w-full p-1"
-          :style="{ paddingLeft: `${item.level - 1 + 0.25}rem` }"
-        >
+        <div class="flex items-center w-full p-1" :style="{ paddingLeft: `${item.level - 1 + 0.25}rem` }">
           <!-- 固定宽度展开区，有子节点时内部渲染箭头，无子节点时为空但宽度不变 -->
           <div class="flex shrink-0 items-center justify-center w-5">
             <ChevronRight
               v-if="
-                item.hasChildren &&
-                Array.isArray(item.value[childrenField]) &&
-                item.value[childrenField].length > 0
+                item.hasChildren && Array.isArray(item.value[childrenField]) && item.value[childrenField].length > 0
               "
               class="text-foreground/80 hover:text-foreground size-4 cursor-pointer transition"
               :class="{ 'rotate-90': isExpanded }"
@@ -598,9 +531,7 @@ defineExpose({
               :model-value="isSelected && !isNodeDisabled(item)"
               :disabled="isNodeDisabled(item)"
               :indeterminate="
-                (isIndeterminate ||
-                  indeterminateKeys.has(get(item.value, valueField))) &&
-                !isNodeDisabled(item)
+                (isIndeterminate || indeterminateKeys.has(get(item.value, valueField))) && !isNodeDisabled(item)
               "
               @click="
                 (event: MouseEvent) => {
@@ -641,12 +572,7 @@ defineExpose({
         </div>
       </TreeItem>
     </TransitionGroup>
-    <div
-      :class="
-        cn('my-0.5 flex w-full items-center p-1', bordered ? 'border-t' : '')
-      "
-      v-if="$slots.footer"
-    >
+    <div :class="cn('my-0.5 flex w-full items-center p-1', bordered ? 'border-t' : '')" v-if="$slots.footer">
       <slot name="footer"> </slot>
     </div>
   </TreeRoot>

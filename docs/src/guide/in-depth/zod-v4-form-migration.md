@@ -8,11 +8,11 @@ outline: deep
 
 ## 依赖变化
 
-| 类型 | 迁移前 | 迁移后 |
-| --- | --- | --- |
-| Schema | `zod@^3.25.76` | `zod@^4.4.3` |
-| 默认值 | `zod-defaults@0.1.3` | `zod-defaults@^0.2.3` |
-| 表单引擎 | `vee-validate@^4.15.1` | `@tanstack/vue-form@^1.33.2` |
+| 类型       | 迁移前                      | 迁移后                                       |
+| ---------- | --------------------------- | -------------------------------------------- |
+| Schema     | `zod@^3.25.76`              | `zod@^4.4.3`                                 |
+| 默认值     | `zod-defaults@0.1.3`        | `zod-defaults@^0.2.3`                        |
+| 表单引擎   | `vee-validate@^4.15.1`      | `@tanstack/vue-form@^1.33.2`                 |
 | Zod 适配器 | `@vee-validate/zod@^4.15.1` | 不再需要，TanStack Form 支持 Standard Schema |
 
 迁移后，源码、package manifest 和锁文件中都不应再依赖 `vee-validate` 或 `@vee-validate/zod`。
@@ -121,10 +121,7 @@ setupVbenForm({
   rules: {
     required(value, _params, context) {
       const isEmpty =
-        value === undefined ||
-        value === null ||
-        value === '' ||
-        (Array.isArray(value) && value.length === 0);
+        value === undefined || value === null || value === '' || (Array.isArray(value) && value.length === 0);
       return isEmpty ? `${context.label} is required` : true;
     },
   },
@@ -163,8 +160,7 @@ npx --yes zod-v3-to-v4@1.21.3 path/to/tsconfig.json
 
 ```ts
 const count = z.number({
-  error: (issue) =>
-    issue.input === undefined ? 'Count is required' : 'Count must be a number',
+  error: (issue) => (issue.input === undefined ? 'Count is required' : 'Count must be a number'),
 });
 ```
 

@@ -12,16 +12,11 @@ describe('pnpm eslint config', () => {
   it('reports invalid catalog entries without applying autofixes', async () => {
     const [packageJsonConfig] = await pnpm();
 
-    expect(packageJsonConfig?.rules?.['pnpm/json-valid-catalog']).toEqual([
-      'error',
-      { autofix: false },
-    ]);
+    expect(packageJsonConfig?.rules?.['pnpm/json-valid-catalog']).toEqual(['error', { autofix: false }]);
   });
 
   it('does not change an invalid catalog during an ESLint autofix run', async () => {
-    const fixtureDirectory = await mkdtemp(
-      join(tmpdir(), 'vben-pnpm-catalog-'),
-    );
+    const fixtureDirectory = await mkdtemp(join(tmpdir(), 'vben-pnpm-catalog-'));
     const packageJsonPath = join(fixtureDirectory, 'package.json');
     const workspacePath = join(fixtureDirectory, 'pnpm-workspace.yaml');
     const packageJson = `${JSON.stringify(
@@ -59,9 +54,7 @@ describe('pnpm eslint config', () => {
 
       // The rule queues workspace writes asynchronously when autofixes are enabled.
       await new Promise((resolve) => setTimeout(resolve, 1100));
-      await expect(readFile(packageJsonPath, 'utf8')).resolves.toBe(
-        packageJson,
-      );
+      await expect(readFile(packageJsonPath, 'utf8')).resolves.toBe(packageJson);
       await expect(readFile(workspacePath, 'utf8')).resolves.toBe(workspace);
     } finally {
       await rm(fixtureDirectory, { force: true, recursive: true });

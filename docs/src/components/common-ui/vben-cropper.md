@@ -84,13 +84,13 @@ getCropImage(
 
 **参数说明：**
 
-| 参数 | 类型 | 默认值 | 描述 |
-| --- | --- | --- | --- |
-| `format` | `'image/jpeg' \| 'image/png'` | `'image/png'` | 输出图片格式 |
-| `quality` | `number` | `0.92` | 压缩质量（0-1），仅 jpeg 有效 |
-| `outputType` | `'base64' \| 'blob'` | `'blob'` | 输出类型，base64 字符串或 Blob 对象 |
-| `targetWidth` | `number` | - | 目标宽度，不传则使用原始裁剪宽度 |
-| `targetHeight` | `number` | - | 目标高度，不传则使用原始裁剪高度 |
+| 参数           | 类型                          | 默认值        | 描述                                |
+| -------------- | ----------------------------- | ------------- | ----------------------------------- |
+| `format`       | `'image/jpeg' \| 'image/png'` | `'image/png'` | 输出图片格式                        |
+| `quality`      | `number`                      | `0.92`        | 压缩质量（0-1），仅 jpeg 有效       |
+| `outputType`   | `'base64' \| 'blob'`          | `'blob'`      | 输出类型，base64 字符串或 Blob 对象 |
+| `targetWidth`  | `number`                      | -             | 目标宽度，不传则使用原始裁剪宽度    |
+| `targetHeight` | `number`                      | -             | 目标高度，不传则使用原始裁剪高度    |
 
 ## 功能特性
 
@@ -158,13 +158,7 @@ const handleCropWithSize = async () => {
 
 <template>
   <div>
-    <VCropper
-      ref="cropperRef"
-      :img="imageUrl"
-      :width="500"
-      :height="400"
-      aspect-ratio="1:1"
-    />
+    <VCropper ref="cropperRef" :img="imageUrl" :width="500" :height="400" aspect-ratio="1:1" />
     <button @click="handleCropBlob">裁剪</button>
     <img v-if="croppedImage" :src="croppedImage" />
   </div>

@@ -30,9 +30,7 @@ const timeMode = ref<'date' | 'month' | 'range'>('date');
 const expanded = ref(false);
 const fieldsId = useId();
 const fields = computed<FilterField[]>(() => [
-  ...(props.keyword
-    ? [{ key: 'keyword', label: '关键词', placeholder: '名称 / 编号 / 手机号' }]
-    : []),
+  ...(props.keyword ? [{ key: 'keyword', label: '关键词', placeholder: '名称 / 编号 / 手机号' }] : []),
   ...(props.storeOptions
     ? [
         {
@@ -65,8 +63,7 @@ function changed() {
   if (props.immediate) emit('search');
 }
 function changeTimeMode() {
-  for (const key of ['date', 'month', 'from', 'to'])
-    Reflect.deleteProperty(model.value, key);
+  for (const key of ['date', 'month', 'from', 'to']) Reflect.deleteProperty(model.value, key);
 }
 function reset() {
   model.value = {};
@@ -76,12 +73,7 @@ function reset() {
 </script>
 
 <template>
-  <Form
-    :model="model"
-    class="gym-filter"
-    layout="vertical"
-    @finish="emit('search')"
-  >
+  <Form :model="model" class="gym-filter" layout="vertical" @finish="emit('search')">
     <div :id="fieldsId" class="gym-filter-fields">
       <FormItem
         v-for="(field, index) in fields"
@@ -124,16 +116,8 @@ function reset() {
             @change="changeTimeMode"
           />
         </FormItem>
-        <FormItem
-          v-if="timeMode !== 'range'"
-          :label="timeMode === 'date' ? '日期' : '月份'"
-          html-for="filter-time"
-        >
-          <Input
-            id="filter-time"
-            v-model:value="model[timeMode]"
-            :type="timeMode"
-          />
+        <FormItem v-if="timeMode !== 'range'" :label="timeMode === 'date' ? '日期' : '月份'" html-for="filter-time">
+          <Input id="filter-time" v-model:value="model[timeMode]" :type="timeMode" />
         </FormItem>
         <template v-else>
           <FormItem label="开始日期（含）" html-for="filter-from">
@@ -147,9 +131,7 @@ function reset() {
     </div>
     <div v-if="!immediate || collapsible" class="gym-filter-actions">
       <template v-if="!immediate">
-        <Button type="primary" html-type="submit" :loading="loading">
-          查询
-        </Button>
+        <Button type="primary" html-type="submit" :loading="loading"> 查询 </Button>
         <Button :disabled="loading" @click="reset">重置</Button>
       </template>
       <Button

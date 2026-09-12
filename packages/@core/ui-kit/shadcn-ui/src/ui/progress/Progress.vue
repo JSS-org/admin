@@ -10,9 +10,7 @@ import { cn } from '@vben-core/shared/utils';
 import { reactiveOmit } from '@vueuse/core';
 import { ProgressIndicator, ProgressRoot, useForwardPropsEmits } from 'reka-ui';
 
-const props = defineProps<
-  ProgressRootProps & { class?: HTMLAttributes['class'] }
->();
+const props = defineProps<ProgressRootProps & { class?: HTMLAttributes['class'] }>();
 
 const emits = defineEmits<ProgressRootEmits>();
 
@@ -30,9 +28,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
  */
 const normalizedMax = computed(() => {
   const { max } = props;
-  return typeof max === 'number' && Number.isFinite(max) && max > 0
-    ? max
-    : DEFAULT_MAX;
+  return typeof max === 'number' && Number.isFinite(max) && max > 0 ? max : DEFAULT_MAX;
 });
 </script>
 
@@ -42,12 +38,7 @@ const normalizedMax = computed(() => {
     data-slot="progress"
     v-bind="forwarded"
     :max="normalizedMax"
-    :class="
-      cn(
-        'bg-primary/20 relative h-2 w-full overflow-hidden rounded-full',
-        props.class,
-      )
-    "
+    :class="cn('bg-primary/20 relative h-2 w-full overflow-hidden rounded-full', props.class)"
   >
     <ProgressIndicator
       data-slot="progress-indicator"

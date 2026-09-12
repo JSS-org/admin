@@ -26,20 +26,20 @@ outline: deep
 
 ### Props
 
-| 属性名 | 描述 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| startVal | 起始值 | `number` | `0` |
-| endVal | 结束值 | `number` | `2021` |
-| duration | 动画持续时间 | `number` | `1500` |
-| autoplay | 是否自动播放 | `boolean` | `true` |
-| prefix | 前缀 | `string` | `''` |
-| suffix | 后缀 | `string` | `''` |
-| separator | 千分位分隔符 | `string` | `','` |
-| decimal | 小数点分隔符 | `string` | `'.'` |
-| color | 文本颜色 | `string` | `''` |
-| useEasing | 是否启用过渡预设 | `boolean` | `true` |
-| transition | 过渡预设名称 | `keyof typeof TransitionPresets` | `'linear'` |
-| decimals | 保留小数位数 | `number` | `0` |
+| 属性名     | 描述             | 类型                             | 默认值     |
+| ---------- | ---------------- | -------------------------------- | ---------- |
+| startVal   | 起始值           | `number`                         | `0`        |
+| endVal     | 结束值           | `number`                         | `2021`     |
+| duration   | 动画持续时间     | `number`                         | `1500`     |
+| autoplay   | 是否自动播放     | `boolean`                        | `true`     |
+| prefix     | 前缀             | `string`                         | `''`       |
+| suffix     | 后缀             | `string`                         | `''`       |
+| separator  | 千分位分隔符     | `string`                         | `','`      |
+| decimal    | 小数点分隔符     | `string`                         | `'.'`      |
+| color      | 文本颜色         | `string`                         | `''`       |
+| useEasing  | 是否启用过渡预设 | `boolean`                        | `true`     |
+| transition | 过渡预设名称     | `keyof typeof TransitionPresets` | `'linear'` |
+| decimals   | 保留小数位数     | `number`                         | `0`        |
 
 ### Events
 

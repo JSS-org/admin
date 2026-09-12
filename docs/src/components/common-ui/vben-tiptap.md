@@ -32,17 +32,17 @@ outline: deep
 
 ### Props
 
-| 属性名 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| `modelValue` (v-model) | 编辑器内容（HTML字符串） | `string` | `''` |
-| `editable` | 是否可编辑 | `boolean` | `true` |
-| `toolbar` | 是否显示工具栏 | `boolean` | `true` |
-| `previewable` | 是否显示预览按钮 | `boolean` | `true` |
-| `placeholder` | 占位提示文本 | `string` | - |
-| `minHeight` | 最小高度 | `number \| string` | `240` |
-| `maxHeight` | 最大高度 | `number \| string` | `400` |
-| `extensions` | 自定义 Tiptap 扩展配置 | `Extensions` | - |
-| `imageUpload` | 图片上传配置 | `ImageUploadOptions` | - |
+| 属性名                 | 说明                     | 类型                 | 默认值 |
+| ---------------------- | ------------------------ | -------------------- | ------ |
+| `modelValue` (v-model) | 编辑器内容（HTML字符串） | `string`             | `''`   |
+| `editable`             | 是否可编辑               | `boolean`            | `true` |
+| `toolbar`              | 是否显示工具栏           | `boolean`            | `true` |
+| `previewable`          | 是否显示预览按钮         | `boolean`            | `true` |
+| `placeholder`          | 占位提示文本             | `string`             | -      |
+| `minHeight`            | 最小高度                 | `number \| string`   | `240`  |
+| `maxHeight`            | 最大高度                 | `number \| string`   | `400`  |
+| `extensions`           | 自定义 Tiptap 扩展配置   | `Extensions`         | -      |
+| `imageUpload`          | 图片上传配置             | `ImageUploadOptions` | -      |
 
 ### Events
 
@@ -73,10 +73,7 @@ interface ImageUploadOptions {
   /** 上传失败回调，未提供时使用 alert 弹窗提示 */
   onUploadError?: (error: unknown) => void;
   /** 上传函数，返回图片 URL */
-  upload: (
-    file: File,
-    onProgress?: (percent: number) => void,
-  ) => Promise<string>;
+  upload: (file: File, onProgress?: (percent: number) => void) => Promise<string>;
 }
 ```
 

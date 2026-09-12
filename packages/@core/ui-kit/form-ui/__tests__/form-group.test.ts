@@ -38,9 +38,7 @@ afterEach(() => {
   }
 });
 
-function createContactGroup(
-  overrides: Partial<Extract<FormSchema, { type: 'group' }>> = {},
-): FormSchema {
+function createContactGroup(overrides: Partial<Extract<FormSchema, { type: 'group' }>> = {}): FormSchema {
   return {
     children: [
       {
@@ -65,10 +63,7 @@ function getGroupState(wrapper: VueWrapper) {
 describe('form group rendering', () => {
   it('renders grouped fields as regular form fields', async () => {
     const [Form, formApi] = useVbenForm({
-      schema: [
-        { component: TestInput, fieldName: 'name', label: 'Name' },
-        createContactGroup({ extra: 'Optional' }),
-      ],
+      schema: [{ component: TestInput, fieldName: 'name', label: 'Name' }, createContactGroup({ extra: 'Optional' })],
     });
     const wrapper = mount(Form);
     wrappers.push(wrapper);
@@ -92,18 +87,12 @@ describe('form group rendering', () => {
     await flushPromises();
 
     expect(getGroupState(wrapper)).toBe('closed');
-    expect(wrapper.get('button.form-group-trigger').attributes('type')).toBe(
-      'button',
-    );
-    expect(
-      wrapper.get('button.form-group-trigger').attributes('aria-expanded'),
-    ).toBe('false');
+    expect(wrapper.get('button.form-group-trigger').attributes('type')).toBe('button');
+    expect(wrapper.get('button.form-group-trigger').attributes('aria-expanded')).toBe('false');
 
     await wrapper.get('button.form-group-trigger').trigger('click');
     expect(getGroupState(wrapper)).toBe('open');
-    expect(
-      wrapper.get('button.form-group-trigger').attributes('aria-expanded'),
-    ).toBe('true');
+    expect(wrapper.get('button.form-group-trigger').attributes('aria-expanded')).toBe('true');
 
     await wrapper.get('button.form-group-trigger').trigger('click');
     expect(getGroupState(wrapper)).toBe('closed');
@@ -111,9 +100,7 @@ describe('form group rendering', () => {
 
   it('keeps a non-collapsible group open despite defaultCollapsed', async () => {
     const [Form] = useVbenForm({
-      schema: [
-        createContactGroup({ collapsible: false, defaultCollapsed: true }),
-      ],
+      schema: [createContactGroup({ collapsible: false, defaultCollapsed: true })],
     });
     const wrapper = mount(Form);
     wrappers.push(wrapper);

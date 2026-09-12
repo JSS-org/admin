@@ -1,10 +1,6 @@
 import type { VxeGridInstance } from 'vxe-table';
 
-import type {
-  BaseFormComponentType,
-  ExtendedFormApi,
-  FormValues,
-} from '@vben-core/form-ui';
+import type { BaseFormComponentType, ExtendedFormApi, FormValues } from '@vben-core/form-ui';
 
 import type { VxeGridProps } from './types';
 import type { ViewedRowHelper } from './viewed-row';
@@ -12,13 +8,7 @@ import type { ViewedRowHelper } from './viewed-row';
 import { toRaw } from 'vue';
 
 import { Store } from '@vben-core/shared/store';
-import {
-  bindMethods,
-  isBoolean,
-  isFunction,
-  mergeWithArrayOverride,
-  StateHandler,
-} from '@vben-core/shared/utils';
+import { bindMethods, isBoolean, isFunction, mergeWithArrayOverride, StateHandler } from '@vben-core/shared/utils';
 
 function getDefaultState(): VxeGridProps {
   return {
@@ -56,25 +46,19 @@ export class VxeGridApi<
   private stateHandler: StateHandler;
 
   constructor(
-    options: VxeGridProps<
+    options: VxeGridProps<T, D, P, TFormValues, TSubmitValues> = {} as VxeGridProps<
       T,
       D,
       P,
       TFormValues,
       TSubmitValues
-    > = {} as VxeGridProps<T, D, P, TFormValues, TSubmitValues>,
+    >,
   ) {
     const storeState = { ...options };
 
     const defaultState = getDefaultState();
     this.store = new Store<VxeGridProps<T, D, P, TFormValues, TSubmitValues>>(
-      mergeWithArrayOverride(storeState, defaultState) as VxeGridProps<
-        T,
-        D,
-        P,
-        TFormValues,
-        TSubmitValues
-      >,
+      mergeWithArrayOverride(storeState, defaultState) as VxeGridProps<T, D, P, TFormValues, TSubmitValues>,
     );
 
     this.store.subscribe((state) => {
@@ -123,10 +107,7 @@ export class VxeGridApi<
     this.viewedRowHelper?.markAsViewed(record);
   }
 
-  mount(
-    instance: null | VxeGridInstance,
-    formApi: ExtendedFormApi<TFormValues, D, P, TSubmitValues>,
-  ) {
+  mount(instance: null | VxeGridInstance, formApi: ExtendedFormApi<TFormValues, D, P, TSubmitValues>) {
     if (!this.isMounted && instance) {
       this.grid = instance;
       this.formApi = formApi;
@@ -158,11 +139,7 @@ export class VxeGridApi<
     this.viewedRowHelper?.removeKeys(keys);
   }
 
-  setGridOptions(
-    options: Partial<
-      VxeGridProps<T, D, P, TFormValues, TSubmitValues>['gridOptions']
-    >,
-  ) {
+  setGridOptions(options: Partial<VxeGridProps<T, D, P, TFormValues, TSubmitValues>['gridOptions']>) {
     this.setState({
       gridOptions: options,
     });

@@ -21,11 +21,7 @@ vxeUI.renderer.add('CellImage', {
 vxeUI.renderer.add('CellLink', {
   renderTableDefault(renderOpts) {
     const { props } = renderOpts;
-    return h(
-      Button,
-      { size: 'small', type: 'link' },
-      { default: () => props?.text },
-    );
+    return h(Button, { size: 'small', type: 'link' }, { default: () => props?.text });
   },
 });
 ```
@@ -64,17 +60,17 @@ const [Grid, gridApi] = useVbenVxeGrid({
 
 ## Props
 
-| Prop | Description | Type |
-| --- | --- | --- |
-| `tableTitle` | table title | `string` |
-| `tableTitleHelp` | help text for the table title | `string` |
-| `class` | class for the outer container | `string` |
-| `gridClass` | class for the `vxe-grid` node | `string` |
-| `gridOptions` | `vxe-grid` options | `DeepPartial<VxeTableGridOptions>` |
-| `gridEvents` | `vxe-grid` event handlers | `DeepPartial<VxeGridListeners>` |
-| `formOptions` | search form options | `VbenFormProps` |
-| `showSearchForm` | whether the search form is visible | `boolean` |
-| `separator` | separator between the search form and table body | `boolean \| SeparatorOptions` |
+| Prop             | Description                                      | Type                               |
+| ---------------- | ------------------------------------------------ | ---------------------------------- |
+| `tableTitle`     | table title                                      | `string`                           |
+| `tableTitleHelp` | help text for the table title                    | `string`                           |
+| `class`          | class for the outer container                    | `string`                           |
+| `gridClass`      | class for the `vxe-grid` node                    | `string`                           |
+| `gridOptions`    | `vxe-grid` options                               | `DeepPartial<VxeTableGridOptions>` |
+| `gridEvents`     | `vxe-grid` event handlers                        | `DeepPartial<VxeGridListeners>`    |
+| `formOptions`    | search form options                              | `VbenFormProps`                    |
+| `showSearchForm` | whether the search form is visible               | `boolean`                          |
+| `separator`      | separator between the search form and table body | `boolean \| SeparatorOptions`      |
 
 ## Slots
 

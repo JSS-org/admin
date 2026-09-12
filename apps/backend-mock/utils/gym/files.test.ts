@@ -15,10 +15,6 @@ it('requires business permission as well as file permission for private document
   fileAccess(actor, file);
   actor.codes = actor.codes.filter((c) => c !== 'measurements:read');
   expect(() => fileAccess(actor, file)).toThrow('权限');
-  expect(() => fileAccess(actor, { ...file, storeId: seedId(2) })).toThrow(
-    '不可访问',
-  );
-  expect(() =>
-    fileAccess(actor, { ...file, category: 'contract' }, true),
-  ).toThrow('权限');
+  expect(() => fileAccess(actor, { ...file, storeId: seedId(2) })).toThrow('不可访问');
+  expect(() => fileAccess(actor, { ...file, category: 'contract' }, true)).toThrow('权限');
 });

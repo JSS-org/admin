@@ -6,13 +6,7 @@ import { computed, ref, useSlots } from 'vue';
 import { VbenTooltip } from '@vben-core/shadcn-ui';
 
 import { Code } from '@lucide/vue';
-import {
-  TabsContent,
-  TabsIndicator,
-  TabsList,
-  TabsRoot,
-  TabsTrigger,
-} from 'reka-ui';
+import { TabsContent, TabsIndicator, TabsList, TabsRoot, TabsTrigger } from 'reka-ui';
 
 defineOptions({
   inheritAttrs: false,
@@ -80,10 +74,7 @@ const toggleOpen = () => {
         >
           <VbenTooltip side="top">
             <template #trigger>
-              <Code
-                class="size-7 cursor-pointer rounded-full p-1.5 hover:bg-accent"
-                @click="toggleOpen"
-              />
+              <Code class="size-7 cursor-pointer rounded-full p-1.5 hover:bg-accent" @click="toggleOpen" />
             </template>
             {{ open ? 'Collapse code' : 'Expand code' }}
           </VbenTooltip>
@@ -94,13 +85,7 @@ const toggleOpen = () => {
       :class="`${open ? 'h-[unset] max-h-[80vh]' : 'h-0'}`"
       class="block overflow-y-scroll bg-(--vp-code-block-bg) transition-all duration-300"
     >
-      <TabsContent
-        v-for="tab in tabs"
-        :key="tab.label"
-        :value="tab.label"
-        as-child
-        class="rounded-xl"
-      >
+      <TabsContent v-for="tab in tabs" :key="tab.label" :value="tab.label" as-child class="rounded-xl">
         <div class="relative rounded-xl text-foreground">
           <component :is="tab.component" class="border-0" />
         </div>

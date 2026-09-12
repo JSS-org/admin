@@ -78,9 +78,7 @@ describe('page.vue', () => {
     expect(content.classes()).toContain('min-h-0');
     expect(content.classes()).toContain('flex-1');
     expect(content.classes()).toContain('overflow-y-auto');
-    expect(content.attributes('style')).toContain(
-      '--page-content-height-offset: 12px',
-    );
+    expect(content.attributes('style')).toContain('--page-content-height-offset: 12px');
     expect(content.attributes('style')).not.toContain('--vben-content-height');
   });
 

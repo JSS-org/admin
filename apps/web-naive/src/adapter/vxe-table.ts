@@ -5,10 +5,7 @@ import type { ComponentPropsMap, ComponentType } from './component';
 
 import { h } from 'vue';
 
-import {
-  setupVbenVxeTable,
-  useVbenVxeGrid as useGrid,
-} from '@vben/plugins/vxe-table';
+import { setupVbenVxeTable, useVbenVxeGrid as useGrid } from '@vben/plugins/vxe-table';
 
 import { NButton, NImage } from 'naive-ui';
 
@@ -57,11 +54,7 @@ setupVbenVxeTable({
     vxeUI.renderer.add('CellLink', {
       renderTableDefault(renderOpts) {
         const { props } = renderOpts;
-        return h(
-          NButton,
-          { size: 'small', type: 'primary', quaternary: true },
-          { default: () => props?.text },
-        );
+        return h(NButton, { size: 'small', type: 'primary', quaternary: true }, { default: () => props?.text });
       },
     });
 
@@ -76,18 +69,7 @@ export const useVbenVxeGrid = <
   TFormValues extends FormValues = FormValues,
   TSubmitValues extends FormValues = TFormValues,
 >(
-  ...rest: Parameters<
-    typeof useGrid<
-      T,
-      ComponentType,
-      ComponentPropsMap,
-      TFormValues,
-      TSubmitValues
-    >
-  >
-) =>
-  useGrid<T, ComponentType, ComponentPropsMap, TFormValues, TSubmitValues>(
-    ...rest,
-  );
+  ...rest: Parameters<typeof useGrid<T, ComponentType, ComponentPropsMap, TFormValues, TSubmitValues>>
+) => useGrid<T, ComponentType, ComponentPropsMap, TFormValues, TSubmitValues>(...rest);
 
 export type * from '@vben/plugins/vxe-table';

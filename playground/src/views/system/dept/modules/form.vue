@@ -15,10 +15,7 @@ import { useSchema } from '../data';
 
 const emit = defineEmits(['success']);
 const formData = ref<SystemDeptApi.SystemDept>();
-type DeptModalData =
-  | null
-  | SystemDeptApi.SystemDept
-  | { pid: SystemDeptApi.SystemDept['pid'] };
+type DeptModalData = null | SystemDeptApi.SystemDept | { pid: SystemDeptApi.SystemDept['pid'] };
 
 const getTitle = computed(() => {
   return formData.value?.id
@@ -44,9 +41,7 @@ const [Modal, modalApi] = useVbenModal<DeptModalData>({
       modalApi.lock();
       const data = await formApi.getValues();
       try {
-        await (formData.value?.id
-          ? updateDept(formData.value.id, data)
-          : createDept(data));
+        await (formData.value?.id ? updateDept(formData.value.id, data) : createDept(data));
         modalApi.close();
         emit('success');
       } finally {

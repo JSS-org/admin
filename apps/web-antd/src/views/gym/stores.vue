@@ -97,15 +97,8 @@ async function upload(file: File) {
   if (!selected.value) return false;
   busy.value = true;
   try {
-    const result = await uploadGymFile(
-      file,
-      file.type.startsWith('video/') ? 'video' : 'image',
-      selected.value.id,
-    );
-    await saveMedia([
-      ...media.value,
-      { ...result, fileId: result.id, isCover: media.value.length === 0 },
-    ]);
+    const result = await uploadGymFile(file, file.type.startsWith('video/') ? 'video' : 'image', selected.value.id);
+    await saveMedia([...media.value, { ...result, fileId: result.id, isCover: media.value.length === 0 }]);
     message.success('已上传');
   } finally {
     busy.value = false;
@@ -135,12 +128,7 @@ async function upload(file: File) {
         <Button type="link" @click="showMedia(row)"> 环境照片/视频 </Button>
       </template>
     </ResourcePage>
-    <AdminDrawer
-      v-model:open="visible"
-      :title="`${selected?.name} 环境媒体`"
-      :footer="null"
-      :width="720"
-    >
+    <AdminDrawer v-model:open="visible" :title="`${selected?.name} 环境媒体`" :footer="null" :width="720">
       <Upload
         v-if="canGym('stores:write')"
         :before-upload="upload"
@@ -160,11 +148,10 @@ async function upload(file: File) {
         ]"
       >
         <template #bodyCell="{ column, record }">
-          <span v-if="column.dataIndex === 'isCover'">{{
-            record.isCover ? '是' : '否'
-          }}</span>
+          <span v-if="column.dataIndex === 'isCover'">{{ record.isCover ? '是' : '否' }}</span>
           <Space v-if="column.dataIndex === '_actions'">
-            <Button type="link" @click="openGymFile(record.fileId)">查看</Button><Button
+            <Button type="link" @click="openGymFile(record.fileId)">查看</Button
+            ><Button
               v-if="canGym('stores:write')"
               type="link"
               @click="
@@ -176,14 +163,12 @@ async function upload(file: File) {
                 )
               "
             >
-              设为封面
-</Button><Button
+              设为封面 </Button
+            ><Button
               v-if="canGym('stores:write')"
               danger
               type="link"
-              @click="
-                saveMedia(media.filter((m) => m.fileId !== record.fileId))
-              "
+              @click="saveMedia(media.filter((m) => m.fileId !== record.fileId))"
             >
               移除
             </Button>

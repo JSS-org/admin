@@ -2,8 +2,7 @@ import { fileContents, find, insert, now, seedId } from './core';
 
 // A visibly marked development PDF, not a legal contract or signed evidence.
 function examplePdf() {
-  const stream =
-    'BT /F1 20 Tf 60 740 Td (MOCK CONTRACT - DEVELOPMENT ONLY) Tj ET';
+  const stream = 'BT /F1 20 Tf 60 740 Td (MOCK CONTRACT - DEVELOPMENT ONLY) Tj ET';
   const objects = [
     '<< /Type /Catalog /Pages 2 0 R >>',
     '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',

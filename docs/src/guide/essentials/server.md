@@ -63,11 +63,9 @@ export default defineConfig(async () => {
 ```ts
 import axios from 'axios';
 
-axios
-  .post('/api/auth/login', { username: 'vben', password: '123456' })
-  .then((res) => {
-    console.log(res);
-  });
+axios.post('/api/auth/login', { username: 'vben', password: '123456' }).then((res) => {
+  console.log(res);
+});
 ```
 
 此时，请求会被代理到 `http://localhost:5320/api/auth/login`。
@@ -126,12 +124,7 @@ type ExtendOptions<T = any> = {
    * - repeat: ids=1&ids=2&ids=3
    * @default 'brackets'
    */
-  paramsSerializer?:
-    | 'brackets'
-    | 'comma'
-    | 'indices'
-    | 'repeat'
-    | AxiosRequestConfig<T>['paramsSerializer'];
+  paramsSerializer?: 'brackets' | 'comma' | 'indices' | 'repeat' | AxiosRequestConfig<T>['paramsSerializer'];
   /**
    * 响应数据的返回方式。
    * - raw: 原始的AxiosResponse，包括headers、status等，不做是否成功请求的检查。
@@ -199,11 +192,7 @@ import type { HttpResponse } from '@vben/request';
 
 import { useAppConfig } from '@vben/hooks';
 import { preferences } from '@vben/preferences';
-import {
-  authenticateResponseInterceptor,
-  errorMessageResponseInterceptor,
-  RequestClient,
-} from '@vben/request';
+import { authenticateResponseInterceptor, errorMessageResponseInterceptor, RequestClient } from '@vben/request';
 import { useAccessStore } from '@vben/stores';
 
 import { message } from 'antdv-next';
@@ -227,10 +216,7 @@ function createRequestClient(baseURL: string) {
     const accessStore = useAccessStore();
     const authStore = useAuthStore();
     accessStore.setAccessToken(null);
-    if (
-      preferences.app.loginExpiredMode === 'modal' &&
-      accessStore.isAccessChecked
-    ) {
+    if (preferences.app.loginExpiredMode === 'modal' && accessStore.isAccessChecked) {
       accessStore.setLoginExpired(true);
     } else {
       await authStore.logout();
@@ -311,10 +297,7 @@ export const baseRequestClient = new RequestClient({ baseURL: apiURL });
 只需要创建多个 `requestClient` 即可，如：
 
 ```ts
-const { apiURL, otherApiURL } = useAppConfig(
-  import.meta.env,
-  import.meta.env.PROD,
-);
+const { apiURL, otherApiURL } = useAppConfig(import.meta.env, import.meta.env.PROD);
 
 export const requestClient = createRequestClient(apiURL);
 

@@ -32,17 +32,17 @@ Read-only preview component for displaying editor content.
 
 ### Props
 
-| Property | Description | Type | Default |
-| --- | --- | --- | --- |
-| `modelValue` (v-model) | Editor content (HTML string) | `string` | `''` |
-| `editable` | Whether the editor is editable | `boolean` | `true` |
-| `toolbar` | Whether to show the toolbar | `boolean` | `true` |
-| `previewable` | Whether to show the preview button | `boolean` | `true` |
-| `placeholder` | Placeholder text | `string` | - |
-| `minHeight` | Minimum height | `number \| string` | `240` |
-| `maxHeight` | Maximum height | `number \| string` | `400` |
-| `extensions` | Custom Tiptap extensions | `Extensions` | - |
-| `imageUpload` | Image upload configuration | `ImageUploadOptions` | - |
+| Property               | Description                        | Type                 | Default |
+| ---------------------- | ---------------------------------- | -------------------- | ------- |
+| `modelValue` (v-model) | Editor content (HTML string)       | `string`             | `''`    |
+| `editable`             | Whether the editor is editable     | `boolean`            | `true`  |
+| `toolbar`              | Whether to show the toolbar        | `boolean`            | `true`  |
+| `previewable`          | Whether to show the preview button | `boolean`            | `true`  |
+| `placeholder`          | Placeholder text                   | `string`             | -       |
+| `minHeight`            | Minimum height                     | `number \| string`   | `240`   |
+| `maxHeight`            | Maximum height                     | `number \| string`   | `400`   |
+| `extensions`           | Custom Tiptap extensions           | `Extensions`         | -       |
+| `imageUpload`          | Image upload configuration         | `ImageUploadOptions` | -       |
 
 ### Events
 
@@ -73,10 +73,7 @@ interface ImageUploadOptions {
   /** Upload error callback, uses alert if not provided */
   onUploadError?: (error: unknown) => void;
   /** Upload function, returns image URL */
-  upload: (
-    file: File,
-    onProgress?: (percent: number) => void,
-  ) => Promise<string>;
+  upload: (file: File, onProgress?: (percent: number) => void) => Promise<string>;
 }
 ```
 

@@ -14,9 +14,7 @@ import { VxeGridApi } from './api';
 import VxeGrid from './use-vxe-grid.vue';
 
 type FilteredSlots<T> = {
-  [
-    K in keyof VxeGridSlots<T> as K extends 'form' ? never : K
-  ]: VxeGridSlots<T>[K];
+  [K in keyof VxeGridSlots<T> as K extends 'form' ? never : K]: VxeGridSlots<T>[K];
 };
 
 export function useVbenVxeGrid<
@@ -28,23 +26,23 @@ export function useVbenVxeGrid<
 >(options: VxeGridProps<T, D, P, TFormValues, TSubmitValues>) {
   // const IS_REACTIVE = isReactive(options);
   const api = new VxeGridApi<T, D, P, TFormValues, TSubmitValues>(options);
-  const extendedApi: ExtendedVxeGridApi<T, D, P, TFormValues, TSubmitValues> =
-    api as ExtendedVxeGridApi<T, D, P, TFormValues, TSubmitValues>;
+  const extendedApi: ExtendedVxeGridApi<T, D, P, TFormValues, TSubmitValues> = api as ExtendedVxeGridApi<
+    T,
+    D,
+    P,
+    TFormValues,
+    TSubmitValues
+  >;
   extendedApi.useStore = (selector) => {
     return useStore(api.store, selector);
   };
 
   const Grid = defineComponent(
-    (
-      props: VxeGridProps<T, D, P, TFormValues, TSubmitValues>,
-      { attrs, slots },
-    ) => {
+    (props: VxeGridProps<T, D, P, TFormValues, TSubmitValues>, { attrs, slots }) => {
       onBeforeUnmount(() => {
         api.unmount();
       });
-      api.setState({ ...props, ...attrs } as Partial<
-        VxeGridProps<T, D, P, TFormValues, TSubmitValues>
-      >);
+      api.setState({ ...props, ...attrs } as Partial<VxeGridProps<T, D, P, TFormValues, TSubmitValues>>);
       return () =>
         h(
           VxeGrid,

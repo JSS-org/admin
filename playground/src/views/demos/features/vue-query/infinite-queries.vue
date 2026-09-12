@@ -6,32 +6,22 @@ import { Button } from 'antdv-next';
 
 const LIMIT = 10;
 const fetchProducts = async ({ pageParam = 0 }): Promise<IProducts> => {
-  const res = await fetch(
-    `https://dummyjson.com/products?limit=${LIMIT}&skip=${pageParam * LIMIT}`,
-  );
+  const res = await fetch(`https://dummyjson.com/products?limit=${LIMIT}&skip=${pageParam * LIMIT}`);
   return res.json();
 };
 
-const {
-  data,
-  error,
-  fetchNextPage,
-  hasNextPage,
-  isError,
-  isFetching,
-  isFetchingNextPage,
-  isPending,
-} = useInfiniteQuery({
-  getNextPageParam: (current, allPages) => {
-    const nextPage = allPages.length + 1;
-    const lastPage = current.skip + current.limit;
-    if (lastPage === current.total) return;
-    return nextPage;
-  },
-  initialPageParam: 0,
-  queryFn: fetchProducts,
-  queryKey: ['products'],
-});
+const { data, error, fetchNextPage, hasNextPage, isError, isFetching, isFetchingNextPage, isPending } =
+  useInfiniteQuery({
+    getNextPageParam: (current, allPages) => {
+      const nextPage = allPages.length + 1;
+      const lastPage = current.skip + current.limit;
+      if (lastPage === current.total) return;
+      return nextPage;
+    },
+    initialPageParam: 0,
+    queryFn: fetchProducts,
+    queryKey: ['products'],
+  });
 </script>
 
 <template>
@@ -45,10 +35,7 @@ const {
           {{ product.title }}
         </li>
       </ul>
-      <Button
-        :disabled="!hasNextPage || isFetchingNextPage"
-        @click="() => fetchNextPage()"
-      >
+      <Button :disabled="!hasNextPage || isFetchingNextPage" @click="() => fetchNextPage()">
         <span v-if="isFetchingNextPage">加载中...</span>
         <span v-else-if="hasNextPage">加载更多</span>
         <span v-else>没有更多了</span>

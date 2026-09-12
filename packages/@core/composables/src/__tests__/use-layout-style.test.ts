@@ -26,10 +26,7 @@ describe('useLayoutContentStyle', () => {
     activeApp = createApp({
       setup() {
         const { contentElement, overlayStyle } = useLayoutContentStyle();
-        return () =>
-          h('main', { ref: contentElement }, [
-            h('div', { style: overlayStyle.value }),
-          ]);
+        return () => h('main', { ref: contentElement }, [h('div', { style: overlayStyle.value })]);
       },
     });
     activeApp.mount(host);

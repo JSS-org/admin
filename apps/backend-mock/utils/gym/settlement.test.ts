@@ -23,9 +23,7 @@ it('masks account data and never fabricates channel bindings', () => {
   });
   expect(account.accountMasked).toBe('****1234');
   expect(account.credentialSecretRef).toBeUndefined();
-  expect(() =>
-    call('hq', 'POST', `/payment-accounts/${account.id}/bindings`),
-  ).toThrow('尚未配置');
+  expect(() => call('hq', 'POST', `/payment-accounts/${account.id}/bindings`)).toThrow('尚未配置');
   expect(() => call('store1', 'GET', '/payment-accounts')).toThrow('权限');
 });
 it('validates ratios, bound accounts, effective overlap and immutable versions', () => {
@@ -45,16 +43,10 @@ it('validates ratios, bound accounts, effective overlap and immutable versions',
   expect(() => call('hq', 'POST', path, data)).toThrow('合计');
   data.items = [{ paymentAccountId: account.id, ratio: '1' }];
   const rule = call('hq', 'POST', path, data);
-  expect(() =>
-    call('hq', 'PATCH', `/settlement-rules/${rule.id}`, { status: 'active' }),
-  ).toThrow('渠道绑定');
+  expect(() => call('hq', 'PATCH', `/settlement-rules/${rule.id}`, { status: 'active' })).toThrow('渠道绑定');
   find('paymentAccounts', account.id).bindingStatus = 'bound';
   call('hq', 'PATCH', `/settlement-rules/${rule.id}`, { status: 'active' });
-  expect(() =>
-    call('hq', 'PATCH', `/settlement-rules/${rule.id}`, { cycleValue: 2 }),
-  ).toThrow('新建版本');
+  expect(() => call('hq', 'PATCH', `/settlement-rules/${rule.id}`, { cycleValue: 2 })).toThrow('新建版本');
   const next = call('hq', 'POST', path, data);
-  expect(() =>
-    call('hq', 'PATCH', `/settlement-rules/${next.id}`, { status: 'active' }),
-  ).toThrow('重叠');
+  expect(() => call('hq', 'PATCH', `/settlement-rules/${next.id}`, { status: 'active' })).toThrow('重叠');
 });

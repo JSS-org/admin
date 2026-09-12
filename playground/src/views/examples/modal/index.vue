@@ -3,14 +3,7 @@ import type { ExplicitModalData } from './typed-data-contract';
 
 import { onBeforeUnmount } from 'vue';
 
-import {
-  alert,
-  clearAllAlerts,
-  confirm,
-  Page,
-  prompt,
-  useVbenModal,
-} from '@vben/common-ui';
+import { alert, clearAllAlerts, confirm, Page, prompt, useVbenModal } from '@vben/common-ui';
 
 import { Button, Card, Flex, message } from 'antdv-next';
 
@@ -65,10 +58,9 @@ const [TypedDataAutoModal, typedDataAutoModalApi] = useVbenModal({
   connectedComponent: TypedDataAutoDemo,
 });
 
-const [TypedDataExplicitModal, typedDataExplicitModalApi] =
-  useVbenModal<ExplicitModalData>({
-    connectedComponent: TypedDataExplicitDemo,
-  });
+const [TypedDataExplicitModal, typedDataExplicitModalApi] = useVbenModal<ExplicitModalData>({
+  connectedComponent: TypedDataExplicitDemo,
+});
 
 const [TypedDataFactoryModal, typedDataFactoryModalApi] = useFactoryModal({
   connectedComponent: TypedDataFactoryDemo,
@@ -257,9 +249,7 @@ async function openPrompt() {
       <Card class="w-75" title="内容高度自适应">
         <p>可根据内容并自动调整高度</p>
         <template #actions>
-          <Button type="primary" @click="openAutoHeightModal">
-            打开弹窗
-          </Button>
+          <Button type="primary" @click="openAutoHeightModal"> 打开弹窗 </Button>
         </template>
       </Card>
 
@@ -276,18 +266,14 @@ async function openPrompt() {
           <Button type="link" @click="openDynamicModal">打开弹窗</Button>
         </template>
         <template #actions>
-          <Button type="primary" @click="handleUpdateTitle">
-            外部修改标题并打开
-          </Button>
+          <Button type="primary" @click="handleUpdateTitle"> 外部修改标题并打开 </Button>
         </template>
       </Card>
 
       <Card class="w-75" title="内外数据共享示例">
         <p>通过共享 sharedData 来进行数据交互</p>
         <template #actions>
-          <Button type="primary" @click="openSharedModal">
-            打开弹窗并传递数据
-          </Button>
+          <Button type="primary" @click="openSharedModal"> 打开弹窗并传递数据 </Button>
         </template>
       </Card>
 
@@ -301,27 +287,21 @@ async function openPrompt() {
       <Card class="w-75" title="共享数据：自动推导">
         <p>子组件 expose API，父组件从 connected component 推导类型</p>
         <template #actions>
-          <Button type="primary" @click="openTypedDataAutoModal">
-            打开自动推导示例
-          </Button>
+          <Button type="primary" @click="openTypedDataAutoModal"> 打开自动推导示例 </Button>
         </template>
       </Card>
 
       <Card class="w-75" title="共享数据：显式泛型">
         <p>无法自动推导时，父子组件显式引用同一个数据类型</p>
         <template #actions>
-          <Button type="primary" @click="openTypedDataExplicitModal">
-            打开显式泛型示例
-          </Button>
+          <Button type="primary" @click="openTypedDataExplicitModal"> 打开显式泛型示例 </Button>
         </template>
       </Card>
 
       <Card class="w-75" title="共享数据：契约工厂">
         <p>通过 createVbenModal 预绑定类型并复用 typed composable</p>
         <template #actions>
-          <Button type="primary" @click="openTypedDataFactoryModal">
-            打开契约工厂示例
-          </Button>
+          <Button type="primary" @click="openTypedDataFactoryModal"> 打开契约工厂示例 </Button>
         </template>
       </Card>
 

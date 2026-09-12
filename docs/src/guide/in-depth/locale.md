@@ -128,10 +128,7 @@ const items = computed(() => [{ title: $t('demos.title') }]);
   ```ts
   import { setSupportLanguages, SUPPORT_LANGUAGES } from '@vben/constants';
 
-  setSupportLanguages([
-    ...SUPPORT_LANGUAGES,
-    { label: '繁體中文', value: 'zh-TW' },
-  ]);
+  setSupportLanguages([...SUPPORT_LANGUAGES, { label: '繁體中文', value: 'zh-TW' }]);
   ```
 
 - 如果应用使用了 dayjs、组件库等第三方库，在 `src/locales/index.ts` 的语言加载逻辑中补充对应的语言包分支。

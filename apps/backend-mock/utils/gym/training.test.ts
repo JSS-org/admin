@@ -7,13 +7,7 @@ import { find, insert, seedId } from './core';
 import { reset } from './state';
 import { training } from './training';
 
-function request(
-  method: string,
-  path: string,
-  body = {},
-  username = 'store1',
-  query = {},
-) {
+function request(method: string, path: string, body = {}, username = 'store1', query = {}) {
   const actor = authenticate(login(username, '123456').accessToken);
   return training({ actor, method, path, body, query } as Request);
 }
@@ -36,9 +30,7 @@ describe('training management', () => {
     expect(() => request('POST', '/bookings', next)).toThrow('名额已满');
     request('PATCH', `/bookings/${result.id}`, { status: 'cancelled' });
     expect(request('POST', '/bookings', next).status).toBe('confirmed');
-    expect(() =>
-      request('PATCH', `/bookings/${seedId(361)}`, { status: 'cancelled' }),
-    ).toThrow('待上课');
+    expect(() => request('PATCH', `/bookings/${seedId(361)}`, { status: 'cancelled' })).toThrow('待上课');
   });
   it('reserves course rights and cancellation releases exactly once', () => {
     const pack = insert('memberCoursePacks', {
@@ -66,22 +58,12 @@ describe('training management', () => {
       status: 'cancelled',
     });
     expect(pack.reservedSessions).toBe(0);
-    expect(() =>
-      request('PATCH', `/bookings/${result.id}`, { status: 'cancelled' }),
-    ).toThrow('待上课');
+    expect(() => request('PATCH', `/bookings/${result.id}`, { status: 'cancelled' })).toThrow('待上课');
     expect(pack.reservedSessions).toBe(0);
   });
   it('rejects conflicting scheduling and foreign store references', () => {
     const session = find('courseSessions', seedId(341));
-    const {
-      storeId,
-      courseProductId,
-      coachId,
-      startsAt,
-      endsAt,
-      capacity,
-      room,
-    } = session;
+    const { storeId, courseProductId, coachId, startsAt, endsAt, capacity, room } = session;
     expect(() =>
       request('POST', '/course-sessions', {
         storeId,
@@ -93,9 +75,7 @@ describe('training management', () => {
         room,
       }),
     ).toThrow('已有排课');
-    expect(() => request('GET', `/course-sessions/${seedId(342)}`)).toThrow(
-      '不可访问',
-    );
+    expect(() => request('GET', `/course-sessions/${seedId(342)}`)).toThrow('不可访问');
     expect(() =>
       request('POST', '/bookings', {
         ...booking,
@@ -113,14 +93,10 @@ describe('training management', () => {
       measuredAt: new Date().toISOString(),
       weightKg: '70.500',
     };
-    expect(() =>
-      request('POST', '/body-measurements', { ...body, bodyFatPercent: '101' }),
-    ).toThrow('超出范围');
+    expect(() => request('POST', '/body-measurements', { ...body, bodyFatPercent: '101' })).toThrow('超出范围');
     const result = request('POST', '/body-measurements', body);
     request('PATCH', `/body-measurements/${result.id}`, { note: '已复查' });
-    expect(request('GET', `/body-measurements/${result.id}`).note).toBe(
-      '已复查',
-    );
+    expect(request('GET', `/body-measurements/${result.id}`).note).toBe('已复查');
     expect(() =>
       request('PATCH', `/body-measurements/${result.id}`, {
         memberId: seedId(102),

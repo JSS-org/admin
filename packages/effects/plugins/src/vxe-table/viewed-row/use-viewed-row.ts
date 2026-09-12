@@ -1,21 +1,13 @@
 /* oxlint-disable unicorn/no-nested-ternary */
 import type { VxeGridProps as VxeTableGridProps } from 'vxe-table';
 
-import type {
-  ViewedRowOptions,
-  ViewedRowPersistOptions,
-  ViewedRowStorageAdapter,
-} from './types';
+import type { ViewedRowOptions, ViewedRowPersistOptions, ViewedRowStorageAdapter } from './types';
 
 import { isRef, shallowRef, toRaw, triggerRef, watch } from 'vue';
 
 import { isBoolean, isFunction } from '@vben/utils';
 
-import {
-  IndexedDBDriver,
-  LocalStorageDriver,
-  StorageManager,
-} from '@vben-core/shared/cache';
+import { IndexedDBDriver, LocalStorageDriver, StorageManager } from '@vben-core/shared/cache';
 
 import { useDebounceFn } from '@vueuse/core';
 
@@ -103,9 +95,7 @@ function createIndexedDBAdapter(
         // 只写入新增的 key，不覆盖已有记录的过期时间
         const toAdd = keys.filter((key) => !existingKeySet.has(String(key)));
         if (toAdd.length > 0) {
-          await Promise.all(
-            toAdd.map((key) => manager.setItem(String(key), key, opts.ttl)),
-          );
+          await Promise.all(toAdd.map((key) => manager.setItem(String(key), key, opts.ttl)));
         }
 
         // 清理不在新集合中的旧 key
@@ -123,9 +113,7 @@ function createIndexedDBAdapter(
 /**
  * 根据 persist 配置创建存储适配器
  */
-function createStorageAdapter(
-  persist?: string | ViewedRowPersistOptions,
-): null | ViewedRowStorageAdapter {
+function createStorageAdapter(persist?: string | ViewedRowPersistOptions): null | ViewedRowStorageAdapter {
   if (!persist) return null;
 
   // 简写模式：string → localStorage
@@ -148,11 +136,7 @@ function createStorageAdapter(
       return null;
     }
     case 'sessionStorage': {
-      return createWebStorageAdapter(
-        'sessionStorage',
-        persist.key,
-        persist.ttl,
-      );
+      return createWebStorageAdapter('sessionStorage', persist.key, persist.ttl);
     }
     default: {
       return null;
@@ -179,9 +163,7 @@ function enforceMaxSize(set: Set<number | string>, maxSize: number): void {
 
 // ========== 核心 composable ==========
 
-export function useViewedRow<T = any>(
-  options: ViewedRowOptions<T> & { keyField: string },
-) {
+export function useViewedRow<T = any>(options: ViewedRowOptions<T> & { keyField: string }) {
   // ========== 解析持久化配置 ==========
   const persistOpts: null | ViewedRowPersistOptions = options.persist
     ? typeof options.persist === 'string'
@@ -228,9 +210,7 @@ export function useViewedRow<T = any>(
   // 先恢复存储，再合并外部 viewedKeys，确保 viewedKeys 是最新插入的（最后被淘汰）
   restoreFromStorage().then(() => {
     if (options.viewedKeys) {
-      const keys = isRef(options.viewedKeys)
-        ? options.viewedKeys.value
-        : options.viewedKeys;
+      const keys = isRef(options.viewedKeys) ? options.viewedKeys.value : options.viewedKeys;
       updateViewedSet((set) => {
         let changed = false;
         for (const key of keys) {
@@ -275,9 +255,7 @@ export function useViewedRow<T = any>(
 
   // ========== 标记已读 ==========
   function markAsViewed(record: T) {
-    const key = (record as Record<string, any>)[options.keyField] as
-      | number
-      | string;
+    const key = (record as Record<string, any>)[options.keyField] as number | string;
     if (key === null || key === undefined) return;
 
     updateViewedSet((set) => {
@@ -302,9 +280,7 @@ export function useViewedRow<T = any>(
 
   // ========== 查询 ==========
   function isViewed(record: T): boolean {
-    const key = (record as Record<string, any>)[options.keyField] as
-      | number
-      | string;
+    const key = (record as Record<string, any>)[options.keyField] as number | string;
     return viewedSet.value.has(key);
   }
 
@@ -408,11 +384,7 @@ function mergeClassNames(...classNames: any[]): string {
  * 包装 columns，拦截 CellOperation 的 onClick，根据 actionCodes 自动标记已读
  * 注意：columns 每次都是 cloneDeep 后的新对象，不存在重复包装问题
  */
-function wrapColumnsForViewedRow(
-  columns: any[],
-  actionCodes: string[],
-  markAsViewed: (record: any) => void,
-): any[] {
+function wrapColumnsForViewedRow(columns: any[], actionCodes: string[], markAsViewed: (record: any) => void): any[] {
   return columns.map((column) => {
     if (!column || typeof column !== 'object') return column;
 
@@ -435,11 +407,7 @@ function wrapColumnsForViewedRow(
     }
 
     if (Array.isArray(nextColumn.children)) {
-      nextColumn.children = wrapColumnsForViewedRow(
-        nextColumn.children,
-        actionCodes,
-        markAsViewed,
-      );
+      nextColumn.children = wrapColumnsForViewedRow(nextColumn.children, actionCodes, markAsViewed);
     }
 
     return nextColumn;
@@ -456,22 +424,14 @@ export function applyViewedRowOptions(
   helper: ReturnType<typeof useViewedRow>,
 ) {
   // 从最新的配置中读取 rowClassName 和 rowStyle（支持运行时修改）
-  const viewedRowClassName = isBoolean(viewedRowConfig)
-    ? undefined
-    : viewedRowConfig.rowClassName;
-  const viewedRowStyle = isBoolean(viewedRowConfig)
-    ? undefined
-    : viewedRowConfig.rowStyle;
+  const viewedRowClassName = isBoolean(viewedRowConfig) ? undefined : viewedRowConfig.rowClassName;
+  const viewedRowStyle = isBoolean(viewedRowConfig) ? undefined : viewedRowConfig.rowStyle;
 
   // 注入 rowClassName
   const originalRowClassName = mergedOptions.rowClassName;
   mergedOptions.rowClassName = (params: any) => {
     if (!helper.isViewed(params.row)) {
-      return normalizeClassName(
-        isFunction(originalRowClassName)
-          ? originalRowClassName(params)
-          : originalRowClassName,
-      );
+      return normalizeClassName(isFunction(originalRowClassName) ? originalRowClassName(params) : originalRowClassName);
     }
 
     let viewedClass: string;
@@ -486,9 +446,7 @@ export function applyViewedRowOptions(
     }
 
     return mergeClassNames(
-      isFunction(originalRowClassName)
-        ? originalRowClassName(params)
-        : originalRowClassName,
+      isFunction(originalRowClassName) ? originalRowClassName(params) : originalRowClassName,
       viewedClass,
     );
   };
@@ -496,9 +454,7 @@ export function applyViewedRowOptions(
   // 注入 rowStyle
   const originalRowStyle = mergedOptions.rowStyle;
   mergedOptions.rowStyle = (params: any) => {
-    const originalStyle = isFunction(originalRowStyle)
-      ? originalRowStyle(params)
-      : originalRowStyle;
+    const originalStyle = isFunction(originalRowStyle) ? originalRowStyle(params) : originalRowStyle;
 
     if (!helper.isViewed(params.row)) {
       return originalStyle || undefined;
@@ -528,10 +484,6 @@ export function applyViewedRowOptions(
       : [];
 
   if (actionCodes.length > 0 && Array.isArray(mergedOptions.columns)) {
-    mergedOptions.columns = wrapColumnsForViewedRow(
-      mergedOptions.columns,
-      actionCodes,
-      helper.markAsViewed,
-    );
+    mergedOptions.columns = wrapColumnsForViewedRow(mergedOptions.columns, actionCodes, helper.markAsViewed);
   }
 }

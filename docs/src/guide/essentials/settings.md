@@ -140,14 +140,9 @@ const { apiURL } = useAppConfig(import.meta.env, import.meta.env.PROD);
 - 在 `packages/effects/hooks/src/use-app-config.ts` 中，新增对应的配置项，如：
 
   ```ts
-  export function useAppConfig(
-    env: Record<string, any>,
-    isProduction: boolean,
-  ): ApplicationConfig {
+  export function useAppConfig(env: Record<string, any>, isProduction: boolean): ApplicationConfig {
     // 生产环境下，直接使用 window._VBEN_ADMIN_PRO_APP_CONF_ 全局变量
-    const config = isProduction
-      ? window._VBEN_ADMIN_PRO_APP_CONF_
-      : (env as VbenAdminProAppConfigRaw);
+    const config = isProduction ? window._VBEN_ADMIN_PRO_APP_CONF_ : (env as VbenAdminProAppConfigRaw);
 
     const { VITE_GLOB_API_URL, VITE_GLOB_OTHER_API_URL } = config; // [!code ++]
 
@@ -199,10 +194,7 @@ export const overridesPreferences = defineOverridesPreferences({
 #### 1. 在应用的 `src/preferences.ts` 中定义扩展
 
 ```ts
-import {
-  defineOverridesPreferences,
-  definePreferencesExtension,
-} from '@vben/preferences';
+import { defineOverridesPreferences, definePreferencesExtension } from '@vben/preferences';
 
 interface ProjectPreferencesExtension {
   defaultTableSize: number;
@@ -217,54 +209,53 @@ export const overridesPreferences = defineOverridesPreferences({
   },
 });
 
-export const preferencesExtension =
-  definePreferencesExtension<ProjectPreferencesExtension>({
-    tabLabel: 'preferences.antd.tabLabel',
-    title: 'preferences.antd.title',
-    fields: [
-      {
-        component: 'switch',
-        defaultValue: true,
-        key: 'enableFormFullscreen',
-        label: 'preferences.antd.fields.enableFormFullscreen.label',
-        tip: 'preferences.antd.fields.enableFormFullscreen.tip',
-      },
-      {
-        component: 'select',
-        defaultValue: 'single',
-        key: 'tenantMode',
-        label: 'preferences.antd.fields.tenantMode.label',
-        options: [
-          {
-            label: 'preferences.antd.fields.tenantMode.options.single.label',
-            value: 'single',
-          },
-          {
-            label: 'preferences.antd.fields.tenantMode.options.multi.label',
-            value: 'multi',
-          },
-        ],
-      },
-      {
-        component: 'number',
-        componentProps: {
-          max: 200,
-          min: 10,
-          step: 10,
+export const preferencesExtension = definePreferencesExtension<ProjectPreferencesExtension>({
+  tabLabel: 'preferences.antd.tabLabel',
+  title: 'preferences.antd.title',
+  fields: [
+    {
+      component: 'switch',
+      defaultValue: true,
+      key: 'enableFormFullscreen',
+      label: 'preferences.antd.fields.enableFormFullscreen.label',
+      tip: 'preferences.antd.fields.enableFormFullscreen.tip',
+    },
+    {
+      component: 'select',
+      defaultValue: 'single',
+      key: 'tenantMode',
+      label: 'preferences.antd.fields.tenantMode.label',
+      options: [
+        {
+          label: 'preferences.antd.fields.tenantMode.options.single.label',
+          value: 'single',
         },
-        defaultValue: 20,
-        key: 'defaultTableSize',
-        label: 'preferences.antd.fields.defaultTableSize.label',
+        {
+          label: 'preferences.antd.fields.tenantMode.options.multi.label',
+          value: 'multi',
+        },
+      ],
+    },
+    {
+      component: 'number',
+      componentProps: {
+        max: 200,
+        min: 10,
+        step: 10,
       },
-      {
-        component: 'input',
-        defaultValue: '',
-        key: 'reportTitle',
-        label: 'preferences.antd.fields.reportTitle.label',
-        placeholder: 'preferences.antd.fields.reportTitle.placeholder',
-      },
-    ],
-  });
+      defaultValue: 20,
+      key: 'defaultTableSize',
+      label: 'preferences.antd.fields.defaultTableSize.label',
+    },
+    {
+      component: 'input',
+      defaultValue: '',
+      key: 'reportTitle',
+      label: 'preferences.antd.fields.reportTitle.label',
+      placeholder: 'preferences.antd.fields.reportTitle.placeholder',
+    },
+  ],
+});
 ```
 
 - `tabLabel` 是标签名称，`title` 是该标签页标题；如果不传 `title`，会回退使用 `tabLabel`。
@@ -290,11 +281,7 @@ await initPreferences({
 #### 3. 在业务页面中读取或更新扩展偏好
 
 ```ts
-import {
-  getCustomPreferences,
-  updateCustomPreferences,
-  usePreferences,
-} from '@vben/preferences';
+import { getCustomPreferences, updateCustomPreferences, usePreferences } from '@vben/preferences';
 
 interface ProjectPreferencesExtension {
   defaultTableSize: number;
@@ -362,8 +349,7 @@ const defaultPreferences: Preferences = {
     contentPaddingLeft: 0,
     contentPaddingRight: 0,
     contentPaddingTop: 0,
-    defaultAvatar:
-      'https://unpkg.com/@vbenjs/static-source@0.1.7/source/avatar-v1.webp',
+    defaultAvatar: 'https://unpkg.com/@vbenjs/static-source@0.1.7/source/avatar-v1.webp',
     defaultHomePath: '/dashboard/analytics',
     dynamicTitle: true,
     enableCheckUpdates: true,

@@ -5,17 +5,7 @@ import type { GymRow } from '#/api/gym';
 
 import { computed, ref } from 'vue';
 
-import {
-  Alert,
-  Button,
-  Form,
-  FormItem,
-  Input,
-  InputNumber,
-  message,
-  Select,
-  Table,
-} from 'ant-design-vue';
+import { Alert, Button, Form, FormItem, Input, InputNumber, message, Select, Table } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 
@@ -23,24 +13,15 @@ import AdminDrawer from './components/admin-drawer.vue';
 import ResourcePage from './components/resource-page.vue';
 
 const props = defineProps<{ resource: string }>();
-const f = (
-  key: string,
-  label: string,
-  type: Field['type'] = 'text',
-  extra: Partial<Field> = {},
-): Field => ({ key, label, type, ...extra });
-const source = (
-  key: string,
-  label: string,
-  source: string,
-  required = false,
-): Field => f(key, label, 'select', { source, required });
-const choices = (
-  key: string,
-  label: string,
-  values: string[][],
-  value?: string,
-): Field =>
+const f = (key: string, label: string, type: Field['type'] = 'text', extra: Partial<Field> = {}): Field => ({
+  key,
+  label,
+  type,
+  ...extra,
+});
+const source = (key: string, label: string, source: string, required = false): Field =>
+  f(key, label, 'select', { source, required });
+const choices = (key: string, label: string, values: string[][], value?: string): Field =>
   f(key, label, 'select', {
     options: values.map(([label = '', value = '']) => ({ label, value })),
     default: value,
@@ -299,9 +280,7 @@ const config = computed(() => {
       ...value,
       fields: value.fields.map((field) => ({
         ...field,
-        immutable: ['cardTemplateId', 'courseProductId', 'kind'].includes(
-          field.key,
-        ),
+        immutable: ['cardTemplateId', 'courseProductId', 'kind'].includes(field.key),
       })),
     };
   return value;
@@ -310,10 +289,7 @@ function prepare(values: Record<string, any>) {
   const data = { ...values };
   for (const key of ['startsAt', 'expiresAt', 'effectiveFrom', 'effectiveTo'])
     if (data[key]) data[key] = new Date(data[key]).toISOString();
-  if (
-    props.resource === 'gift-code-batches' ||
-    props.resource === 'point-products'
-  ) {
+  if (props.resource === 'gift-code-batches' || props.resource === 'point-products') {
     const kind = data.rewardType ?? data.kind;
     for (const key of ['cardTemplateId', 'courseProductId', 'pointAmount'])
       if (
@@ -342,9 +318,7 @@ function initial(row: GymRow) {
   for (const key of ['startsAt', 'expiresAt', 'effectiveFrom', 'effectiveTo'])
     if (data[key]) {
       const time = new Date(data[key]);
-      data[key] = new Date(time.getTime() - time.getTimezoneOffset() * 60_000)
-        .toISOString()
-        .slice(0, 16);
+      data[key] = new Date(time.getTime() - time.getTimezoneOffset() * 60_000).toISOString().slice(0, 16);
     }
   return data;
 }
@@ -392,10 +366,8 @@ async function start() {
   subject.value = '';
   content.value = '';
   stores.value = await all('stores');
-  if (props.resource !== 'message-batches')
-    templates.value = await all('coupon-templates');
-  if (props.resource !== 'coupon-quota-batches')
-    members.value = await all('members');
+  if (props.resource !== 'message-batches') templates.value = await all('coupon-templates');
+  if (props.resource !== 'coupon-quota-batches') members.value = await all('members');
   visible.value = true;
 }
 async function details(row: GymRow) {
@@ -417,9 +389,7 @@ function saved(row: GymRow) {
   }
 }
 function downloadCodes() {
-  const url = URL.createObjectURL(
-    new Blob([codes.value.join('\n')], { type: 'text/plain;charset=utf-8' }),
-  );
+  const url = URL.createObjectURL(new Blob([codes.value.join('\n')], { type: 'text/plain;charset=utf-8' }));
   const link = document.createElement('a');
   link.href = url;
   link.download = 'gift-codes.txt';
@@ -435,16 +405,12 @@ async function submit() {
         templateId: templateId.value,
         targetMode: targetMode.value,
         quantityPerStore: quantity.value,
-        ...(targetMode.value === 'selected'
-          ? { storeIds: storeIds.value }
-          : {}),
+        ...(targetMode.value === 'selected' ? { storeIds: storeIds.value } : {}),
       };
     else if (props.resource === 'coupon-batches')
       data = {
         templateId: templateId.value,
-        targets: targets.value.flatMap((t) =>
-          t.memberIds.map((memberId) => ({ memberId, storeId: t.storeId })),
-        ),
+        targets: targets.value.flatMap((t) => t.memberIds.map((memberId) => ({ memberId, storeId: t.storeId }))),
       };
     else {
       const target = targets.value[0];
@@ -515,41 +481,17 @@ async function newVersion(row: GymRow) {
       @saved="saved"
     >
       <template v-if="canCreateBatch && canGym(canCreateBatch)" #toolbar>
-        <Button
-          v-if="canCreateBatch && canGym(canCreateBatch)"
-          type="primary"
-          @click="start"
-        >
-          {{
-            resource === 'coupon-quota-batches'
-              ? '批量分配门店额度'
-              : '创建批次'
-          }}
+        <Button v-if="canCreateBatch && canGym(canCreateBatch)" type="primary" @click="start">
+          {{ resource === 'coupon-quota-batches' ? '批量分配门店额度' : '创建批次' }}
         </Button>
       </template>
-      <template
-        v-if="
-          resource.endsWith('batches') || (config.code && canGym(config.code))
-        "
-        #actions="{ row, reload }"
-      >
-        <Button
-          v-if="resource.endsWith('batches')"
-          type="link"
-          @click="details(row)"
-        >
-          逐项结果
-</Button><Button
-          v-if="resource === 'point-rules' && canGym('points:manage')"
-          type="link"
-          @click="newVersion(row)"
-        >
-          新版本
-</Button><Button
+      <template v-if="resource.endsWith('batches') || (config.code && canGym(config.code))" #actions="{ row, reload }">
+        <Button v-if="resource.endsWith('batches')" type="link" @click="details(row)"> 逐项结果 </Button
+        ><Button v-if="resource === 'point-rules' && canGym('points:manage')" type="link" @click="newVersion(row)">
+          新版本 </Button
+        ><Button
           v-if="
-            ['point-rules', 'point-products', 'coupon-templates'].includes(
-              resource,
-            ) &&
+            ['point-rules', 'point-products', 'coupon-templates'].includes(resource) &&
             config.code &&
             canGym(config.code)
           "
@@ -569,23 +511,14 @@ async function newVersion(row: GymRow) {
     </ResourcePage>
     <AdminDrawer
       v-model:open="visible"
-      :title="
-        mode === 'create'
-          ? '批量操作'
-          : mode === 'codes'
-            ? '礼品码（仅本次显示）'
-            : '批次结果'
-      "
+      :title="mode === 'create' ? '批量操作' : mode === 'codes' ? '礼品码（仅本次显示）' : '批次结果'"
       :width="900"
       :footer="mode === 'create' ? undefined : null"
       :confirm-loading="busy"
       @ok="submit"
     >
       <template v-if="mode === 'codes'">
-        <Alert
-          type="warning"
-          message="请现在下载或保存，关闭后仅可查询掩码，无法再次读取完整礼品码。"
-        /><Input.TextArea
+        <Alert type="warning" message="请现在下载或保存，关闭后仅可查询掩码，无法再次读取完整礼品码。" /><Input.TextArea
           :value="codes.join('\n')"
           :rows="12"
           readonly
@@ -594,10 +527,7 @@ async function newVersion(row: GymRow) {
       </template>
       <Form v-else-if="mode === 'create'" layout="vertical">
         <FormItem v-if="resource !== 'message-batches'" label="优惠券模板">
-          <Select
-            v-model:value="templateId"
-            :options="templates.map((t) => ({ label: t.name, value: t.id }))"
-          />
+          <Select v-model:value="templateId" :options="templates.map((t) => ({ label: t.name, value: t.id }))" />
         </FormItem>
         <template v-if="resource === 'coupon-quota-batches'">
           <FormItem label="分配范围">
@@ -607,23 +537,16 @@ async function newVersion(row: GymRow) {
                 { label: '所有启用且适用的门店', value: 'allEligible' },
                 { label: '指定门店', value: 'selected' },
               ]"
-            />
-</FormItem><FormItem v-if="targetMode === 'selected'" label="目标门店">
+            /> </FormItem
+          ><FormItem v-if="targetMode === 'selected'" label="目标门店">
             <Select
               v-model:value="storeIds"
               mode="multiple"
               :options="stores.map((s) => ({ label: s.name, value: s.id }))"
-            />
-</FormItem><FormItem label="每店追加可发张数">
-            <InputNumber
-              v-model:value="quantity"
-              :min="1"
-              :max="1000000"
-            />
-</FormItem><Alert
-            type="info"
-            message="本操作只分配门店发券额度；实际发给会员时才消耗额度。"
-          />
+            /> </FormItem
+          ><FormItem label="每店追加可发张数">
+            <InputNumber v-model:value="quantity" :min="1" :max="1000000" /> </FormItem
+          ><Alert type="info" message="本操作只分配门店发券额度；实际发给会员时才消耗额度。" />
         </template>
         <template v-else>
           <div v-for="(target, index) in targets" :key="index">
@@ -632,8 +555,8 @@ async function newVersion(row: GymRow) {
                 v-model:value="target.storeId"
                 :options="stores.map((s) => ({ label: s.name, value: s.id }))"
                 @change="target.memberIds = []"
-              />
-</FormItem><FormItem label="本店会员">
+              /> </FormItem
+            ><FormItem label="本店会员">
               <Select
                 v-model:value="target.memberIds"
                 mode="multiple"
@@ -647,20 +570,10 @@ async function newVersion(row: GymRow) {
                       value: m.id,
                     }))
                 "
-              />
-</FormItem><Button
-              v-if="targets.length > 1"
-              @click="targets.splice(index, 1)"
-            >
-              移除此门店
-            </Button>
+              /> </FormItem
+            ><Button v-if="targets.length > 1" @click="targets.splice(index, 1)"> 移除此门店 </Button>
           </div>
-          <Button
-            v-if="resource === 'coupon-batches'"
-            @click="targets.push({ memberIds: [] })"
-          >
-            增加发行门店
-          </Button>
+          <Button v-if="resource === 'coupon-batches'" @click="targets.push({ memberIds: [] })"> 增加发行门店 </Button>
         </template>
         <template v-if="resource === 'message-batches'">
           <FormItem label="消息类型">
@@ -670,8 +583,8 @@ async function newVersion(row: GymRow) {
                 { label: '私信（一位会员）', value: 'private' },
                 { label: '批量通知', value: 'bulk' },
               ]"
-            />
-</FormItem><FormItem label="发送渠道">
+            /> </FormItem
+          ><FormItem label="发送渠道">
             <Select
               v-model:value="channel"
               :options="[
@@ -679,21 +592,14 @@ async function newVersion(row: GymRow) {
                 { label: 'App', value: 'app' },
                 { label: '短信', value: 'sms' },
               ]"
-            />
-</FormItem><FormItem label="标题"><Input v-model:value="subject" /></FormItem><FormItem label="内容">
-            <Input.TextArea v-model:value="content" :rows="4" />
-</FormItem><Alert
-            type="info"
-            message="未配置真实渠道的消息会记录发送失败，不会发送到会员。"
-          />
+            /> </FormItem
+          ><FormItem label="标题"><Input v-model:value="subject" /></FormItem
+          ><FormItem label="内容"> <Input.TextArea v-model:value="content" :rows="4" /> </FormItem
+          ><Alert type="info" message="未配置真实渠道的消息会记录发送失败，不会发送到会员。" />
         </template>
       </Form>
       <template v-else>
-        <Alert
-          type="info"
-          :message="`批次状态：${current?.status ?? '—'}`"
-          class="mb-3"
-        /><Table
+        <Alert type="info" :message="`批次状态：${current?.status ?? '—'}`" class="mb-3" /><Table
           :data-source="items"
           row-key="id"
           :columns="[

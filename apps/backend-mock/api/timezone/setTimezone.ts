@@ -1,11 +1,7 @@
 import { eventHandler, readBody, setResponseStatus } from 'h3';
 import { verifyAccessToken } from '~/utils/jwt-utils';
 import { TIME_ZONE_OPTIONS } from '~/utils/mock-data';
-import {
-  unAuthorizedResponse,
-  useResponseError,
-  useResponseSuccess,
-} from '~/utils/response';
+import { unAuthorizedResponse, useResponseError, useResponseSuccess } from '~/utils/response';
 import { setTimezone } from '~/utils/timezone-utils';
 
 export default eventHandler(async (event) => {
@@ -14,8 +10,7 @@ export default eventHandler(async (event) => {
     return unAuthorizedResponse(event);
   }
   const body = await readBody<{ timezone?: unknown }>(event);
-  const timezone =
-    typeof body?.timezone === 'string' ? body.timezone : undefined;
+  const timezone = typeof body?.timezone === 'string' ? body.timezone : undefined;
   const allowed = TIME_ZONE_OPTIONS.some((o) => o.timezone === timezone);
   if (!timezone || !allowed) {
     setResponseStatus(event, 400);

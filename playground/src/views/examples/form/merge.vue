@@ -80,9 +80,7 @@ const [SecondForm, secondFormApi] = useVbenForm({
 const stepsItems: StepItem[] = [{ title: '表单1' }, { title: '表单2' }];
 const needMerge = ref(true);
 async function handleMergeSubmit() {
-  const values = await firstFormApi
-    .merge(secondFormApi)
-    .submitAllForm(needMerge.value);
+  const values = await firstFormApi.merge(secondFormApi).submitAllForm(needMerge.value);
   message.success({
     content: `merged form values: ${JSON.stringify(values)}`,
   });

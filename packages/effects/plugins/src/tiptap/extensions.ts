@@ -20,10 +20,7 @@ import StarterKit from '@tiptap/starter-kit';
 
 const DEFAULT_ACCEPT = 'image/*';
 
-function validateFile(
-  file: File,
-  options: ImageUploadOptions,
-): string | undefined {
+function validateFile(file: File, options: ImageUploadOptions): string | undefined {
   if (options.maxSize !== undefined && file.size > options.maxSize) {
     return $t('ui.tiptap.upload.fileTooLarge');
   }
@@ -58,11 +55,7 @@ function findPlaceholderPos(doc: ProseMirrorNode, blobUrl: string): number {
   let found = -1;
   doc.descendants((node: ProseMirrorNode, offset: number) => {
     if (found !== -1) return false;
-    if (
-      node.type.name === 'image' &&
-      node.attrs.src === blobUrl &&
-      node.attrs['data-uploading'] === 'true'
-    ) {
+    if (node.type.name === 'image' && node.attrs.src === blobUrl && node.attrs['data-uploading'] === 'true') {
       found = offset;
       return false;
     }
@@ -175,10 +168,7 @@ function createUploadProcess(
   return uploadContext;
 }
 
-function createCustomImage(
-  imageUpload: ImageUploadOptions,
-  blobUrlTracker?: Set<string>,
-) {
+function createCustomImage(imageUpload: ImageUploadOptions, blobUrlTracker?: Set<string>) {
   return Image.extend({
     addAttributes() {
       return {
@@ -249,11 +239,7 @@ function createCustomImage(
             }
 
             const newProgress = updatedNode.attrs['data-upload-progress'];
-            if (
-              newProgress !== null &&
-              newProgress !== undefined &&
-              newProgress > 0
-            ) {
+            if (newProgress !== null && newProgress !== undefined && newProgress > 0) {
               spinner.style.display = 'none';
               progressBar.style.display = '';
               progressFill.style.width = `${newProgress}%`;
@@ -310,9 +296,7 @@ function createCustomImage(
             handleDrop: (view: EditorView, event: DragEvent) => {
               if (!event.dataTransfer?.files.length) return false;
 
-              const imageFiles = [...event.dataTransfer.files].filter((f) =>
-                f.type.startsWith('image/'),
-              );
+              const imageFiles = [...event.dataTransfer.files].filter((f) => f.type.startsWith('image/'));
               if (imageFiles.length === 0) return false;
 
               event.preventDefault();
@@ -321,10 +305,7 @@ function createCustomImage(
               const file = imageFiles[0];
               if (!file) return false;
               if (imageFiles.length > 1) {
-                handleUploadError(
-                  new Error($t('ui.tiptap.upload.onlySingleImage')),
-                  imageUpload,
-                );
+                handleUploadError(new Error($t('ui.tiptap.upload.onlySingleImage')), imageUpload);
               }
 
               const error = validateFile(file, imageUpload);
@@ -340,13 +321,7 @@ function createCustomImage(
 
               const pos = coordinates?.pos ?? view.state.selection.from;
 
-              createUploadProcess(
-                editor,
-                file,
-                imageUpload,
-                blobUrlTracker,
-                pos,
-              );
+              createUploadProcess(editor, file, imageUpload, blobUrlTracker, pos);
               return true;
             },
           },
@@ -373,10 +348,7 @@ function createCustomImage(
               const imageFile = imageFiles[0];
               if (!imageFile) return false;
               if (imageFiles.length > 1) {
-                handleUploadError(
-                  new Error($t('ui.tiptap.upload.onlySingleImage')),
-                  imageUpload,
-                );
+                handleUploadError(new Error($t('ui.tiptap.upload.onlySingleImage')), imageUpload);
               }
 
               const error = validateFile(imageFile, imageUpload);
@@ -385,12 +357,7 @@ function createCustomImage(
                 return true;
               }
 
-              createUploadProcess(
-                editor,
-                imageFile,
-                imageUpload,
-                blobUrlTracker,
-              );
+              createUploadProcess(editor, imageFile, imageUpload, blobUrlTracker);
               return true;
             },
           },
@@ -400,9 +367,7 @@ function createCustomImage(
   });
 }
 
-export function createDefaultTiptapExtensions(
-  options: VbenTiptapExtensionOptions = {},
-): Extensions {
+export function createDefaultTiptapExtensions(options: VbenTiptapExtensionOptions = {}): Extensions {
   return [
     StarterKit.configure({
       heading: {
@@ -428,10 +393,7 @@ export function createDefaultTiptapExtensions(
       protocols: ['mailto', { optionalSlashes: true, scheme: 'tel' }],
     }),
     options.imageUpload
-      ? createCustomImage(
-          options.imageUpload,
-          options._blobUrlTracker,
-        ).configure({
+      ? createCustomImage(options.imageUpload, options._blobUrlTracker).configure({
           allowBase64: true,
           HTMLAttributes: {
             class: 'vben-tiptap__image',

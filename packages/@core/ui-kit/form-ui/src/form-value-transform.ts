@@ -16,17 +16,9 @@ import {
   resolveValueFormatFieldName,
   setValueByFieldName,
 } from './field-name';
-import {
-  getFormArraySchemaChildren,
-  getFormFieldSchemas,
-  resolveArrayChildFieldName,
-} from './form-render/schema';
+import { getFormArraySchemaChildren, getFormFieldSchemas, resolveArrayChildFieldName } from './form-render/schema';
 
-type AnyFormSchema<TValues extends FormValues> = FormSchema<
-  BaseFormComponentType,
-  Record<string, any>,
-  TValues
->;
+type AnyFormSchema<TValues extends FormValues> = FormSchema<BaseFormComponentType, Record<string, any>, TValues>;
 
 type AnyFormFieldSchema<TValues extends FormValues> = FormFieldSchema<
   BaseFormComponentType,
@@ -34,11 +26,7 @@ type AnyFormFieldSchema<TValues extends FormValues> = FormFieldSchema<
   TValues
 >;
 
-function processFields(
-  fields: string[],
-  separator: string,
-  values: Record<string, any>,
-) {
+function processFields(fields: string[], separator: string, values: Record<string, any>) {
   for (const field of fields) {
     const value = values[field];
     if (value === undefined || value === null) {
@@ -55,18 +43,12 @@ function processFields(
       values[field] = [];
       continue;
     }
-    const escapedSeparator = separator.replaceAll(
-      /[.*+?^${}()|[\]\\]/g,
-      String.raw`\$&`,
-    );
+    const escapedSeparator = separator.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`);
     values[field] = value.split(new RegExp(escapedSeparator));
   }
 }
 
-function applyArrayToStringFields(
-  values: Record<string, any>,
-  arrayToStringFields?: ArrayToStringFields,
-) {
+function applyArrayToStringFields(values: Record<string, any>, arrayToStringFields?: ArrayToStringFields) {
   if (!arrayToStringFields || !Array.isArray(arrayToStringFields)) {
     return;
   }
@@ -86,28 +68,19 @@ function applyArrayToStringFields(
     }
     const [fields, separator = ','] = fieldConfig;
     if (!Array.isArray(fields)) {
-      console.warn(
-        `Invalid field configuration: fields should be an array of strings, got ${typeof fields}`,
-      );
+      console.warn(`Invalid field configuration: fields should be an array of strings, got ${typeof fields}`);
       continue;
     }
     processFields(fields, separator, values);
   }
 }
 
-function applyRangeTimeFields(
-  values: Record<string, any>,
-  fieldMappingTime?: FieldMappingTime,
-) {
+function applyRangeTimeFields(values: Record<string, any>, fieldMappingTime?: FieldMappingTime) {
   if (!fieldMappingTime || !Array.isArray(fieldMappingTime)) {
     return;
   }
 
-  for (const [
-    field,
-    [startTimeKey, endTimeKey],
-    format = 'YYYY-MM-DD',
-  ] of fieldMappingTime) {
+  for (const [field, [startTimeKey, endTimeKey], format = 'YYYY-MM-DD'] of fieldMappingTime) {
     if (startTimeKey && endTimeKey && values[field] === null) {
       Reflect.deleteProperty(values, startTimeKey);
       Reflect.deleteProperty(values, endTimeKey);
@@ -125,15 +98,9 @@ function applyRangeTimeFields(
       values[startTimeKey] = format(startTime, startTimeKey);
       values[endTimeKey] = format(endTime, endTimeKey);
     } else {
-      const [startTimeFormat, endTimeFormat] = Array.isArray(format)
-        ? format
-        : [format, format];
-      values[startTimeKey] = startTime
-        ? formatDate(startTime, startTimeFormat)
-        : undefined;
-      values[endTimeKey] = endTime
-        ? formatDate(endTime, endTimeFormat)
-        : undefined;
+      const [startTimeFormat, endTimeFormat] = Array.isArray(format) ? format : [format, format];
+      values[startTimeKey] = startTime ? formatDate(startTime, startTimeFormat) : undefined;
+      values[endTimeKey] = endTime ? formatDate(endTime, endTimeFormat) : undefined;
     }
     Reflect.deleteProperty(values, field);
   }
@@ -146,13 +113,9 @@ function applyValueFormatBySchemas<TValues extends FormValues>(
   parentContext?: FormSchemaContext<TValues>,
 ) {
   for (const schema of schemas) {
-    const fieldName = parentPath
-      ? resolveArrayChildFieldName(parentPath, schema.fieldName)
-      : schema.fieldName;
+    const fieldName = parentPath ? resolveArrayChildFieldName(parentPath, schema.fieldName) : schema.fieldName;
     const row =
-      parentPath && parentContext?.rowPath
-        ? getValueByFieldName(values, parentContext.rowPath)
-        : parentContext?.row;
+      parentPath && parentContext?.rowPath ? getValueByFieldName(values, parentContext.rowPath) : parentContext?.row;
     const schemaContext: FormSchemaContext<TValues> = {
       ...parentContext,
       fieldName,
@@ -161,8 +124,7 @@ function applyValueFormatBySchemas<TValues extends FormValues>(
       row,
     };
 
-    const children =
-      getFormArraySchemaChildren<AnyFormFieldSchema<TValues>>(schema);
+    const children = getFormArraySchemaChildren<AnyFormFieldSchema<TValues>>(schema);
     if (children.length > 0) {
       const arrayValue = getValueByFieldName(values, fieldName);
       if (Array.isArray(arrayValue)) {
@@ -186,11 +148,7 @@ function applyValueFormatBySchemas<TValues extends FormValues>(
     const formattedValue = schema.valueFormat(
       value,
       (key, nextValue) => {
-        setValueByFieldName(
-          values,
-          resolveValueFormatFieldName(key, parentPath),
-          nextValue,
-        );
+        setValueByFieldName(values, resolveValueFormatFieldName(key, parentPath), nextValue);
       },
       values as TValues,
       schemaContext,

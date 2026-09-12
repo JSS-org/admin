@@ -1,5 +1,3 @@
-/* eslint-disable vue/one-component-per-file */
-
 import type { PropType } from 'vue';
 
 import type { FormLayout, FormRenderProps } from '../src/types';
@@ -9,10 +7,7 @@ import { defineComponent, h, reactive, toRefs } from 'vue';
 
 import { describe, expect, it } from 'vitest';
 
-import {
-  provideFormRenderProps,
-  useFormContext,
-} from '../src/form-render/context';
+import { provideFormRenderProps, useFormContext } from '../src/form-render/context';
 import { resolveLabelStyle, useFormLabelWidth } from '../src/form-render/utils';
 
 describe('form label width context', () => {
@@ -47,15 +42,11 @@ describe('form label width context', () => {
       props: { layout: 'horizontal' },
     });
 
-    expect(wrapper.get('[data-layout]').attributes('data-layout')).toBe(
-      'horizontal',
-    );
+    expect(wrapper.get('[data-layout]').attributes('data-layout')).toBe('horizontal');
 
     await wrapper.setProps({ layout: 'vertical' });
 
-    expect(wrapper.get('[data-layout]').attributes('data-layout')).toBe(
-      'vertical',
-    );
+    expect(wrapper.get('[data-layout]').attributes('data-layout')).toBe('vertical');
   });
 });
 

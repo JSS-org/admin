@@ -36,8 +36,6 @@ describe('form field slot migration warning plugin', () => {
       },
     ]);
     expect(FORM_FIELD_SLOT_MIGRATION_WARNING).toContain('`v-bind="slotProps"`');
-    expect(FORM_FIELD_SLOT_MIGRATION_WARNING).toContain(
-      '`v-bind="slotProps.componentProps"`',
-    );
+    expect(FORM_FIELD_SLOT_MIGRATION_WARNING).toContain('`v-bind="slotProps.componentProps"`');
   });
 });

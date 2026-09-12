@@ -61,9 +61,7 @@ describe('date range codec', () => {
     });
     const formValues = codec.decode(submitValues);
     expect(formValues.keyword).toBe('admin');
-    expect(
-      formValues.createdAt?.map((value) => value.format('YYYY-MM-DD')),
-    ).toEqual(['2026-07-01', '2026-07-23']);
+    expect(formValues.createdAt?.map((value) => value.format('YYYY-MM-DD'))).toEqual(['2026-07-01', '2026-07-23']);
   });
 
   it('does not reconstruct a range with a missing bound', () => {
