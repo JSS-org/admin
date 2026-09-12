@@ -74,7 +74,7 @@
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
   "[vue]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "oxc.oxc-vscode"
   },
 
   // extensions
@@ -199,9 +199,7 @@
     "yaml"
   ],
 
-  "tailwindCSS.experimental.classRegex": [
-    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
-  ],
+  "tailwindCSS.experimental.classRegex": [["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]],
 
   "github.copilot.enable": {
     "*": true,
@@ -212,11 +210,7 @@
 
   "cssVariables.lookupFiles": ["packages/@core/base/design/src/**/*.css"],
 
-  "i18n-ally.localesPaths": [
-    "packages/locales/src/langs",
-    "playground/src/locales/langs",
-    "apps/*/src/locales/langs"
-  ],
+  "i18n-ally.localesPaths": ["packages/locales/src/langs", "playground/src/locales/langs", "apps/*/src/locales/langs"],
   "i18n-ally.pathMatcher": "{locale}/{namespace}.{ext}",
   "i18n-ally.enabledParsers": ["json"],
   "i18n-ally.sourceLanguage": "en",

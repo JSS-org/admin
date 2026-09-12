@@ -8,10 +8,10 @@ type OxfmtConfig = Parameters<typeof defineOxfmtConfig>[0];
  */
 const oxfmtConfig: OxfmtConfig = defineOxfmtConfig({
   /**
-   * 单行长度 oxfmt，适配 prettier 的 80
+   * 单行长度 oxfmt
    * Default：100
    */
-  printWidth: 80,
+  printWidth: 120,
   /**
    * 缩进宽度
    * Default：2
