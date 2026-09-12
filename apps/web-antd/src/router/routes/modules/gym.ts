@@ -308,4 +308,17 @@ const groupedRoutes: RouteRecordRaw[] = groups.map(
     }),
   }),
 );
-export default groupedRoutes;
+const homeRoute: RouteRecordRaw = {
+  name: 'GymHome',
+  path: '/gym/home',
+  component: () => import('#/views/gym/home.vue'),
+  meta: {
+    title: '首页',
+    icon: 'lucide:house',
+    order: -1,
+    affixTab: true,
+    authority: ['hq', 'store'],
+  },
+};
+
+export default [homeRoute, ...groupedRoutes];

@@ -104,7 +104,7 @@ export function userInfo(actor: Actor) {
     userId: actor.id,
     avatar: '',
     desc: '开发环境 Mock 账号',
-    homePath: '/gym/stores',
+    homePath: '/gym/home',
     authorizedStores: rows('stores')
       .filter((s) => actor.scopeType === 'hq' || actor.storeIds.includes(s.id))
       .map((s) => ({ id: s.id, name: s.name })),
