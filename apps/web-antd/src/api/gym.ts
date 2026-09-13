@@ -14,6 +14,15 @@ export interface GymPage {
 }
 export const gymApi = {
   list: (path: string, params: Record<string, any> = {}) => requestClient.get<GymPage>(`/admin/v1/${path}`, { params }),
+  // Reference selectors must include every page, even when there are more than 100 records.
+  listAll: async (path: string, params: Record<string, any> = {}): Promise<GymRow[]> => {
+    const rows: GymRow[] = [];
+    for (let page = 1; ; page++) {
+      const result = await gymApi.list(path, { ...params, page, pageSize: 100 });
+      rows.push(...result.items);
+      if (rows.length >= result.total || result.items.length === 0) return rows;
+    }
+  },
   get: <T = GymRow>(path: string, params?: Record<string, any>) =>
     requestClient.get<T>(`/admin/v1/${path}`, { params }),
   post: <T = GymRow>(path: string, data: unknown, key?: string) =>

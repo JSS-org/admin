@@ -1,0 +1,19 @@
+<script setup lang="ts">
+import ResourcePage from '#/views/gym/components/resource-page.vue';
+
+import { config } from './data';
+</script>
+<template>
+  <div class="gym-view">
+    <ResourcePage
+      :title="config.title"
+      endpoint="lesson-records"
+      :fields="config.fields"
+      :columns="config.columns"
+      :create="false"
+      :edit="false"
+      store-filter
+      time-filter
+    />
+  </div>
+</template>
