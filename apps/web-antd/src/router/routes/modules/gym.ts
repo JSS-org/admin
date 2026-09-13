@@ -53,6 +53,7 @@ const routes: RouteRecordRaw[] = [
           title,
           authority: scope === 'hq' ? ['hq'] : ['hq', 'store'],
           order: 60,
+          hideInMenu: resource === 'reviews',
         },
       })),
       ...[
@@ -101,7 +102,7 @@ const routes: RouteRecordRaw[] = [
       ...[
         ['devices', '智能设备', 'store'],
         ['equipment', '器械教学', 'store'],
-        ['blacklists', '全店黑名单', 'hq'],
+        ['blacklists', '黑名单', 'hq'],
       ].map(([resource = '', title = '', scope]) => ({
         name: `Gym-${resource}`,
         path: resource,
@@ -142,7 +143,7 @@ const routes: RouteRecordRaw[] = [
         path: resource ?? '',
         component: () => import('#/views/gym/training.vue'),
         props: { resource },
-        meta: { title, authority: ['hq', 'store'], order: 10 },
+        meta: { title, authority: ['hq', 'store'], order: 10, hideInMenu: resource === 'qr-codes' },
       })),
       {
         name: 'GymStores',
@@ -154,25 +155,25 @@ const routes: RouteRecordRaw[] = [
         name: 'GymEmployees',
         path: 'employees',
         component: () => import('#/views/gym/employees.vue'),
-        meta: { title: '员工与账号', authority: ['hq', 'store'] },
+        meta: { title: '员工资料', authority: ['hq', 'store'] },
       },
       {
         name: 'GymRoles',
         path: 'roles',
         component: () => import('#/views/gym/roles.vue'),
-        meta: { title: '角色权限', authority: ['hq'] },
+        meta: { title: '角色权限', authority: ['hq'], hideInMenu: true },
       },
       {
         name: 'GymMembers',
         path: 'members',
         component: () => import('#/views/gym/members.vue'),
-        meta: { title: '会员管理', authority: ['hq', 'store'] },
+        meta: { title: '会员资料', authority: ['hq', 'store'] },
       },
       {
         name: 'GymCards',
         path: 'cards',
         component: () => import('#/views/gym/cards.vue'),
-        meta: { title: '会员卡种', authority: ['hq', 'store'] },
+        meta: { title: '会员卡模板', authority: ['hq', 'store'] },
       },
     ],
   },
