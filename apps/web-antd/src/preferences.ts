@@ -47,4 +47,5 @@ export const overridesPreferences = defineOverridesPreferences({
     accessMode: 'frontend',
     name: import.meta.env.VITE_APP_TITLE,
   },
+  theme: { mode: 'light' as const },
 });

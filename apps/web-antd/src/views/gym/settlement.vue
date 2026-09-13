@@ -11,6 +11,8 @@ import AdminDrawer from './components/admin-drawer.vue';
 import Page from './components/admin-page.vue';
 import FilterBar from './components/filter-bar.vue';
 import ResourcePage from './components/resource-page.vue';
+import TableSelectionActions from './components/table-selection-actions.vue';
+import { useTableSelection } from './components/use-table-selection';
 
 const props = defineProps<{ resource: string }>();
 const stores = ref<GymRow[]>([]);
@@ -19,6 +21,19 @@ const storeId = ref<string>();
 const rules = ref<GymRow[]>([]);
 const visible = ref(false);
 const busy = ref(false);
+const rulesLoading = ref(false);
+const rulesPage = ref(1);
+const rulesPageSize = ref(20);
+const currentRules = computed(() =>
+  rules.value.slice((rulesPage.value - 1) * rulesPageSize.value, rulesPage.value * rulesPageSize.value),
+);
+const rulesSelectionDisabled = computed(() => rulesLoading.value || busy.value);
+const {
+  clear: clearRulesSelection,
+  rowSelection: rulesRowSelection,
+  selectAll: selectAllRules,
+  selectedKeys: selectedRuleKeys,
+} = useTableSelection(currentRules, rulesSelectionDisabled);
 const form = ref<Record<string, any>>({});
 const detail = ref<GymRow>();
 const showDetail = ref(false);
@@ -31,7 +46,16 @@ async function all(path: string) {
   }
 }
 async function loadRules() {
-  if (storeId.value) rules.value = await all(`stores/${storeId.value}/settlement-rules`);
+  clearRulesSelection();
+  rulesPage.value = 1;
+  const selectedStore = storeId.value;
+  rulesLoading.value = true;
+  try {
+    const data = selectedStore ? await all(`stores/${selectedStore}/settlement-rules`) : [];
+    if (selectedStore === storeId.value) rules.value = data;
+  } finally {
+    if (selectedStore === storeId.value) rulesLoading.value = false;
+  }
 }
 onMounted(async () => {
   if (props.resource === 'settlement-rules') {
@@ -122,10 +146,32 @@ const scopeFilter = computed({
       />
       <div class="gym-toolbar">
         <Button type="primary" :disabled="!storeId" @click="edit()"> 新增版本 </Button>
+        <TableSelectionActions
+          :selected="selectedRuleKeys.length"
+          :total="currentRules.length"
+          :disabled="rulesSelectionDisabled"
+          @select-all="selectAllRules"
+          @clear="clearRulesSelection"
+        />
       </div>
       <Table
         row-key="id"
         :data-source="rules"
+        :loading="rulesLoading"
+        :row-selection="rulesRowSelection"
+        :pagination="{
+          current: rulesPage,
+          pageSize: rulesPageSize,
+          showSizeChanger: true,
+          showTotal: (n: number) => `共 ${n} 条`,
+        }"
+        @change="
+          (p) => {
+            clearRulesSelection();
+            rulesPage = p.current ?? 1;
+            rulesPageSize = p.pageSize ?? 20;
+          }
+        "
         :columns="[
           { title: '版本', dataIndex: 'version' },
           { title: '周期', dataIndex: 'cycleUnit' },

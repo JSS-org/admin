@@ -12,6 +12,8 @@ import { canGym, gymApi } from '#/api/gym';
 import AdminDrawer from './admin-drawer.vue';
 import Page from './admin-page.vue';
 import FilterBar from './filter-bar.vue';
+import TableSelectionActions from './table-selection-actions.vue';
+import { useTableSelection } from './use-table-selection';
 
 export interface Field {
   key: string;
@@ -67,6 +69,15 @@ const loading = ref(false);
 const saving = ref(false);
 const page = ref(1);
 const pageSize = ref(20);
+const selectionDisabled = computed(() => loading.value || saving.value);
+const {
+  clear: clearSelection,
+  rowSelection,
+  selectAll,
+  selectedKeys,
+  selectedRows,
+} = useTableSelection(items, selectionDisabled);
+let loadRequest = 0;
 const filters = reactive<Record<string, any>>({ keyword: '' });
 const filterDraft = ref<Record<string, any>>({});
 const response = ref<Record<string, any>>({});
@@ -129,6 +140,7 @@ const statuses: Record<string, string> = {
   course: '课程',
 };
 async function load() {
+  const request = ++loadRequest;
   loading.value = true;
   try {
     const data = await gymApi.list(props.endpoint, {
@@ -136,11 +148,12 @@ async function load() {
       page: page.value,
       pageSize: pageSize.value,
     });
+    if (request !== loadRequest) return;
     items.value = data.items;
     response.value = data;
     total.value = data.total;
   } finally {
-    loading.value = false;
+    if (request === loadRequest) loading.value = false;
   }
 }
 async function loadOptions() {
@@ -230,6 +243,7 @@ function display(value: any, key: string) {
   return value;
 }
 function search() {
+  clearSelection();
   for (const key of Object.keys(filters)) Reflect.deleteProperty(filters, key);
   Object.assign(filters, filterDraft.value);
   page.value = 1;
@@ -238,6 +252,8 @@ function search() {
 watch(
   () => props.endpoint,
   () => {
+    clearSelection();
+    items.value = [];
     page.value = 1;
     filterDraft.value = {};
     Object.keys(filters).forEach((key) => Reflect.deleteProperty(filters, key));
@@ -246,6 +262,7 @@ watch(
   },
   { immediate: true },
 );
+watch([page, pageSize], clearSelection, { flush: 'sync' });
 defineExpose({ load, open, items });
 </script>
 
@@ -261,9 +278,16 @@ defineExpose({ load, open, items });
       @search="search"
       @reset="search"
     />
-    <div v-if="(writable && create) || $slots.toolbar" class="gym-toolbar">
+    <div class="gym-toolbar">
       <Button v-if="writable && create" type="primary" @click="open()"> 新增 </Button>
-      <slot name="toolbar" :reload="load"></slot>
+      <TableSelectionActions
+        :selected="selectedKeys.length"
+        :total="items.length"
+        :disabled="selectionDisabled"
+        @select-all="selectAll"
+        @clear="clearSelection"
+      />
+      <slot name="toolbar" :reload="load" :selected-rows="selectedRows" :selected-row-keys="selectedKeys"></slot>
     </div>
     <slot name="summary" :data="response"></slot>
     <Table
@@ -271,6 +295,7 @@ defineExpose({ load, open, items });
       :columns="displayColumns"
       :scroll="{ x: 'max-content' }"
       :loading="loading"
+      :row-selection="rowSelection"
       row-key="id"
       :pagination="{
         current: page,

@@ -6,7 +6,6 @@ import type { GymRow } from '#/api/gym';
 import { computed, onActivated, onDeactivated, onMounted, onUnmounted, ref } from 'vue';
 
 import {
-  Alert,
   Button,
   Descriptions,
   DescriptionsItem,
@@ -565,10 +564,5 @@ onUnmounted(stop);
         </Space>
       </template>
     </AdminDrawer>
-    <Alert
-      v-if="resource === 'qr-codes'"
-      type="info"
-      message="生成二维码需要配置真实小程序/App渠道或落地链接，当前 Mock 未接入渠道。"
-    />
   </div>
 </template>

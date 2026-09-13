@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue';
-
-import { IconifyIcon } from '@vben/icons';
+import { computed, ref } from 'vue';
 
 import { Button, Form, FormItem, Input, Select } from 'ant-design-vue';
 
@@ -27,8 +25,6 @@ const props = withDefaults(
 const emit = defineEmits<{ search: []; reset: [] }>();
 const model = defineModel<Record<string, any>>({ required: true });
 const timeMode = ref<'date' | 'month' | 'range'>('date');
-const expanded = ref(false);
-const fieldsId = useId();
 const fields = computed<FilterField[]>(() => [
   ...(props.keyword ? [{ key: 'keyword', label: '关键词', placeholder: '名称 / 编号 / 手机号' }] : []),
   ...(props.storeOptions
@@ -44,23 +40,18 @@ const fields = computed<FilterField[]>(() => [
     : []),
   ...props.fields,
 ]);
-const collapsible = computed(() => fields.value.length > 2 || props.time);
-const hiddenFilterCount = computed(() => {
-  if (expanded.value) return 0;
-  const keys = [
-    ...fields.value.slice(2).map((field) => field.key),
-    ...(props.time ? ['date', 'month', 'from', 'to'] : []),
-  ];
-  return keys.filter((key) => {
-    const value = model.value[key];
-    return value !== undefined && value !== null && value !== '';
-  }).length;
-});
 function setValue(key: string, value: any) {
   model.value = { ...model.value, [key]: value };
 }
 function changed() {
   if (props.immediate) emit('search');
+}
+function handleFocusOut(event: FocusEvent) {
+  if (props.immediate) return;
+  const next = event.relatedTarget as Node | null;
+  const current = event.currentTarget as HTMLElement | null;
+  if (next && current?.contains(next)) return;
+  emit('search');
 }
 function changeTimeMode() {
   for (const key of ['date', 'month', 'from', 'to']) Reflect.deleteProperty(model.value, key);
@@ -73,15 +64,9 @@ function reset() {
 </script>
 
 <template>
-  <Form :model="model" class="gym-filter" layout="vertical" @finish="emit('search')">
-    <div :id="fieldsId" class="gym-filter-fields">
-      <FormItem
-        v-for="(field, index) in fields"
-        v-show="expanded || index < 2"
-        :key="field.key"
-        :label="field.label"
-        :html-for="`filter-${field.key}`"
-      >
+  <Form :model="model" class="gym-filter" layout="vertical" @finish="emit('search')" @focusout="handleFocusOut">
+    <div class="gym-filter-fields">
+      <FormItem v-for="field in fields" :key="field.key" :label="field.label" :html-for="`filter-${field.key}`">
         <Select
           v-if="field.type === 'select'"
           :id="`filter-${field.key}`"
@@ -103,7 +88,7 @@ function reset() {
           @change="changed"
         />
       </FormItem>
-      <template v-if="time && expanded">
+      <template v-if="time">
         <FormItem label="时间方式" html-for="filter-time-mode">
           <Select
             id="filter-time-mode"
@@ -129,26 +114,9 @@ function reset() {
         </template>
       </template>
     </div>
-    <div v-if="!immediate || collapsible" class="gym-filter-actions">
-      <template v-if="!immediate">
-        <Button type="primary" html-type="submit" :loading="loading"> 查询 </Button>
-        <Button :disabled="loading" @click="reset">重置</Button>
-      </template>
-      <Button
-        v-if="collapsible"
-        type="link"
-        :aria-expanded="expanded"
-        :aria-controls="fieldsId"
-        @click="expanded = !expanded"
-      >
-        {{ expanded ? '收起' : '展开' }}
-        <span v-if="hiddenFilterCount">（{{ hiddenFilterCount }} 项已选）</span>
-        <IconifyIcon
-          :icon="expanded ? 'lucide:chevron-up' : 'lucide:chevron-down'"
-          class="ml-1 size-4"
-          aria-hidden="true"
-        />
-      </Button>
+    <div v-if="!immediate" class="gym-filter-actions">
+      <Button type="primary" html-type="submit" :loading="loading"> 查询 </Button>
+      <Button :disabled="loading" @click="reset">重置</Button>
     </div>
   </Form>
 </template>
@@ -156,6 +124,7 @@ function reset() {
 <style scoped>
 .gym-filter {
   padding: 16px;
+  background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius);
 }
