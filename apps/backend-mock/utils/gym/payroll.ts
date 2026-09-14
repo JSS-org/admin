@@ -235,6 +235,41 @@ function calculate(req: Request, storeId: string, month: string): Row[] {
 function signedCents(value: string) {
   return value.startsWith('-') ? -cents(value.slice(1)) : cents(value);
 }
+
+/** Switch one employee/store to a new template without losing historical periods. */
+export function assignEmployeeSalary(req: Request, employeeId: string, input: Record<string, any>) {
+  marketingHQ(req, 'payroll:templates');
+  only(input, ['storeId', 'templateId', 'effectiveFrom', 'effectiveTo']);
+  const dates = effectiveDates(input);
+  const previous = rows('employeeSalaryAssignments').filter(
+    (row) => row.employeeId === employeeId && row.storeId === input.storeId && overlaps(row, dates),
+  );
+  if (previous.some((row) => row.effectiveFrom >= dates.effectiveFrom))
+    fail('生效日期须晚于已有薪资配置的开始日期，请检查已安排的薪资期间', 409);
+  const snapshot = structuredClone(rows('employeeSalaryAssignments'));
+  const auditSnapshot = structuredClone(rows('operationLogs'));
+  try {
+    for (const row of previous)
+      payroll({
+        ...req,
+        method: 'PATCH',
+        path: `employee-salary-assignments/${row.id}`,
+        body: { effectiveTo: dates.effectiveFrom },
+        query: {},
+      });
+    return payroll({
+      ...req,
+      method: 'POST',
+      path: 'employee-salary-assignments',
+      body: { ...input, employeeId },
+      query: {},
+    });
+  } catch (error) {
+    tables.employeeSalaryAssignments = snapshot;
+    tables.operationLogs = auditSnapshot;
+    throw error;
+  }
+}
 function runView(row: Row, details = false) {
   const items = rows('payrollItems').filter((i) => i.runId === row.id);
   return {

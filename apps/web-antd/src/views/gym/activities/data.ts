@@ -11,7 +11,7 @@ const fields: Field[] = [
   { key: 'registrationEndsAt', label: '报名结束', type: 'datetime', required: true },
   { key: 'startsAt', label: '活动开始', type: 'datetime', required: true },
   { key: 'endsAt', label: '活动结束', type: 'datetime', required: true },
-  { key: 'capacity', label: '名额（空为不限）', type: 'number' },
+  { key: 'capacity', label: '名额（空为不限）', type: 'number', batch: true },
 ];
 
 const columns = [

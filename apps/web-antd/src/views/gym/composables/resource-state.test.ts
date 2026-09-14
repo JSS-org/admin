@@ -56,6 +56,52 @@ afterEach(() => {
 });
 
 describe('resource list and selection', () => {
+  it('retains filters after failure and recovers on retry without showing stale rows', async () => {
+    api.list
+      .mockResolvedValueOnce(pageData('old'))
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValueOnce(pageData('new'));
+    const list = setup(() => useResourceList(() => 'members'));
+    await flush();
+    list.filterDraft.value = { keyword: '  新会员  ', storeId: '', enabled: false };
+    await list.search();
+    expect(list.error.value).toBe(true);
+    expect(list.items.value).toEqual([]);
+    expect(list.hasFilters.value).toBe(true);
+    await list.load();
+    expect(api.list).toHaveBeenLastCalledWith('members', { keyword: '新会员', enabled: false, page: 1, pageSize: 20 });
+    expect(list.error.value).toBe(false);
+    expect(list.items.value).toEqual([{ id: 'new' }]);
+  });
+
+  it('returns to the last available page when the result count shrinks', async () => {
+    api.list.mockResolvedValue(pageData('last'));
+    const list = setup(() => useResourceList(() => 'members'));
+    await flush();
+    list.page.value = 4;
+    await list.load();
+    expect(list.page.value).toBe(1);
+    expect(api.list).toHaveBeenLastCalledWith('members', { page: 1, pageSize: 20 });
+    expect(list.loading.value).toBe(false);
+  });
+
+  it('ignores a stale request failure after a newer query succeeds', async () => {
+    let reject!: (error: Error) => void;
+    api.list
+      .mockReturnValueOnce(
+        new Promise((_resolve, fail) => {
+          reject = fail;
+        }),
+      )
+      .mockResolvedValueOnce(pageData('new'));
+    const list = setup(() => useResourceList(() => 'members'));
+    await list.search();
+    reject(new Error('old failure'));
+    await flush();
+    expect(list.error.value).toBe(false);
+    expect(list.items.value).toEqual([{ id: 'new' }]);
+  });
+
   it('keeps the latest query when responses arrive out of order', async () => {
     const first = deferred<ReturnType<typeof pageData>>();
     const second = deferred<ReturnType<typeof pageData>>();
@@ -114,6 +160,30 @@ describe('resource list and selection', () => {
 });
 
 describe('resource editor', () => {
+  it('only validates and submits fields belonging to the selected type', async () => {
+    const editor = setup(() =>
+      useResourceEditor(
+        {
+          title: '卡种',
+          endpoint: 'card-templates',
+          columns: [],
+          fields: [
+            { key: 'kind', label: '类型', default: 'period' },
+            { key: 'durationDays', label: '天数', default: 30, visibleWhen: (values) => values.kind === 'period' },
+            { key: 'includedUses', label: '次数', default: 10, visibleWhen: (values) => values.kind === 'count' },
+            { key: 'salaryMode', label: '仅编辑', onlyEdit: true },
+          ],
+        },
+        vi.fn(),
+      ),
+    );
+    api.post.mockResolvedValue({ id: 'new' });
+    await editor.open();
+    expect(editor.visibleFields.value.map((field) => field.key)).toEqual(['kind', 'durationDays']);
+    editor.form.kind = 'count';
+    await editor.save();
+    expect(api.post).toHaveBeenCalledWith('card-templates', { kind: 'count', includedUses: 10 }, undefined);
+  });
   const props = (): ResourcePageProps => ({
     title: '会员',
     endpoint: 'members',

@@ -7,7 +7,7 @@ import { ref } from 'vue';
 
 import { message } from 'ant-design-vue';
 
-import { gymApi, uploadGymFile } from '#/api/gym';
+import { gymApi } from '#/api/gym';
 
 export function usePage(page: Readonly<Ref<null | ResourcePageHandle>>) {
   const current = ref<GymRow>();
@@ -17,26 +17,13 @@ export function usePage(page: Readonly<Ref<null | ResourcePageHandle>>) {
   const contractName = ref('');
   const applicableType = ref('card');
   const reminderDays = ref(3);
-  const fileId = ref<string>();
-  const filename = ref('');
+  const fileId = ref<null | string>();
   function createContract() {
     current.value = undefined;
     contractName.value = '';
     fileId.value = undefined;
-    filename.value = '';
     mode.value = 'contract';
     visible.value = true;
-  }
-  async function upload(file: File) {
-    busy.value = true;
-    try {
-      const result = await uploadGymFile(file, 'contract');
-      fileId.value = result.id;
-      filename.value = file.name;
-    } finally {
-      busy.value = false;
-    }
-    return false;
   }
   async function newVersion(row: GymRow) {
     const result = await gymApi.post(`contract-templates/${row.id}/versions`, {});
@@ -48,10 +35,14 @@ export function usePage(page: Readonly<Ref<null | ResourcePageHandle>>) {
     current.value = row;
     mode.value = 'file';
     fileId.value = undefined;
-    filename.value = '';
     visible.value = true;
   }
   async function save() {
+    if (busy.value) return;
+    if (mode.value === 'contract' && !contractName.value.trim()) {
+      message.error('请填写模板名称');
+      return;
+    }
     busy.value = true;
     try {
       if (mode.value === 'contract') {
@@ -88,9 +79,8 @@ export function usePage(page: Readonly<Ref<null | ResourcePageHandle>>) {
     contractName,
     applicableType,
     reminderDays,
-    filename,
+    fileId,
     createContract,
-    upload,
     newVersion,
     replaceFile,
     save,

@@ -7,6 +7,7 @@ import { Button, Tooltip } from 'ant-design-vue';
 
 import { useAuthStore } from '#/store';
 import LoginForm from '#/views/_core/authentication/login.vue';
+import FilePreview from '#/views/gym/components/file-preview.vue';
 
 const userStore = useUserStore();
 const accessStore = useAccessStore();
@@ -27,11 +28,12 @@ async function handleLogout() {
             {{ isMock ? '开发 · Mock' : '开发环境' }}
           </span>
         </Tooltip>
-        <span>{{ userStore.userInfo?.realName }}</span>
+        <span class="admin-account-name">{{ userStore.userInfo?.realName }}</span>
         <Button type="text" @click="handleLogout">退出登录</Button>
       </div>
     </template>
     <template #extra>
+      <FilePreview />
       <AuthenticationLoginExpiredModal v-model:open="accessStore.loginExpired">
         <LoginForm />
       </AuthenticationLoginExpiredModal>
@@ -53,7 +55,17 @@ async function handleLogout() {
   display: flex;
   gap: 12px;
   align-items: center;
+  align-self: stretch;
+  height: 100%;
+  min-height: 32px;
   padding-inline: 12px;
   white-space: nowrap;
+}
+
+.admin-account-name {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  line-height: 1;
 }
 </style>

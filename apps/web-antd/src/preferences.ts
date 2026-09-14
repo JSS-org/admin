@@ -1,6 +1,5 @@
 import { defineOverridesPreferences } from '@vben/preferences';
 
-// Product controls are fixed by the application, including when old preferences are cached.
 export const adminPreferences = {
   app: {
     defaultHomePath: '/gym/home',
@@ -18,7 +17,6 @@ export const adminPreferences = {
     collapsedButton: true,
     fixedButton: false,
     draggable: false,
-    // 框架中 true 表示固定侧栏，禁止鼠标移入/移出自动展开或收起。
     expandOnHover: true,
   },
   shortcutKeys: {
@@ -27,6 +25,12 @@ export const adminPreferences = {
     globalLockScreen: false,
   },
   tabbar: { showMaximize: false },
+  theme: {
+    mode: 'light' as const,
+    semiDarkHeader: false,
+    semiDarkSidebar: false,
+    semiDarkSidebarSub: false,
+  },
   widget: {
     sidebarToggle: false,
     globalSearch: false,
@@ -47,5 +51,4 @@ export const overridesPreferences = defineOverridesPreferences({
     accessMode: 'frontend',
     name: import.meta.env.VITE_APP_TITLE,
   },
-  theme: { mode: 'light' as const },
 });

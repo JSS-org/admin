@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 
-import { Button, Form, FormItem, Input, Select } from 'ant-design-vue';
+import { Button, DatePicker, Form, FormItem, Input, Select } from 'ant-design-vue';
 
 export interface FilterField {
   key: string;
@@ -25,6 +25,9 @@ const props = withDefaults(
 const emit = defineEmits<{ search: []; reset: [] }>();
 const model = defineModel<Record<string, any>>({ required: true });
 const timeMode = ref<'date' | 'month' | 'range'>('date');
+const rangeInvalid = computed(
+  () => !!(props.time && model.value.from && model.value.to && model.value.from >= model.value.to),
+);
 const fields = computed<FilterField[]>(() => [
   ...(props.keyword ? [{ key: 'keyword', label: '关键词', placeholder: '名称 / 编号 / 手机号' }] : []),
   ...(props.storeOptions
@@ -44,17 +47,14 @@ function setValue(key: string, value: any) {
   model.value = { ...model.value, [key]: value };
 }
 function changed() {
-  if (props.immediate) emit('search');
+  if (props.immediate) search();
 }
-function handleFocusOut(event: FocusEvent) {
-  if (props.immediate) return;
-  const next = event.relatedTarget as Node | null;
-  const current = event.currentTarget as HTMLElement | null;
-  if (next && current?.contains(next)) return;
-  emit('search');
+function search() {
+  if (!rangeInvalid.value) emit('search');
 }
 function changeTimeMode() {
   for (const key of ['date', 'month', 'from', 'to']) Reflect.deleteProperty(model.value, key);
+  changed();
 }
 function reset() {
   model.value = {};
@@ -64,7 +64,7 @@ function reset() {
 </script>
 
 <template>
-  <Form :model="model" class="gym-filter" layout="vertical" @finish="emit('search')" @focusout="handleFocusOut">
+  <Form :model="model" class="gym-filter" layout="vertical" @finish="search">
     <div class="gym-filter-fields">
       <FormItem v-for="field in fields" :key="field.key" :label="field.label" :html-for="`filter-${field.key}`">
         <Select
@@ -75,6 +75,19 @@ function reset() {
           :options="field.options"
           :placeholder="field.placeholder ?? '全部'"
           :allow-clear="field.clearable !== false"
+          show-search
+          option-filter-prop="label"
+          @change="changed"
+        />
+        <DatePicker
+          v-else-if="field.type === 'date' || field.type === 'month'"
+          :id="`filter-${field.key}`"
+          :value="model[field.key] || undefined"
+          :picker="field.type === 'month' ? 'month' : 'date'"
+          :value-format="field.type === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'"
+          :placeholder="field.placeholder"
+          :allow-clear="field.clearable !== false"
+          @update:value="setValue(field.key, $event)"
           @change="changed"
         />
         <Input
@@ -102,20 +115,32 @@ function reset() {
           />
         </FormItem>
         <FormItem v-if="timeMode !== 'range'" :label="timeMode === 'date' ? '日期' : '月份'" html-for="filter-time">
-          <Input id="filter-time" v-model:value="model[timeMode]" :type="timeMode" />
+          <DatePicker
+            id="filter-time"
+            v-model:value="model[timeMode]"
+            :picker="timeMode === 'month' ? 'month' : 'date'"
+            :value-format="timeMode === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD'"
+            @change="changed"
+          />
         </FormItem>
         <template v-else>
           <FormItem label="开始日期（含）" html-for="filter-from">
-            <Input id="filter-from" v-model:value="model.from" type="date" />
+            <DatePicker id="filter-from" v-model:value="model.from" value-format="YYYY-MM-DD" @change="changed" />
           </FormItem>
-          <FormItem label="结束日期（不含）" html-for="filter-to">
-            <Input id="filter-to" v-model:value="model.to" type="date" />
+          <FormItem
+            label="结束日期（不含）"
+            html-for="filter-to"
+            :validate-status="rangeInvalid ? 'error' : undefined"
+            :help="rangeInvalid ? '结束日期须晚于开始日期' : undefined"
+          >
+            <DatePicker id="filter-to" v-model:value="model.to" value-format="YYYY-MM-DD" @change="changed" />
           </FormItem>
         </template>
       </template>
     </div>
     <div v-if="!immediate" class="gym-filter-actions">
-      <Button type="primary" html-type="submit" :loading="loading"> 查询 </Button>
+      <span class="gym-filter-hint">设置条件后查询，重置可查看全部记录</span>
+      <Button type="primary" html-type="submit" :loading="loading" :disabled="rangeInvalid"> 查询 </Button>
       <Button :disabled="loading" @click="reset">重置</Button>
     </div>
   </Form>
@@ -141,6 +166,7 @@ function reset() {
 }
 
 .gym-filter-fields :deep(.ant-select),
+.gym-filter-fields :deep(.ant-picker),
 .gym-filter-fields :deep(.ant-input-affix-wrapper),
 .gym-filter-fields :deep(.ant-input) {
   width: 100%;
@@ -154,5 +180,11 @@ function reset() {
   align-items: center;
   justify-content: flex-end;
   margin-top: 16px;
+}
+
+.gym-filter-hint {
+  margin-right: auto;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
 }
 </style>

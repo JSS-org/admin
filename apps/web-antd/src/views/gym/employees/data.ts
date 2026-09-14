@@ -4,7 +4,7 @@ const fields: Field[] = [
   { key: 'employeeNo', label: '工号', required: true, immutable: true },
   { key: 'name', label: '姓名', required: true },
   { key: 'phone', label: '手机号', required: true },
-  { key: 'jobTitle', label: '职位' },
+  { key: 'jobTitle', label: '职位', batch: true },
   {
     key: 'hiredOn',
     label: '入职日期',
@@ -22,6 +22,7 @@ const fields: Field[] = [
   },
   {
     key: 'status',
+    batch: true,
     label: '状态',
     type: 'select',
     default: 'active',

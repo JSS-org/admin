@@ -3,10 +3,11 @@ import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { useTemplateRef } from 'vue';
 
-import { Button, Form, FormItem, Input, InputNumber, Select, Upload } from 'ant-design-vue';
+import { Button, Form, FormItem, Input, InputNumber, Select } from 'ant-design-vue';
 
 import { canGym, gymApi, openGymFile } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
+import FileUpload from '#/views/gym/components/file-upload.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 
 import { columns, fields, isTemplate, title, writeCode } from './data';
@@ -21,9 +22,8 @@ const {
   contractName,
   applicableType,
   reminderDays,
-  filename,
+  fileId,
   createContract,
-  upload,
   newVersion,
   replaceFile,
   save,
@@ -62,22 +62,22 @@ const {
             "
             >{{ row.status === 'published' ? '停用' : '发布' }}</Button
           >
-          <Button type="link" @click="openGymFile(row.fileId)"> 查看PDF </Button>
           <Button v-if="row.status === 'draft'" type="link" @click="replaceFile(row)"> 替换PDF </Button>
         </template>
+        <Button v-if="canGym('files:read')" type="link" @click="openGymFile(row.fileId)">预览 PDF</Button>
       </template>
     </ResourcePage>
     <AdminDrawer
       v-model:open="visible"
-      title="管理操作"
+      :title="mode === 'contract' ? '上传合同模板' : '替换合同 PDF'"
       :width="760"
       :footer="undefined"
       :confirm-loading="busy"
       @ok="save"
     >
-      <Form layout="vertical">
+      <Form layout="vertical" :disabled="busy">
         <template v-if="mode === 'contract'">
-          <FormItem label="模板名称">
+          <FormItem label="模板名称" required>
             <Input v-model:value="contractName" />
           </FormItem>
           <FormItem label="适用类型">
@@ -93,12 +93,15 @@ const {
             <InputNumber v-model:value="reminderDays" :min="0" :max="365" />
           </FormItem>
         </template>
-        <FormItem label="合同PDF">
-          <Upload :before-upload="upload" :show-upload-list="false" accept=".pdf">
-            <Button :loading="busy">上传PDF</Button>
-          </Upload>
-          {{ filename }}</FormItem
-        >
+        <FormItem label="合同 PDF" required extra="上传后可点击文件名预览，确认无误后保存模板。">
+          <FileUpload
+            v-model="fileId"
+            category="contract"
+            title="点击或拖入合同 PDF"
+            :disabled="busy"
+            @uploading="busy = $event"
+          />
+        </FormItem>
       </Form>
     </AdminDrawer>
   </div>

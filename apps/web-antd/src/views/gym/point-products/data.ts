@@ -2,7 +2,7 @@ import type { GymRow } from '#/api/gym';
 import type { ResourceDefinition } from '#/views/gym/types';
 
 const config: ResourceDefinition = {
-  title: '积分兑换商品',
+  title: '积分兑换',
   code: 'points:manage',
   fields: [
     { key: 'name', label: '名称', type: 'text', required: true, immutable: false },
@@ -21,22 +21,24 @@ const config: ResourceDefinition = {
     },
     {
       key: 'cardTemplateId',
+      visibleWhen: (values) => values.kind === 'card',
       label: '卡种',
       type: 'select',
       source: 'card-templates',
-      required: false,
+      required: true,
       immutable: true,
     },
     {
       key: 'courseProductId',
+      visibleWhen: (values) => values.kind === 'course',
       label: '课程',
       type: 'select',
       source: 'course-products',
-      required: false,
+      required: true,
       immutable: true,
     },
-    { key: 'pointsPrice', label: '兑换所需积分', type: 'number', required: true, immutable: false },
-    { key: 'stock', label: '库存（空为不限）', type: 'number', immutable: false },
+    { key: 'pointsPrice', label: '兑换所需积分', type: 'number', required: true, immutable: false, batch: true },
+    { key: 'stock', label: '库存（空为不限）', type: 'number', immutable: false, batch: true },
   ],
   columns: [
     { title: '名称', dataIndex: 'name' },

@@ -49,6 +49,26 @@ export function usePage(list: Readonly<Ref<null | ResourcePageHandle>>) {
     };
   }
   async function saveTemplate() {
+    if (busy.value || (form.value.status === 'published' && !form.value.newVersion)) return;
+    if (!String(form.value.name ?? '').trim() || !form.value.effectiveFrom || form.value.baseSalary === null) {
+      message.error('请填写模板名称、生效日期和底薪');
+      return;
+    }
+    if (form.value.effectiveTo && form.value.effectiveTo <= form.value.effectiveFrom) {
+      message.error('失效日期须晚于生效日期');
+      return;
+    }
+    if (
+      form.value.rules.some((rule: Record<string, any>) => {
+        let amount = rule.fixedAmount;
+        if (['card_sales', 'pt_sales'].includes(rule.component)) amount = rule.rate;
+        else if (rule.component === 'lessons') amount = rule.unitAmount;
+        return amount === undefined || amount === null;
+      })
+    ) {
+      message.error('请填写每条规则对应的比例或金额');
+      return;
+    }
     busy.value = true;
     try {
       const { name, baseSalary, effectiveFrom, effectiveTo, rules } = form.value;

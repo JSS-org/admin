@@ -1,6 +1,7 @@
 import { useAccessStore } from '@vben/stores';
 
-import { baseRequestClient, requestClient } from '#/api/request';
+import { filePreview } from './file-preview-state';
+import { requestClient } from './request';
 
 export interface GymRow {
   id: string;
@@ -43,14 +44,15 @@ export async function uploadGymFile(file: File, category: string, storeId?: stri
     headers: { 'Content-Type': 'multipart/form-data' },
   });
 }
-export async function openGymFile(id: string) {
-  const response = await baseRequestClient.get<Blob>(`/admin/v1/files/${id}/content`, {
+export async function getGymFileUrl(id: string) {
+  const response = await requestClient.get<Blob>(`/admin/v1/files/${id}/content`, {
     responseType: 'blob',
     responseReturn: 'body',
-    headers: { Authorization: `Bearer ${useAccessStore().accessToken}` },
   });
-  const url = URL.createObjectURL(response);
-  window.open(url, '_blank', 'noopener');
-  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  return URL.createObjectURL(response);
+}
+export async function openGymFile(id: string) {
+  filePreview.fileId = id;
+  filePreview.open = true;
 }
 export const canGym = (code: string) => useAccessStore().accessCodes.includes(code);

@@ -64,13 +64,13 @@ const routes: RouteRecordRaw[] = [
         name: 'Gym-employee-salary-assignments',
         path: '/gym/employee-salary-assignments',
         component: () => import('#/views/gym/employee-salary-assignments/index.vue'),
-        meta: { title: '员工薪资关联', authority: ['hq', 'store'], order: 3 },
+        meta: { title: '员工薪资关联', authority: ['hq', 'store'], order: 3, hideInMenu: true },
       },
       {
         name: 'Gym-payrolls',
         path: '/gym/payrolls',
         component: () => import('#/views/gym/payrolls/index.vue'),
-        meta: { title: '门店工资表', authority: ['hq', 'store'], order: 4 },
+        meta: { title: '门店工资表', authority: ['hq', 'store'], order: 4, hideInMenu: true },
       },
     ],
   },
@@ -189,7 +189,7 @@ const routes: RouteRecordRaw[] = [
   {
     name: 'GymGroup-approval-management',
     path: '/gym/approval-management',
-    meta: { title: '审批管理', icon: 'lucide:file-check', order: 6, authority: ['hq', 'store'] },
+    meta: { title: '审批管理', icon: 'lucide:file-check', order: 6, authority: ['hq', 'store'], hideInMenu: true },
     children: [
       {
         name: 'Gym-approval-templates',
@@ -239,13 +239,13 @@ const routes: RouteRecordRaw[] = [
         name: 'Gym-coupon-store-quotas',
         path: '/gym/coupon-store-quotas',
         component: () => import('#/views/gym/coupon-store-quotas/index.vue'),
-        meta: { title: '门店优惠券额度', authority: ['hq', 'store'], order: 1 },
+        meta: { title: '优惠券额度管理', authority: ['hq', 'store'], order: 1 },
       },
       {
         name: 'Gym-coupon-quota-batches',
         path: '/gym/coupon-quota-batches',
         component: () => import('#/views/gym/coupon-quota-batches/index.vue'),
-        meta: { title: '一键维护：门店额度', authority: ['hq'], order: 2 },
+        meta: { title: '一键维护：门店额度', authority: ['hq'], order: 2, hideInMenu: true },
       },
       {
         name: 'Gym-coupon-batches',
@@ -257,7 +257,7 @@ const routes: RouteRecordRaw[] = [
         name: 'Gym-coupon-quota-ledger',
         path: '/gym/coupon-quota-ledger',
         component: () => import('#/views/gym/coupon-quota-ledger/index.vue'),
-        meta: { title: '券额度流水', authority: ['hq', 'store'], order: 4 },
+        meta: { title: '券额度流水', authority: ['hq', 'store'], order: 4, hideInMenu: true },
       },
       {
         name: 'Gym-member-coupons',
@@ -288,7 +288,7 @@ const routes: RouteRecordRaw[] = [
         name: 'Gym-point-products',
         path: '/gym/point-products',
         component: () => import('#/views/gym/point-products/index.vue'),
-        meta: { title: '积分兑换商品', authority: ['hq'], order: 1 },
+        meta: { title: '积分兑换', authority: ['hq'], order: 1 },
       },
       {
         name: 'Gym-point-ledger',
@@ -300,14 +300,20 @@ const routes: RouteRecordRaw[] = [
         name: 'Gym-point-redemptions',
         path: '/gym/point-redemptions',
         component: () => import('#/views/gym/point-redemptions/index.vue'),
-        meta: { title: '积分兑换记录', authority: ['hq'], order: 3 },
+        meta: { title: '兑换记录', authority: ['hq'], order: 3 },
       },
     ],
   },
   {
     name: 'GymGroup-communications',
     path: '/gym/communications',
-    meta: { title: '消息管理', icon: 'lucide:messages-square', order: 10, authority: ['hq', 'store'] },
+    meta: {
+      title: '消息管理',
+      icon: 'lucide:messages-square',
+      order: 10,
+      authority: ['hq', 'store'],
+      hideInMenu: true,
+    },
     children: [
       {
         name: 'Gym-message-batches',
@@ -345,7 +351,7 @@ const routes: RouteRecordRaw[] = [
   {
     name: 'GymGroup-franchise',
     path: '/gym/franchise',
-    meta: { title: '加盟管理', icon: 'lucide:handshake', order: 12, authority: ['hq'] },
+    meta: { title: '加盟管理', icon: 'lucide:handshake', order: 12, authority: ['hq'], hideInMenu: true },
     children: [
       {
         name: 'Gym-franchise-brand',

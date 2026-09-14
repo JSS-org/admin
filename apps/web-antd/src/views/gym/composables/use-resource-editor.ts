@@ -19,14 +19,23 @@ export function useResourceEditor(props: ResourcePageProps, onSaved: (row: GymRo
   let requestKey = '';
   let openRequest = 0;
   const visibleFields = computed(() =>
-    props.fields.filter((field) => !field.hidden && !(current.value && field.immutable)),
+    props.fields.filter(
+      (field) =>
+        !field.hidden &&
+        !(current.value && field.immutable) &&
+        (!field.onlyEdit || !!current.value) &&
+        (!field.visibleWhen || field.visibleWhen(form)),
+    ),
   );
   async function open(row?: GymRow) {
+    if (saving.value) return;
     const request = ++openRequest;
     const endpoint = props.endpoint;
     requestKey = crypto.randomUUID();
 
-    const raw = row ? await gymApi.get(`${props.endpoint}/${row.id}`) : undefined;
+    const raw = row
+      ? await (props.loadDetail ? props.loadDetail(row) : gymApi.get(`${props.endpoint}/${row.id}`))
+      : undefined;
     if (request !== openRequest || endpoint !== props.endpoint) return;
     current.value = row;
     for (const key of Object.keys(form)) Reflect.deleteProperty(form, key);

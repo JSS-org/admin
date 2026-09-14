@@ -9,8 +9,8 @@ const config: ResourceDefinition = {
     { key: 'name', label: '课程名称', required: true },
     { key: 'description', label: '介绍', type: 'textarea' },
     { key: 'sessionCount', label: '课次', type: 'number', required: true, default: 1 },
-    { key: 'durationMinutes', label: '时长（分钟）', type: 'number', required: true, default: 60 },
-    { key: 'price', label: '价格（元）', type: 'money', required: true, default: '0.00' },
+    { key: 'durationMinutes', label: '时长（分钟）', type: 'number', required: true, default: 60, batch: true },
+    { key: 'price', label: '价格（元）', type: 'money', required: true, default: '0.00', batch: true },
   ],
   columns: [
     { title: '门店', dataIndex: 'storeName' },

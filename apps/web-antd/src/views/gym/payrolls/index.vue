@@ -4,7 +4,7 @@ import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { onMounted, ref, useTemplateRef } from 'vue';
 
-import { Alert, Button, Form, FormItem, Input, Modal, Select, Space, Table } from 'ant-design-vue';
+import { Alert, Button, DatePicker, Form, FormItem, Modal, Select, Space, Table } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
@@ -108,7 +108,7 @@ function confirm(row: GymRow) {
           <Select v-model:value="storeId" :options="stores.map((s) => ({ label: s.name, value: s.id }))" />
         </FormItem>
         <FormItem label="月份">
-          <Input v-model:value="month" type="month" />
+          <DatePicker v-model:value="month" picker="month" value-format="YYYY-MM" />
         </FormItem>
       </Form>
     </AdminDrawer>

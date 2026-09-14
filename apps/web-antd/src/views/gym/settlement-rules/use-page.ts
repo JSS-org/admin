@@ -58,6 +58,19 @@ export function usePage() {
     visible.value = true;
   }
   async function save() {
+    if (busy.value || form.value.status === 'active') return;
+    if (!form.value.items?.length || form.value.items.some((item: Record<string, any>) => !item.paymentAccountId)) {
+      message.error('请为每项选择接收账户');
+      return;
+    }
+    if (
+      Math.abs(
+        form.value.items.reduce((sum: number, item: Record<string, any>) => sum + Number(item.ratio ?? 0), 0) - 1,
+      ) > 0.000001
+    ) {
+      message.error('分账比例合计须为100%');
+      return;
+    }
     busy.value = true;
     try {
       const { cycleUnit, cycleValue, effectiveFrom, effectiveTo, items } = form.value;

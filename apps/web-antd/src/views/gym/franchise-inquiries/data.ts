@@ -5,6 +5,7 @@ const title = '加盟咨询';
 const fields: Field[] = [
   {
     key: 'status',
+    batch: true,
     label: '处理状态',
     type: 'select',
     options: [

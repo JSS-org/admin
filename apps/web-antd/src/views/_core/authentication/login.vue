@@ -12,6 +12,7 @@ import { useAuthStore } from '#/store';
 defineOptions({ name: 'Login' });
 
 const authStore = useAuthStore();
+const isMock = import.meta.env.DEV && import.meta.env.VITE_NITRO_MOCK === 'true';
 
 const MOCK_USER_OPTIONS: BasicOption[] = [
   {
@@ -29,7 +30,7 @@ const MOCK_USER_OPTIONS: BasicOption[] = [
 ];
 
 const formSchema = computed((): VbenFormSchema[] => {
-  return [
+  const schema: VbenFormSchema[] = [
     {
       component: 'VbenSelect',
       componentProps: {
@@ -51,7 +52,7 @@ const formSchema = computed((): VbenFormSchema[] => {
       },
       dependencies: {
         trigger(values, form) {
-          if (values.selectAccount) {
+          if (isMock && values.selectAccount) {
             const findUser = MOCK_USER_OPTIONS.find((item) => item.value === values.selectAccount);
             if (findUser) {
               form.setValues({
@@ -77,11 +78,15 @@ const formSchema = computed((): VbenFormSchema[] => {
       rules: z.string().min(1, { message: $t('authentication.passwordTip') }),
     },
   ];
+  return isMock ? schema : schema.slice(1).map((field) => ({ ...field, dependencies: undefined }));
 });
 </script>
 
 <template>
   <AuthenticationLogin
+    title="登录门店管理"
+    sub-title="使用员工账号登录，处理会员服务与门店日常运营。"
+    submit-button-text="登录工作台"
     :show-code-login="false"
     :show-qrcode-login="false"
     :show-register="false"

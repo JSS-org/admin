@@ -1,7 +1,7 @@
 import type { ResourceDefinition } from '#/views/gym/types';
 
 const config: ResourceDefinition = {
-  title: '积分兑换记录',
+  title: '兑换记录',
   fields: [],
   columns: [
     { title: '会员', dataIndex: 'memberName' },

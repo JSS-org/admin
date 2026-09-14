@@ -71,6 +71,11 @@ async function details(row: GymRow) {
 }
 
 async function submit() {
+  if (busy.value) return;
+  if (!templateId.value || targets.value.some((target) => !target.storeId || target.memberIds.length === 0)) {
+    message.error('请选择优惠券模板，并为每个发行门店选择会员');
+    return;
+  }
   busy.value = true;
   try {
     let data: Record<string, any> = {};
@@ -116,22 +121,29 @@ async function submit() {
       :confirm-loading="busy"
       @ok="submit"
     >
-      <Form v-if="mode === 'create'" layout="vertical">
-        <FormItem label="优惠券模板">
-          <Select v-model:value="templateId" :options="templates.map((t) => ({ label: t.name, value: t.id }))" />
+      <Form v-if="mode === 'create'" layout="vertical" :disabled="busy">
+        <FormItem label="优惠券模板" required>
+          <Select
+            v-model:value="templateId"
+            show-search
+            option-filter-prop="label"
+            :options="templates.map((t) => ({ label: t.name, value: t.id }))"
+          />
         </FormItem>
-        <div v-for="(target, index) in targets" :key="index">
-          <FormItem label="发行 / 发送门店">
+        <div v-for="(target, index) in targets" :key="index" class="gym-rule-card">
+          <FormItem label="发行门店" required>
             <Select
               v-model:value="target.storeId"
               :options="stores.map((s) => ({ label: s.name, value: s.id }))"
               @change="target.memberIds = []"
             />
           </FormItem>
-          <FormItem label="本店会员">
+          <FormItem label="本店会员" required>
             <Select
               v-model:value="target.memberIds"
               mode="multiple"
+              :disabled="busy || !target.storeId"
+              :placeholder="target.storeId ? '选择领券会员' : '请先选择发行门店'"
               show-search
               option-filter-prop="label"
               :options="
@@ -146,7 +158,7 @@ async function submit() {
           </FormItem>
           <Button v-if="targets.length > 1" @click="targets.splice(index, 1)"> 移除此门店 </Button>
         </div>
-        <Button @click="targets.push({ memberIds: [] })"> 增加发行门店 </Button>
+        <Button class="gym-form-add" type="dashed" @click="targets.push({ memberIds: [] })"> 增加发行门店 </Button>
       </Form>
       <template v-else>
         <Alert type="info" :message="`批次状态：${current?.status ?? '—'}`" class="mb-3" />

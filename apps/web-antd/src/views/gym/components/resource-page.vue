@@ -5,16 +5,17 @@ import type { GymRow } from '#/api/gym';
 
 import { computed, useSlots, watch } from 'vue';
 
-import { Button, Space, Table, Tag } from 'ant-design-vue';
+import { Alert, Button, Empty, Space, Table, Tag } from 'ant-design-vue';
 
 import { canGym } from '#/api/gym';
 
 import { useResourceEditor } from '../composables/use-resource-editor';
 import { useResourceList } from '../composables/use-resource-list';
 import { useResourceOptions } from '../composables/use-resource-options';
-import { displayValue } from '../utils/display';
+import { displayValue, statusColor } from '../utils/display';
 import AdminDrawer from './admin-drawer.vue';
 import Page from './admin-page.vue';
+import BulkEdit from './bulk-edit.vue';
 import FilterBar from './filter-bar.vue';
 import ResourceForm from './resource-form.vue';
 import TableSelectionActions from './table-selection-actions.vue';
@@ -43,6 +44,8 @@ const {
   items,
   total,
   loading,
+  error,
+  hasFilters,
   page,
   pageSize,
   filterDraft,
@@ -86,6 +89,11 @@ function search() {
   void applySearch();
 }
 
+function resetFilters() {
+  filterDraft.value = {};
+  search();
+}
+
 watch([page, pageSize], clearSelection, { flush: 'sync' });
 
 defineExpose({ load, open, items });
@@ -111,8 +119,32 @@ defineExpose({ load, open, items });
         @select-all="selectAll"
         @clear="clearSelection"
       />
+      <BulkEdit
+        v-if="writable && edit && fields.some((field) => field.batch)"
+        :endpoint="endpoint"
+        :fields="fields.filter((field) => field.batch && !field.immutable)"
+        :rows="selectedRows"
+        :editable="editable"
+        :disabled="selectionDisabled"
+        :field-options="fieldOptions"
+        @changed="
+          clearSelection();
+          load();
+          emit('changed');
+        "
+      />
       <slot name="toolbar" :reload="load" :selected-rows="selectedRows" :selected-row-keys="selectedKeys"></slot>
+      <Button class="gym-refresh" :loading="loading" @click="load">刷新列表</Button>
     </div>
+    <Alert
+      v-if="error"
+      type="error"
+      show-icon
+      message="列表加载失败"
+      description="请检查网络连接后重试。当前筛选条件已保留。"
+    >
+      <template #action><Button :loading="loading" @click="load">重试</Button></template>
+    </Alert>
     <slot name="summary" :data="response"></slot>
     <Table
       :data-source="items"
@@ -136,6 +168,15 @@ defineExpose({ load, open, items });
         }
       "
     >
+      <template #emptyText>
+        <Empty
+          :image="Empty.PRESENTED_IMAGE_SIMPLE"
+          :description="error ? '暂时无法获取数据' : hasFilters ? '没有找到符合条件的记录' : '暂无记录'"
+        >
+          <Button v-if="hasFilters && !error" @click="resetFilters">清空筛选</Button>
+          <Button v-else-if="writable && create && !error" type="primary" @click="open()">新增记录</Button>
+        </Empty>
+      </template>
       <template #bodyCell="{ column, record, text }">
         <Space v-if="column.dataIndex === '_actions'" wrap>
           <Button
@@ -148,7 +189,7 @@ defineExpose({ load, open, items });
           <Button v-if="detail" type="link" @click="emit('detail', record as GymRow)"> 详情 </Button>
           <slot name="actions" :row="record as GymRow" :reload="load"></slot>
         </Space>
-        <Tag v-else-if="column.dataIndex === 'status'">
+        <Tag v-else-if="column.dataIndex === 'status'" :color="statusColor(text)">
           {{ displayValue(text, column.dataIndex, fields, options) }}
         </Tag>
         <span v-else>{{ displayValue(text, String(column.dataIndex ?? ''), fields, options) }}</span>
@@ -162,7 +203,14 @@ defineExpose({ load, open, items });
       destroy-on-close
       @ok="save"
     >
-      <ResourceForm :ref="setFormRef" :model-value="form" :fields="visibleFields" :field-options="fieldOptions" />
+      <ResourceForm
+        :ref="setFormRef"
+        :model-value="form"
+        :fields="visibleFields"
+        :field-options="fieldOptions"
+        :disabled="saving"
+      />
+      <slot name="editor-extra" :row="current" :form="form" :saving="saving"></slot>
     </AdminDrawer>
   </Page>
 </template>

@@ -23,9 +23,10 @@ const fields: Field[] = [
   },
   { key: 'provider', label: '厂商（mock为开发模拟设备）', required: true, immutable: true, default: 'mock' },
   { key: 'deviceUid', label: '设备唯一编号', required: true, immutable: true },
-  { key: 'location', label: '安装位置' },
+  { key: 'location', label: '安装位置', batch: true },
   {
     key: 'status',
+    batch: true,
     label: '状态',
     type: 'select',
     default: 'active',

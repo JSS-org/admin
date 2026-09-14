@@ -44,6 +44,16 @@ const statuses: Record<string, string> = {
   course: '课程',
 };
 
+export function statusColor(value: unknown) {
+  if (typeof value !== 'string') return undefined;
+  if (['active', 'approved', 'attended', 'completed', 'published', 'signed', 'succeeded'].includes(value))
+    return 'success';
+  if (['frozen', 'pending', 'queued'].includes(value)) return 'warning';
+  if (['failed', 'missed', 'rejected'].includes(value)) return 'error';
+  if (['confirmed', 'scheduled'].includes(value)) return 'processing';
+  return undefined;
+}
+
 export function displayValue(
   value: any,
   key: string,

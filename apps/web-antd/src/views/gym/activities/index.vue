@@ -2,79 +2,51 @@
 import type { GymRow } from '#/api/gym';
 import type { ResourcePageHandle } from '#/views/gym/types';
 
-import { onMounted, ref, useTemplateRef } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 
-import { Button, message, Table, Upload } from 'ant-design-vue';
+import { Button, Descriptions, DescriptionsItem, Form, FormItem, message, Tag } from 'ant-design-vue';
 
-import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
+import { canGym, gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
+import EntityRecords from '#/views/gym/components/entity-records.vue';
+import FileMedia from '#/views/gym/components/file-media.vue';
+import FileUpload from '#/views/gym/components/file-upload.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import { displayValue, statusColor } from '#/views/gym/utils/display';
 
 import { columns, fields, initial, prepare, title } from './data';
-
-const data = ref<Record<string, any>>({ blocks: [], models: [] });
-
-const busy = ref(false);
-
 const page = useTemplateRef<ResourcePageHandle>('page');
-
+const busy = ref(false);
+const uploading = ref(false);
 const visible = ref(false);
-
 const current = ref<GymRow>();
-
-const registrations = ref<GymRow[]>([]);
-
 const mode = ref('');
-
-async function load() {
-  busy.value = true;
-  try {
-    data.value = await gymApi.get('activities', undefined);
-  } finally {
-    busy.value = false;
-  }
-}
-
-onMounted(async () => {
-  await load();
-});
-
-async function upload(file: File, target: Record<string, any>, key: string, list = false) {
-  busy.value = true;
-  try {
-    const result = await uploadGymFile(file, file.type.startsWith('video/') ? 'video' : 'image', undefined);
-    if (list) target[key].push(result.id);
-    else target[key] = result.id;
-    message.success('文件已上传，请保存配置');
-  } finally {
-    busy.value = false;
-  }
-  return false;
-}
-
-async function detail(row: GymRow) {
-  current.value = row;
-  mode.value = 'registrations';
-  const result = await gymApi.list(`activities/${row.id}/registrations`, {
-    pageSize: 100,
-  });
-  registrations.value = result.items;
-  visible.value = true;
-}
-
-function cover(row: GymRow) {
+function open(row: GymRow, action: string) {
+  if (busy.value || uploading.value) return;
   current.value = { ...row };
-  mode.value = 'cover';
+  mode.value = action;
   visible.value = true;
 }
-
 async function saveCover() {
-  if (current.value) {
-    await gymApi.patch(`activities/${current.value.id}`, {
-      coverFileId: current.value.coverFileId,
-    });
+  if (!current.value || busy.value || uploading.value) return;
+  busy.value = true;
+  try {
+    await gymApi.patch(`activities/${current.value.id}`, { coverFileId: current.value.coverFileId ?? null });
     visible.value = false;
     await page.value?.load();
+    message.success('活动封面已保存');
+  } finally {
+    busy.value = false;
+  }
+}
+async function setStatus(row: GymRow, status: string) {
+  if (busy.value) return;
+  busy.value = true;
+  try {
+    await gymApi.patch(`activities/${row.id}`, { status });
+    await page.value?.load();
+  } finally {
+    busy.value = false;
   }
 }
 </script>
@@ -87,68 +59,73 @@ async function saveCover() {
       :fields="fields"
       :columns="columns"
       write-code="activities:manage"
-      :create="true"
-      :edit="true"
       :prepare="prepare"
       :initial="initial"
-      :store-filter="true"
+      store-filter
       time-filter
     >
-      <template #actions="{ row, reload }">
-        <Button type="link" @click="detail(row)">报名记录</Button>
+      <template #actions="{ row }">
+        <Button type="link" @click="open(row, 'detail')">活动详情</Button>
         <template v-if="canGym('activities:manage')">
-          <Button type="link" @click="cover(row)">封面</Button>
-          <Button
-            type="link"
-            @click="
-              async () => {
-                await gymApi.patch(`activities/${row.id}`, {
-                  status: 'published',
-                });
-                await reload();
-              }
-            "
+          <Button type="link" @click="open(row, 'cover')">编辑封面</Button>
+          <Button v-if="row.status === 'draft'" type="link" :disabled="busy" @click="setStatus(row, 'published')"
+            >发布</Button
           >
-            发布
-          </Button>
-          <Button
-            type="link"
-            @click="
-              async () => {
-                await gymApi.patch(`activities/${row.id}`, {
-                  status: 'cancelled',
-                });
-                await reload();
-              }
-            "
+          <Button v-if="row.status === 'published'" type="link" :disabled="busy" @click="setStatus(row, 'closed')"
+            >结束报名</Button
           >
-            取消活动
-          </Button>
+          <Button
+            v-if="['draft', 'published'].includes(row.status)"
+            type="link"
+            danger
+            :disabled="busy"
+            @click="setStatus(row, 'cancelled')"
+            >取消活动</Button
+          >
         </template>
       </template>
     </ResourcePage>
-    <AdminDrawer v-model:open="visible" title="活动资料" :footer="mode === 'cover' ? undefined : null" @ok="saveCover">
-      <template v-if="mode === 'cover' && current">
-        <Upload
-          :before-upload="(file) => (current ? upload(file, current, 'coverFileId') : false)"
-          :show-upload-list="false"
-          accept=".png,.jpg,.jpeg"
+    <AdminDrawer
+      v-model:open="visible"
+      :title="mode === 'cover' ? '编辑活动封面' : current?.name"
+      :footer="mode === 'cover' ? undefined : null"
+      :width="850"
+      :confirm-loading="busy || uploading"
+      @ok="saveCover"
+    >
+      <Form v-if="mode === 'cover' && current" layout="vertical"
+        ><FormItem label="活动封面"
+          ><FileUpload
+            v-model="current.coverFileId"
+            category="image"
+            :disabled="busy || uploading"
+            @uploading="uploading = $event" /></FormItem
+      ></Form>
+      <template v-else-if="current">
+        <FileMedia v-if="current.coverFileId" :file-id="current.coverFileId" :alt="current.name" class="mb-5" />
+        <Tag :color="statusColor(current.status)">{{ displayValue(current.status, 'status', [], {}) }}</Tag>
+        <p class="my-4 whitespace-pre-wrap leading-7">{{ current.description }}</p>
+        <Descriptions :column="1" bordered class="mb-5"
+          ><DescriptionsItem label="活动门店">{{ current.storeNames }}</DescriptionsItem
+          ><DescriptionsItem label="活动时间"
+            >{{ displayValue(current.startsAt, 'startsAt', [], {}) }} —
+            {{ displayValue(current.endsAt, 'endsAt', [], {}) }}</DescriptionsItem
+          ><DescriptionsItem label="报名情况"
+            >{{ current.registrationCount }} / {{ current.capacity ?? '不限' }}</DescriptionsItem
+          ></Descriptions
         >
-          <Button>上传活动封面</Button>
-        </Upload>
-        <Button v-if="current.coverFileId" type="link" @click="openGymFile(current.coverFileId)"> 查看封面 </Button>
+        <h3 class="mb-3 font-medium">报名记录</h3>
+        <EntityRecords
+          :endpoint="`activities/${current.id}/registrations`"
+          :params="{}"
+          :columns="[
+            { title: '会员', dataIndex: 'memberName' },
+            { title: '门店', dataIndex: 'storeName' },
+            { title: '状态', dataIndex: 'status' },
+            { title: '报名时间', dataIndex: 'registeredAt' },
+          ]"
+        />
       </template>
-      <Table
-        v-else
-        :data-source="registrations"
-        row-key="id"
-        :columns="[
-          { title: '会员', dataIndex: 'memberName' },
-          { title: '门店', dataIndex: 'storeName' },
-          { title: '状态', dataIndex: 'status' },
-          { title: '报名时间', dataIndex: 'registeredAt' },
-        ]"
-      />
     </AdminDrawer>
   </div>
 </template>

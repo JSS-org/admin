@@ -7,6 +7,22 @@
   min-width: 0;
 }
 
+.gym-page-heading h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 650;
+  line-height: 1.5;
+  color: hsl(var(--foreground));
+  letter-spacing: -0.4px;
+}
+
+.gym-page-heading p {
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: hsl(var(--muted-foreground));
+}
+
 .gym-page-content {
   display: flex;
   flex-direction: column;
@@ -30,7 +46,56 @@
   flex-basis: 100%;
 }
 
-.gym-page-content > .ant-form:not(.gym-filter) {
+.gym-refresh {
+  margin-left: auto;
+}
+
+.gym-page-content > .ant-table-wrapper {
+  padding: 0 0 4px;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 10px;
+}
+
+.gym-page-content .ant-table-thead > tr > th {
+  padding-block: 14px;
+  font-weight: 600;
+  background: hsl(var(--muted) / 65%);
+}
+
+.gym-page-content .ant-table-tbody > tr > td {
+  padding-block: 14px;
+}
+
+.gym-page-content .ant-table-pagination {
+  padding-inline: 16px;
+}
+
+.gym-page-content .ant-tag {
+  padding-inline: 9px;
+  border-radius: 6px;
+}
+
+.gym-page-content .ant-empty {
+  padding: 24px 12px;
+}
+
+@media (width <= 640px) {
+  .gym-page-content {
+    gap: 16px;
+    padding: 12px;
+  }
+
+  .gym-page-heading h1 {
+    font-size: 20px;
+  }
+
+  .gym-toolbar {
+    gap: 8px;
+  }
+}
+
+.gym-page-content > .ant-form:not(.gym-filter, .sales-config) {
   max-width: 1120px;
   padding: 20px;
   border: 1px solid hsl(var(--border));
@@ -84,6 +149,65 @@
   width: 100%;
 }
 
+.gym-dialog .ant-form,
+.gym-dialog .ant-form-item,
+.gym-dialog .ant-form-item-control,
+.gym-dialog .ant-form-item-control-input-content,
+.gym-dialog .ant-picker,
+.gym-dialog .ant-input-number,
+.gym-dialog .ant-input-number-group-wrapper {
+  width: 100%;
+  min-width: 0;
+}
+
+.gym-dialog .ant-drawer-body {
+  display: block;
+}
+
+.gym-form-stack,
+.gym-rule-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+}
+
+.gym-rule-card {
+  padding: 16px;
+  margin-block: 16px;
+  background: hsl(var(--muted) / 30%);
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+}
+
+.gym-rule-card .ant-form-item {
+  margin-bottom: 0;
+}
+
+.gym-form-add {
+  width: 100%;
+  min-height: 36px;
+  white-space: normal;
+}
+
+.gym-dialog .ant-form > .ant-btn {
+  width: 100%;
+  min-height: 36px;
+}
+
+.gym-dialog .ant-form .ant-space-horizontal {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.gym-dialog .ant-form .ant-space-item {
+  flex: none;
+  width: 100%;
+}
+
 .gym-dialog pre {
   overflow-wrap: anywhere;
   white-space: pre-wrap;
@@ -109,4 +233,21 @@
 .gym-page-content .ant-table-cell,
 .gym-dialog .ant-table-cell {
   overflow-wrap: anywhere;
+}
+
+.gym-save-bar {
+  position: sticky;
+  bottom: 12px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  color: hsl(var(--muted-foreground));
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 10px;
+  box-shadow: 0 4px 24px hsl(var(--foreground) / 8%);
 }

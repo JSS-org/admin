@@ -3,10 +3,11 @@ import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { useTemplateRef } from 'vue';
 
-import { Alert, Button, Form, FormItem, Input, InputNumber, Select, Space } from 'ant-design-vue';
+import { Alert, Button, DatePicker, Empty, Form, FormItem, Input, InputNumber, Select, Space } from 'ant-design-vue';
 
 import { canGym } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
+import PercentageInput from '#/views/gym/components/percentage-input.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 
 import { labels, templateColumns } from './data';
@@ -48,30 +49,29 @@ const { visible, busy, form, edit, saveTemplate, publish } = usePage(list);
       }"
       @ok="saveTemplate"
     >
-      <Alert
-        message="底薪和固定加扣项按整月；比例填0到1。销售区间为空表示全部净业绩，有区间时仅计算该区间内金额。"
-        type="info"
-      />
-      <Form layout="vertical">
+      <Alert message="底薪和固定加扣项按整月；提成使用百分比。销售区间留空时计算全部净业绩。" type="info" />
+      <Form layout="vertical" :disabled="busy || (form.status === 'published' && !form.newVersion)">
         <FormItem label="模板名称">
           <Input v-model:value="form.name" />
         </FormItem>
         <FormItem label="整月底薪">
           <InputNumber v-model:value="form.baseSalary" :min="0" :precision="2" />
         </FormItem>
-        <Space>
-          <FormItem label="生效日期">
-            <Input v-model:value="form.effectiveFrom" type="date" />
-          </FormItem>
-          <FormItem label="失效日期（不含）">
-            <Input v-model:value="form.effectiveTo" type="date" />
-          </FormItem>
-        </Space>
-        <FormItem v-for="(rule, index) in form.rules" :key="index" :label="`规则 ${Number(index) + 1}`">
-          <Space wrap>
+        <FormItem label="生效日期">
+          <DatePicker v-model:value="form.effectiveFrom" value-format="YYYY-MM-DD" />
+        </FormItem>
+        <FormItem label="失效日期（不含）">
+          <DatePicker v-model:value="form.effectiveTo" value-format="YYYY-MM-DD" />
+        </FormItem>
+        <Empty
+          v-if="!form.rules?.length"
+          :image="Empty.PRESENTED_IMAGE_SIMPLE"
+          description="暂无提成或加扣规则，当前仅计算底薪"
+        />
+        <section v-for="(rule, index) in form.rules" :key="index" class="gym-rule-card">
+          <FormItem :label="`规则 ${Number(index) + 1} · 工资组成`" required>
             <Select
               v-model:value="rule.component"
-              style="width: 160px"
               :options="
                 Object.entries(labels).map(([value, label]) => ({
                   label,
@@ -79,38 +79,39 @@ const { visible, busy, form, edit, saveTemplate, publish } = usePage(list);
                 }))
               "
             />
-            <template v-if="['card_sales', 'pt_sales'].includes(rule.component)">
-              <InputNumber
-                v-model:value="rule.rate"
-                aria-label="提成比例"
-                placeholder="比例"
-                :min="0"
-                :max="1"
-                :step="0.01"
-              />
-              <InputNumber v-model:value="rule.lowerBound" aria-label="区间下限" placeholder="金额下限" :min="0" />
-              <InputNumber v-model:value="rule.upperBound" aria-label="区间上限" placeholder="金额上限" :min="0" />
-            </template>
+          </FormItem>
+          <template v-if="['card_sales', 'pt_sales'].includes(rule.component)">
+            <FormItem label="提成比例" required><PercentageInput v-model:value="rule.rate" /></FormItem>
+            <FormItem label="业绩区间下限（元，留空为0）"
+              ><InputNumber v-model:value="rule.lowerBound" :min="0" :precision="2"
+            /></FormItem>
+            <FormItem label="业绩区间上限（元，留空为不限）"
+              ><InputNumber v-model:value="rule.upperBound" :min="0" :precision="2"
+            /></FormItem>
+          </template>
+          <FormItem v-else-if="rule.component === 'lessons'" label="每课时金额（元）" required>
             <InputNumber
-              v-else-if="rule.component === 'lessons'"
               v-model:value="rule.unitAmount"
               aria-label="每课时金额"
               placeholder="每课时金额"
               :min="0"
               :precision="2"
             />
+          </FormItem>
+          <FormItem v-else :label="rule.component === 'deduction' ? '固定扣款（元）' : '固定补贴（元）'" required>
             <InputNumber
-              v-else
               v-model:value="rule.fixedAmount"
               aria-label="固定金额"
               placeholder="固定金额"
               :min="0"
               :precision="2"
             />
-            <Button @click="form.rules.splice(Number(index), 1)">移除</Button>
-          </Space>
-        </FormItem>
-        <Button @click="form.rules.push({ component: 'card_sales', rate: 0 })"> 添加规则 </Button>
+          </FormItem>
+          <Button danger @click="form.rules.splice(Number(index), 1)">移除此规则</Button>
+        </section>
+        <Button class="gym-form-add" type="dashed" @click="form.rules.push({ component: 'card_sales', rate: 0 })">
+          添加规则
+        </Button>
       </Form>
     </AdminDrawer>
   </div>

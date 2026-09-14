@@ -25,6 +25,7 @@ import {
   unique,
   uuid,
 } from './core';
+import { assignEmployeeSalary } from './payroll';
 import { permissionCodes, storeCodes } from './state';
 
 const storeFields = [
@@ -275,11 +276,9 @@ export function foundation(req: Request): unknown {
       publicEmployee(row, req);
       if (method === 'GET' && !child) return publicEmployee(row, req);
       if (method === 'PATCH' && !child) {
-        only(
-          body,
-          employeeFields.filter((f) => f !== 'employeeNo'),
-        );
-        const next = { ...row, ...body };
+        only(body, [...employeeFields.filter((f) => f !== 'employeeNo'), 'salaryAssignment']);
+        const { salaryAssignment, ...profile } = body;
+        const next = { ...row, ...profile };
         str(next.name, '姓名');
         phone(next.phone);
         date(next.hiredOn, '入职日期');
@@ -290,6 +289,7 @@ export function foundation(req: Request): unknown {
           if (account)
             keepAdministrator(rows('accounts').map((a) => (a.id === account.id ? { ...a, status: 'inactive' } : a)));
         }
+        if (salaryAssignment !== undefined) assignEmployeeSalary(req, rid, salaryAssignment);
         Object.assign(row, next, { updatedAt: now() });
         rows('accounts')
           .filter((a) => a.employeeId === rid)

@@ -72,6 +72,16 @@ async function details(row: GymRow) {
 }
 
 async function submit() {
+  if (busy.value) return;
+  const recipient = targets.value[0];
+  if (!recipient?.storeId || recipient.memberIds.length === 0 || !subject.value.trim() || !content.value.trim()) {
+    message.error('请选择门店、会员并填写消息标题和内容');
+    return;
+  }
+  if (messageKind.value === 'private' && recipient.memberIds.length !== 1) {
+    message.error('私信只能选择一位会员');
+    return;
+  }
   busy.value = true;
   try {
     let data: Record<string, any> = {};
@@ -122,19 +132,46 @@ async function submit() {
       :confirm-loading="busy"
       @ok="submit"
     >
-      <Form v-if="mode === 'create'" layout="vertical">
+      <Form v-if="mode === 'create'" layout="vertical" :disabled="busy">
+        <FormItem label="消息类型" required>
+          <Select
+            v-model:value="messageKind"
+            :options="[
+              { label: '私信（一位会员）', value: 'private' },
+              { label: '批量通知', value: 'bulk' },
+            ]"
+            @change="targets.forEach((target) => (target.memberIds = []))"
+          />
+        </FormItem>
         <div v-for="(target, index) in targets" :key="index">
-          <FormItem label="发行 / 发送门店">
+          <FormItem label="发送门店" required>
             <Select
               v-model:value="target.storeId"
               :options="stores.map((s) => ({ label: s.name, value: s.id }))"
               @change="target.memberIds = []"
             />
           </FormItem>
-          <FormItem label="本店会员">
+          <FormItem :label="messageKind === 'private' ? '私信会员' : '接收会员'" required>
             <Select
+              v-if="messageKind === 'private'"
+              :value="target.memberIds[0]"
+              :disabled="busy || !target.storeId"
+              :placeholder="target.storeId ? '选择一位会员' : '请先选择发送门店'"
+              show-search
+              option-filter-prop="label"
+              :options="
+                members
+                  .filter((m) => m.storeIds?.includes(target.storeId))
+                  .map((m) => ({ label: `${m.name} ${m.phone}`, value: m.id }))
+              "
+              @change="(value) => (target.memberIds = value ? [String(value)] : [])"
+            />
+            <Select
+              v-else
               v-model:value="target.memberIds"
               mode="multiple"
+              :disabled="busy || !target.storeId"
+              :placeholder="target.storeId ? '选择接收会员' : '请先选择发送门店'"
               show-search
               option-filter-prop="label"
               :options="
@@ -149,15 +186,6 @@ async function submit() {
           </FormItem>
           <Button v-if="targets.length > 1" @click="targets.splice(index, 1)"> 移除此门店 </Button>
         </div>
-        <FormItem label="消息类型">
-          <Select
-            v-model:value="messageKind"
-            :options="[
-              { label: '私信（一位会员）', value: 'private' },
-              { label: '批量通知', value: 'bulk' },
-            ]"
-          />
-        </FormItem>
         <FormItem label="发送渠道">
           <Select
             v-model:value="channel"
@@ -168,10 +196,10 @@ async function submit() {
             ]"
           />
         </FormItem>
-        <FormItem label="标题">
+        <FormItem label="标题" required>
           <Input v-model:value="subject" />
         </FormItem>
-        <FormItem label="内容">
+        <FormItem label="内容" required>
           <Input.TextArea v-model:value="content" :rows="4" />
         </FormItem>
         <Alert type="info" message="未配置真实渠道的消息会记录发送失败，不会发送到会员。" />

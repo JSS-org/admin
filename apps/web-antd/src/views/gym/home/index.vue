@@ -5,11 +5,82 @@ import { RouterLink } from 'vue-router';
 import { IconifyIcon } from '@vben/icons';
 import { useAccessStore } from '@vben/stores';
 
+import { Alert, Button, Card, Empty, Segmented, Select, Skeleton, Statistic, Table } from 'ant-design-vue';
+
+import { canGym } from '#/api/gym';
 import AdminPage from '#/views/gym/components/admin-page.vue';
+import { displayValue } from '#/views/gym/utils/display';
+
+import DashboardChart from './dashboard-chart.vue';
+import { useDashboard } from './use-dashboard';
+
+const { data, loading, error, stores, storeId, days, allowed, load } = useDashboard();
+
+const scenarios = [
+  {
+    title: '会员服务',
+    description: '从建档到签约，快速处理会员到店需求。',
+    paths: [
+      '/gym/members',
+      '/gym/checkins',
+      '/gym/contracts',
+      '/gym/body-measurements',
+      '/gym/cards',
+      '/gym/point-products',
+    ],
+  },
+  {
+    title: '课程与经营',
+    description: '安排课程、办理预约，掌握门店经营表现。',
+    paths: [
+      '/gym/course-sessions',
+      '/gym/bookings',
+      '/gym/reports/performance',
+      '/gym/settings',
+      '/gym/coupon-store-quotas',
+      '/gym/activities',
+    ],
+  },
+  {
+    title: '门店协作',
+    description: '维护团队、设备与门店展示，衔接日常管理。',
+    paths: ['/gym/stores', '/gym/employees', '/gym/devices', '/gym/client-settings'],
+  },
+];
 
 const accessStore = useAccessStore();
 
 const shortcuts = [
+  { title: '门店资料', description: '门店位置、营业时间、环境与封面', icon: 'lucide:building-2', path: '/gym/stores' },
+  {
+    title: '员工资料',
+    description: '人员资料、门店归属与工资模板',
+    icon: 'lucide:contact-round',
+    path: '/gym/employees',
+  },
+  { title: '智能设备', description: '设备状态、柜格和指令记录', icon: 'lucide:door-open', path: '/gym/devices' },
+  {
+    title: '展示配置',
+    description: '编排小程序与 App 内容并预览',
+    icon: 'lucide:panels-top-left',
+    path: '/gym/client-settings',
+  },
+  {
+    title: '体测记录',
+    description: '会员身体数据与报告文件',
+    icon: 'lucide:heart-pulse',
+    path: '/gym/body-measurements',
+  },
+  { title: '会员卡模板', description: '维护卡种、适用门店及价格版本', icon: 'lucide:credit-card', path: '/gym/cards' },
+  { title: '积分兑换', description: '管理兑换商品、积分价格与库存', icon: 'lucide:gift', path: '/gym/point-products' },
+  { title: '售卡与核销', description: '配置售卡方案、包月及核销条件', icon: 'lucide:scan-line', path: '/gym/settings' },
+  {
+    title: '优惠券额度',
+    description: '查看、分配门店额度与变动流水',
+    icon: 'lucide:ticket',
+    path: '/gym/coupon-store-quotas',
+  },
+  { title: '门店活动', description: '安排活动、维护封面和报名记录', icon: 'lucide:flag', path: '/gym/activities' },
   {
     title: '会员管理',
     description: '会员建档、资料查询与持卡详情',
@@ -49,18 +120,122 @@ const shortcuts = [
 ];
 
 const visibleShortcuts = computed(() => shortcuts.filter((shortcut) => accessStore.getMenuByPath(shortcut.path)));
+const visibleScenarios = computed(() =>
+  scenarios
+    .map((scenario) => ({
+      ...scenario,
+      shortcuts: visibleShortcuts.value.filter((shortcut) => scenario.paths.includes(shortcut.path)),
+    }))
+    .filter((scenario) => scenario.shortcuts.length > 0),
+);
 </script>
 <template>
   <div class="gym-view">
-    <AdminPage title="首页">
-      <section aria-labelledby="home-shortcuts-title">
-        <h2 id="home-shortcuts-title" class="mb-4 text-base font-medium">常用功能</h2>
+    <AdminPage title="门店工作台" description="围绕会员服务与课程运营，开始今天的工作。">
+      <div class="gym-home-banner">
+        <div class="gym-home-banner-icon"><IconifyIcon icon="lucide:activity" class="size-7" aria-hidden="true" /></div>
+        <div>
+          <p class="gym-home-eyebrow">日常运营</p>
+          <h2>让每一次到店，都衔接顺畅</h2>
+          <p>会员建档、到店签到、课程预约，常用服务从这里开始。</p>
+        </div>
+      </div>
+      <section v-if="allowed" aria-label="经营数据看板">
+        <div class="dashboard-toolbar">
+          <div>
+            <h2 class="text-base font-semibold">经营概览</h2>
+            <p class="mt-1 text-sm text-muted-foreground">按北京时间统计，金额含期间退款；会员数按人去重。</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <Select
+              v-model:value="storeId"
+              placeholder="全部授权门店"
+              allow-clear
+              :options="stores.map((store) => ({ label: store.name, value: store.id }))"
+              aria-label="看板门店"
+              style="min-width: 180px"
+              @change="load"
+            /><Segmented
+              v-model:value="days"
+              :options="[
+                { label: '近7天', value: 7 },
+                { label: '近30天', value: 30 },
+              ]"
+              @change="load"
+            /><Button :loading="loading" @click="load">刷新</Button>
+          </div>
+        </div>
+        <Alert v-if="error" type="error" show-icon message="看板加载失败"
+          ><template #action><Button @click="load">重试</Button></template></Alert
+        >
+        <Skeleton v-else-if="loading" active :paragraph="{ rows: 8 }" />
+        <template v-else-if="data">
+          <p class="mb-4 text-sm text-muted-foreground">{{ data.from }} — {{ data.to }}</p>
+          <div class="dashboard-metrics">
+            <Card
+              ><Statistic title="期间净实收" :value="data.metrics.netAmount" :precision="2" prefix="¥" />
+              <p>按支付及退款发生时间</p></Card
+            >
+            <Card
+              ><Statistic title="到店人次" :value="data.metrics.entries" suffix="次" />
+              <p>仅统计成功签到</p></Card
+            >
+            <Card
+              ><Statistic title="新增会员资料" :value="data.metrics.newMembers" suffix="人" />
+              <p>期间新建会员及潜客</p></Card
+            >
+            <Card
+              ><Statistic title="在册会员" :value="data.metrics.activeMembers" suffix="人" />
+              <p>已启用的会员资料</p></Card
+            >
+          </div>
+          <div class="dashboard-charts">
+            <Card title="净实收与到店趋势"><DashboardChart :trend="data.trend" /></Card
+            ><Card title="会员构成"
+              ><DashboardChart
+                v-if="data.memberSegments.some((item: any) => item.value > 0)"
+                :segments="data.memberSegments"
+              /><Empty v-else description="暂无会员资料" class="py-12" />
+              <div class="flex flex-wrap justify-center gap-3 text-sm">
+                <span v-for="segment in data.memberSegments" :key="segment.name"
+                  >{{ segment.name }} {{ segment.value }}</span
+                >
+              </div></Card
+            >
+          </div>
+          <Card v-if="canGym('courses:read')" title="接下来 7 天的课程" class="mt-5"
+            ><template #extra><RouterLink to="/gym/course-sessions">查看课程安排</RouterLink></template
+            ><Table
+              :data-source="data.upcoming"
+              row-key="id"
+              :pagination="false"
+              size="small"
+              :scroll="{ x: 'max-content' }"
+              :columns="[
+                { title: '课程', dataIndex: 'courseName' },
+                { title: '门店', dataIndex: 'storeName' },
+                { title: '开始时间', dataIndex: 'startsAt' },
+                { title: '已预约 / 容量', dataIndex: 'capacity' },
+              ]"
+              ><template #bodyCell="{ column, text, record }"
+                ><span v-if="column.dataIndex === 'capacity'">{{ record.reservedCount }} / {{ record.capacity }}</span
+                ><span v-else>{{ displayValue(text, String(column.dataIndex ?? ''), [], {}) }}</span></template
+              ></Table
+            ></Card
+          >
+        </template>
+      </section>
+      <section v-for="scenario in visibleScenarios" :key="scenario.title" :aria-label="scenario.title">
+        <div class="gym-home-section-heading">
+          <h2>{{ scenario.title }}</h2>
+          <p>{{ scenario.description }}</p>
+        </div>
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           <RouterLink
-            v-for="shortcut in visibleShortcuts"
+            v-for="shortcut in scenario.shortcuts"
             :key="shortcut.path"
             :to="shortcut.path"
-            class="bg-card text-card-foreground hover:border-primary focus-visible:ring-ring flex items-start gap-4 rounded-lg border p-5 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+            class="gym-shortcut bg-card text-card-foreground hover:border-primary focus-visible:ring-ring flex items-start gap-4 rounded-lg border p-5 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
           >
             <span class="bg-primary/10 text-primary rounded-lg p-3">
               <IconifyIcon :icon="shortcut.icon" class="size-6" aria-hidden="true" />
@@ -79,6 +254,128 @@ const visibleShortcuts = computed(() => shortcuts.filter((shortcut) => accessSto
           </RouterLink>
         </div>
       </section>
+      <p v-if="visibleScenarios.length === 0" class="text-muted-foreground py-8 text-center">
+        暂无可用的常用功能，请联系管理员分配业务权限。
+      </p>
     </AdminPage>
   </div>
 </template>
+
+<style scoped>
+.dashboard-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.dashboard-metrics p {
+  margin-top: 12px;
+  font-size: 12px;
+  color: hsl(var(--muted-foreground));
+}
+
+.dashboard-charts {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.dashboard-charts > * {
+  min-width: 0;
+}
+
+@media (width <= 1000px) {
+  .dashboard-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (width <= 480px) {
+  .dashboard-metrics {
+    grid-template-columns: 1fr;
+  }
+}
+
+.gym-home-banner {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 28px;
+  background: linear-gradient(115deg, hsl(var(--primary) / 12%), hsl(var(--card)) 75%);
+  border: 1px solid hsl(var(--primary) / 18%);
+  border-radius: 12px;
+}
+
+.gym-home-banner-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  color: hsl(var(--primary));
+  background: hsl(var(--card));
+  border-radius: 16px;
+}
+
+.gym-home-eyebrow {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: hsl(var(--primary));
+}
+
+.gym-home-banner h2 {
+  margin-bottom: 8px;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.gym-home-banner h2 + p,
+.gym-home-section-heading p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: hsl(var(--muted-foreground));
+}
+
+.gym-home-section-heading {
+  margin-block: 4px 16px;
+}
+
+.gym-home-section-heading h2 {
+  margin-bottom: 4px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.gym-shortcut {
+  height: 100%;
+  color: hsl(var(--card-foreground));
+}
+
+@media (width <= 640px) {
+  .gym-home-banner {
+    gap: 14px;
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .gym-home-banner h2 {
+    font-size: 20px;
+  }
+}
+</style>

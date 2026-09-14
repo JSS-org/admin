@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Alert, Button, Form, FormItem, Input, InputNumber, Select, Space, Table } from 'ant-design-vue';
+import { Alert, Button, DatePicker, Empty, Form, FormItem, InputNumber, Select, Space, Table } from 'ant-design-vue';
 
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import Page from '#/views/gym/components/admin-page.vue';
 import FilterBar from '#/views/gym/components/filter-bar.vue';
+import PercentageInput from '#/views/gym/components/percentage-input.vue';
 import TableSelectionActions from '#/views/gym/components/table-selection-actions.vue';
 
 import { usePage } from './use-page';
@@ -103,7 +104,7 @@ const {
         :ok-button-props="{ disabled: form.status === 'active' }"
         @ok="save"
       >
-        <Form layout="vertical">
+        <Form layout="vertical" :disabled="busy || form.status === 'active'">
           <FormItem label="周期">
             <Select
               v-model:value="form.cycleUnit"
@@ -118,16 +119,22 @@ const {
             <InputNumber v-model:value="form.cycleValue" :min="1" :max="365" />
           </FormItem>
           <FormItem label="生效日期">
-            <Input v-model:value="form.effectiveFrom" type="date" />
+            <DatePicker v-model:value="form.effectiveFrom" value-format="YYYY-MM-DD" />
           </FormItem>
           <FormItem label="失效日期（不含）">
-            <Input v-model:value="form.effectiveTo" type="date" />
+            <DatePicker v-model:value="form.effectiveTo" value-format="YYYY-MM-DD" />
           </FormItem>
-          <FormItem v-for="(item, index) in form.items" :key="index" :label="`接收账户 ${Number(index) + 1} / 比例`">
-            <Space>
+          <Empty
+            v-if="!form.items?.length"
+            :image="Empty.PRESENTED_IMAGE_SIMPLE"
+            description="请添加至少一个接收账户"
+          />
+          <section v-for="(item, index) in form.items" :key="index" class="gym-rule-card">
+            <FormItem :label="`接收账户 ${Number(index) + 1}`" required>
               <Select
                 v-model:value="item.paymentAccountId"
-                style="width: 250px"
+                show-search
+                option-filter-prop="label"
                 :options="
                   accounts.map((a) => ({
                     label: `${a.accountName} ${a.accountMasked} (${a.bindingStatus})`,
@@ -135,11 +142,22 @@ const {
                   }))
                 "
               />
-              <InputNumber v-model:value="item.ratio" :min="0" :max="1" :step="0.01" />
-              <Button @click="form.items.splice(Number(index), 1)"> 移除 </Button>
-            </Space>
-          </FormItem>
-          <Button @click="form.items.push({ ratio: 0 })">添加接收账户</Button>
+            </FormItem>
+            <FormItem label="分账比例" required><PercentageInput v-model:value="item.ratio" /></FormItem>
+            <Button @click="form.items.splice(Number(index), 1)"> 移除 </Button>
+          </section>
+          <Alert
+            class="mb-4"
+            :type="
+              Math.abs(
+                form.items?.reduce((sum: number, item: Record<string, any>) => sum + Number(item.ratio ?? 0), 0) - 1,
+              ) < 0.000001
+                ? 'success'
+                : 'warning'
+            "
+            :message="`当前合计 ${((form.items ?? []).reduce((sum: number, item: Record<string, any>) => sum + Number(item.ratio ?? 0), 0) * 100).toFixed(2)}%，须为 100%`"
+          />
+          <Button class="gym-form-add" type="dashed" @click="form.items.push({ ratio: 0 })">添加接收账户</Button>
         </Form>
       </AdminDrawer>
     </Page>

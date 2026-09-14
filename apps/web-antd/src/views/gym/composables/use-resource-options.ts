@@ -27,7 +27,8 @@ export function useResourceOptions(props: ResourcePageProps, form: Record<string
         props.fields
           .filter((field) => field.source === source)
           .forEach((field) => {
-            options[field.key] = values;
+            const label = field.optionLabel;
+            options[field.key] = label ? rows.map((row) => ({ label: label(row), value: row.id })) : values;
           });
         if (source === 'stores') stores.value = values;
       }),
@@ -44,11 +45,25 @@ export function useResourceOptions(props: ResourcePageProps, form: Record<string
         if (!r.storeId && !r.storeIds) return true;
         return r.storeId === form.storeId || r.storeIds?.includes(form.storeId);
       })
-      .map((r) => ({ label: r.name ?? r.title ?? r.code, value: r.id }));
+      .map((r) => ({ label: field.optionLabel ? field.optionLabel(r) : (r.name ?? r.title ?? r.code), value: r.id }));
   }
 
   watch(
-    () => [props.endpoint, props.fields, props.storeFilter],
+    () => form.storeId,
+    (storeId, previous) => {
+      if (storeId === previous || previous === undefined) return;
+      for (const field of props.fields) {
+        if (!field.source || field.source === 'stores' || !sourceRows[field.source]) continue;
+        const allowed = new Set(fieldOptions(field).map((option) => option.value));
+        if (Array.isArray(form[field.key]))
+          form[field.key] = form[field.key].filter((value: any) => allowed.has(value));
+        else if (!allowed.has(form[field.key])) form[field.key] = undefined;
+      }
+    },
+  );
+
+  watch(
+    () => [props.endpoint, JSON.stringify(props.fields.map(({ key, source }) => ({ key, source }))), props.storeFilter],
     () => {
       void loadOptions();
     },

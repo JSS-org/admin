@@ -15,10 +15,10 @@ const config: ResourceDefinition = {
       immutable: true,
     },
     { key: 'coachId', label: '教练', source: 'coaches', type: 'select', required: true, immutable: true },
-    { key: 'room', label: '场地' },
+    { key: 'room', label: '场地', batch: true },
     { key: 'startsAt', label: '开始时间', type: 'datetime', required: true },
     { key: 'endsAt', label: '结束时间', type: 'datetime', required: true },
-    { key: 'capacity', label: '容量', type: 'number', required: true, default: 20 },
+    { key: 'capacity', label: '容量', type: 'number', required: true, default: 20, min: 1, batch: true },
   ],
   columns: [
     { title: '门店', dataIndex: 'storeName' },

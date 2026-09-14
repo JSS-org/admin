@@ -5,13 +5,32 @@ import type { GymRow } from '#/api/gym';
 export interface Field {
   key: string;
   label: string;
-  type?: 'date' | 'datetime' | 'money' | 'multi' | 'number' | 'password' | 'select' | 'text' | 'textarea';
+  type?:
+    | 'date'
+    | 'datetime'
+    | 'money'
+    | 'multi'
+    | 'number'
+    | 'password'
+    | 'percent'
+    | 'select'
+    | 'tags'
+    | 'text'
+    | 'textarea'
+    | 'time';
   required?: boolean;
   options?: { label: string; value: any }[];
   source?: string;
+  optionLabel?: (row: GymRow) => string;
   default?: any;
   immutable?: boolean;
   hidden?: boolean;
+  visibleWhen?: (values: Record<string, any>) => boolean;
+  min?: number;
+  max?: number;
+  precision?: number;
+  batch?: boolean;
+  onlyEdit?: boolean;
 }
 
 export interface ResourcePageProps {
@@ -31,6 +50,7 @@ export interface ResourcePageProps {
   prepare?: (values: Record<string, any>, row?: GymRow) => Record<string, any>;
   initial?: (row: GymRow) => GymRow;
   editable?: (row: GymRow) => boolean;
+  loadDetail?: (row: GymRow) => Promise<GymRow>;
 }
 
 export interface ResourcePageHandle {

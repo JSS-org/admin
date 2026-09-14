@@ -4,7 +4,7 @@ import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { useTemplateRef } from 'vue';
 
-import { Alert, Button, Form, FormItem, Input, Select, Space, Table } from 'ant-design-vue';
+import { Alert, Button, Form, FormItem, Input, Select, Table } from 'ant-design-vue';
 
 import { canGym } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
@@ -48,21 +48,26 @@ const { prepare, visible, mode, current, busy, compartments, commands, reason, c
       :confirm-loading="busy"
       @ok="save"
     >
-      <template v-if="mode === 'compartments'">
-        <Space v-for="(cell, index) in compartments" :key="index" class="mb-3">
-          <Input v-model:value="cell.number" placeholder="柜号" />
-          <Select
-            v-model:value="cell.status"
-            :options="[
-              { label: '可用', value: 'available' },
-              { label: '停用', value: 'inactive' },
-            ]"
-            style="min-width: 120px"
-          />
+      <Form v-if="mode === 'compartments'" layout="vertical">
+        <div v-for="(cell, index) in compartments" :key="index" class="gym-rule-card">
+          <FormItem label="柜格编号" required>
+            <Input v-model:value="cell.number" placeholder="柜号" />
+          </FormItem>
+          <FormItem label="柜格状态" required>
+            <Select
+              v-model:value="cell.status"
+              :options="[
+                { label: '可用', value: 'available' },
+                { label: '停用', value: 'inactive' },
+              ]"
+            />
+          </FormItem>
           <Button danger @click="compartments.splice(index, 1)"> 移除 </Button>
-        </Space>
-        <Button @click="compartments.push({ number: '', status: 'available' })"> 增加柜格 </Button>
-      </template>
+        </div>
+        <Button class="gym-form-add" type="dashed" @click="compartments.push({ number: '', status: 'available' })">
+          增加柜格
+        </Button>
+      </Form>
       <template v-if="mode === 'command'">
         <Alert
           v-if="current?.provider === 'mock'"

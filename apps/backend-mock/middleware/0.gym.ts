@@ -13,6 +13,7 @@ import { authenticate, login, refresh, revoke, userInfo } from '../utils/gym/aut
 import { content } from '../utils/gym/content';
 import { allowed, ApiError, fail, fileContents, find, id, insert, only, rows, storeScope } from '../utils/gym/core';
 import { coupons } from '../utils/gym/coupons';
+import { dashboard } from '../utils/gym/dashboard';
 import { devices } from '../utils/gym/devices';
 import { fileAccess } from '../utils/gym/files';
 import { foundation } from '../utils/gym/foundation';
@@ -130,6 +131,11 @@ export default defineEventHandler(async (event) => {
         const data = fileContents.get(row.id);
         if (!data) fail('模拟文件已重置，请重新上传', 404);
         event.node.res.setHeader('Content-Type', row.mimeType);
+        event.node.res.setHeader(
+          'Content-Disposition',
+          `inline; filename*=UTF-8''${encodeURIComponent(row.originalName)}`,
+        );
+        event.node.res.setHeader('Cache-Control', 'private, no-store');
         event.node.res.setHeader('X-Content-Type-Options', 'nosniff');
         return data;
       }
@@ -145,6 +151,7 @@ export default defineEventHandler(async (event) => {
       key: getHeader(event, 'Idempotency-Key'),
     };
     const result =
+      dashboard(request) ??
       payroll(request) ??
       settlement(request) ??
       content(request) ??

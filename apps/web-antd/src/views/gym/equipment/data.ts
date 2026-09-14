@@ -11,6 +11,7 @@ const fields: Field[] = [
   { key: 'model', label: '型号' },
   {
     key: 'status',
+    batch: true,
     label: '状态',
     type: 'select',
     default: 'active',
