@@ -132,14 +132,14 @@ const visibleScenarios = computed(() =>
 <template>
   <div class="gym-view">
     <AdminPage title="门店工作台" description="围绕会员服务与课程运营，开始今天的工作。">
-      <div class="gym-home-banner">
+      <!-- <div class="gym-home-banner">
         <div class="gym-home-banner-icon"><IconifyIcon icon="lucide:activity" class="size-7" aria-hidden="true" /></div>
         <div>
           <p class="gym-home-eyebrow">日常运营</p>
           <h2>让每一次到店，都衔接顺畅</h2>
           <p>会员建档、到店签到、课程预约，常用服务从这里开始。</p>
         </div>
-      </div>
+      </div> -->
       <section v-if="allowed" aria-label="经营数据看板">
         <div class="dashboard-toolbar">
           <div>
