@@ -345,16 +345,16 @@ async function save() {
       <Form v-if="mode === 'contract' || mode === 'file'" layout="vertical">
         <template v-if="mode === 'contract'">
           <FormItem label="模板名称">
-            <Input v-model:value="contractName" />
-</FormItem><FormItem label="适用类型">
+            <Input v-model:value="contractName" /> </FormItem
+          ><FormItem label="适用类型">
             <Select
               v-model:value="applicableType"
               :options="[
                 { label: '会员卡', value: 'card' },
                 { label: '课程', value: 'course' },
               ]"
-            />
-</FormItem><FormItem label="提前提醒天数">
+            /> </FormItem
+          ><FormItem label="提前提醒天数">
             <InputNumber v-model:value="reminderDays" :min="0" :max="365" />
           </FormItem>
         </template>
@@ -377,8 +377,8 @@ async function save() {
               { label: '通过', value: 'approve' },
               { label: '拒绝', value: 'reject' },
             ]"
-          />
-</FormItem><FormItem label="审批意见">
+          /> </FormItem
+        ><FormItem label="审批意见">
           <Input.TextArea v-model:value="comment" />
         </FormItem>
       </Form>
@@ -410,10 +410,10 @@ async function save() {
         <template v-if="isContract">
           <Descriptions :column="1" bordered class="mt-3">
             <DescriptionsItem label="签署IP">
-              {{ current.signIp ?? '尚未签署' }}
-</DescriptionsItem><DescriptionsItem label="设备标识">
-              {{ current.signDeviceUid ?? '—' }}
-</DescriptionsItem><DescriptionsItem label="签署设备信息">
+              {{ current.signIp ?? '尚未签署' }} </DescriptionsItem
+            ><DescriptionsItem label="设备标识">
+              {{ current.signDeviceUid ?? '—' }} </DescriptionsItem
+            ><DescriptionsItem label="签署设备信息">
               {{ current.signUserAgent ?? '—' }}
             </DescriptionsItem>
           </Descriptions>
@@ -422,8 +422,8 @@ async function save() {
               v-if="current.unsignedFileId"
               @click="openGymFile(current.unsignedFileId)"
             >
-              合同原件
-</Button><Button
+              合同原件 </Button
+            ><Button
               v-if="current.signedFileId"
               @click="openGymFile(current.signedFileId)"
             >
@@ -454,13 +454,13 @@ async function save() {
         <template v-else>
           <Descriptions :column="1" bordered class="my-3">
             <DescriptionsItem label="原价">
-              {{ current.requestSnapshot.originalPrice }}
-</DescriptionsItem><DescriptionsItem label="申请价">
-              {{ current.requestSnapshot.requestedPrice }}
-</DescriptionsItem><DescriptionsItem label="原因">
+              {{ current.requestSnapshot.originalPrice }} </DescriptionsItem
+            ><DescriptionsItem label="申请价">
+              {{ current.requestSnapshot.requestedPrice }} </DescriptionsItem
+            ><DescriptionsItem label="原因">
               {{ current.requestSnapshot.reason }}
-            </DescriptionsItem>
-</Descriptions><Table
+            </DescriptionsItem> </Descriptions
+          ><Table
             :data-source="current.tasks"
             row-key="id"
             :pagination="false"

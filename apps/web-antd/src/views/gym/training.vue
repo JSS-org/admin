@@ -484,9 +484,11 @@ onUnmounted(stop);
         >
           代会员预约
         </Button>
-        <span v-if="resource === 'checkins' && summary">今日授权门店：入场 {{ summary.entries }} 次，会员
+        <span v-if="resource === 'checkins' && summary"
+          >今日授权门店：入场 {{ summary.entries }} 次，会员
           {{ summary.members }} 人，陌生访客 {{ summary.visitors }} 次，昨日
-          {{ summary.yesterdayEntries }} 次（每15秒刷新）</span>
+          {{ summary.yesterdayEntries }} 次（每15秒刷新）</span
+        >
       </template>
       <template
         v-if="!['checkins', 'lesson-records'].includes(resource)"
@@ -590,8 +592,8 @@ onUnmounted(stop);
             :key="key"
             :label="title"
           >
-            {{ current[key ?? ''] ?? '—' }}
-</DescriptionsItem><DescriptionsItem label="备注">
+            {{ current[key ?? ''] ?? '—' }} </DescriptionsItem
+          ><DescriptionsItem label="备注">
             {{ current.note }}
           </DescriptionsItem>
         </Descriptions>
@@ -610,8 +612,8 @@ onUnmounted(stop);
             v-if="current.reportFileId"
             @click="openGymFile(current.reportFileId)"
           >
-            查看报告
-</Button><Upload
+            查看报告 </Button
+          ><Upload
             v-if="canGym('measurements:write')"
             :before-upload="report"
             :show-upload-list="false"

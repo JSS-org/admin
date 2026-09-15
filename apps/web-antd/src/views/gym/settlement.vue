@@ -157,8 +157,8 @@ const scopeFilter = computed({
         <template #bodyCell="{ column, record }">
           <Space v-if="column.key === 'action'">
             <Button @click="edit(record)">
-              {{ record.status === 'draft' ? '编辑' : '查看' }}
-</Button><Button v-if="record.status === 'draft'" @click="activate(record)">
+              {{ record.status === 'draft' ? '编辑' : '查看' }} </Button
+            ><Button v-if="record.status === 'draft'" @click="activate(record)">
               启用
             </Button>
           </Space>

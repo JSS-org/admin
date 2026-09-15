@@ -188,10 +188,10 @@ function confirm(row: GymRow) {
       <template #actions="{ row }">
         <Space>
           <Button @click="edit(row)">
-            {{ row.status === 'draft' ? '编辑' : '查看规则' }}
-</Button><Button v-if="row.status === 'draft'" @click="publish(row)">
-            发布
-</Button><Button @click="edit(row, true)">创建新版本</Button>
+            {{ row.status === 'draft' ? '编辑' : '查看规则' }} </Button
+          ><Button v-if="row.status === 'draft'" @click="publish(row)">
+            发布 </Button
+          ><Button @click="edit(row, true)">创建新版本</Button>
         </Space>
       </template>
     </ResourcePage>
@@ -283,8 +283,8 @@ function confirm(row: GymRow) {
             :loading="busy"
             @click="calculate(row)"
           >
-            重算
-</Button><Button
+            重算 </Button
+          ><Button
             v-if="canGym('payroll:confirm') && row.status === 'calculated'"
             @click="confirm(row)"
           >
@@ -321,8 +321,8 @@ function confirm(row: GymRow) {
         </FormItem>
         <Space>
           <FormItem label="生效日期">
-            <Input v-model:value="form.effectiveFrom" type="date" />
-</FormItem><FormItem label="失效日期（不含）">
+            <Input v-model:value="form.effectiveFrom" type="date" /> </FormItem
+          ><FormItem label="失效日期（不含）">
             <Input v-model:value="form.effectiveTo" type="date" />
           </FormItem>
         </Space>
@@ -404,8 +404,8 @@ function confirm(row: GymRow) {
           <Select
             v-model:value="storeId"
             :options="stores.map((s) => ({ label: s.name, value: s.id }))"
-          />
-</FormItem><FormItem label="月份">
+          /> </FormItem
+        ><FormItem label="月份">
           <Input v-model:value="month" type="month" />
         </FormItem>
       </Form>

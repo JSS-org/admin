@@ -2,17 +2,13 @@
 
 [English](./README.md) | **中文**
 
-> **闭源商业项目，禁止外传。** 本仓库是健身树（JSS）的内部商业资产，**非开源项目**，
-> 不接受外部 Issue 与 Pull Request。授权条款见 [LICENSE](./LICENSE)。
+> **闭源商业项目，禁止外传。** 本仓库是健身树（JSS）的内部商业资产，**非开源项目**，不接受外部 Issue 与 Pull Request。授权条款见 [LICENSE](./LICENSE)。
 
 ## 项目简介
 
-JSS Admin 是健身树（JSS）连锁健身门店的运营管理后台，覆盖门店日常经营的主要场景：
-会员、合同与审批、排课与体测、优惠券与积分、销售与结算、设备、内容、门店治理以及薪资
-核算，统一收敛在一个按范围（门店/区域）隔离的管理控制台中。
+JSS Admin 是健身树（JSS）连锁健身门店的运营管理后台，覆盖门店日常经营的主要场景：会员、合同与审批、排课与体测、优惠券与积分、销售与结算、设备、内容、门店治理以及薪资核算，统一收敛在一个按范围（门店/区域）隔离的管理控制台中。
 
-后台基于 [Vue Vben Admin](https://github.com/vbenjs/vue-vben-admin)（MIT）二次开发。
-上游框架代码位于 `packages/` 与 `internal/`，JSS 业务代码位于 `apps/web-antd`。
+后台基于 [Vue Vben Admin](https://github.com/vbenjs/vue-vben-admin)（MIT）二次开发。上游框架代码位于 `packages/` 与 `internal/`，JSS 业务代码位于 `apps/web-antd`。
 
 ## 技术栈
 
@@ -38,34 +34,31 @@ pnpm dev:antd
 
 ## 目录结构
 
-| 路径                | 说明                                       |
-| ------------------- | ------------------------------------------ |
-| `apps/web-antd`     | JSS 管理后台（产品本体）                   |
-| `apps/backend-mock` | 本地开发使用的 Mock 接口服务               |
-| `packages/`         | 共享框架包（`@vben/*`、`@vben-core/*`）    |
-| `internal/`         | 共享的构建、Lint 与 TypeScript 配置        |
-| `scripts/`          | 单体仓库工具（`vsh`、`turbo-run`）         |
-| `database/`         | 数据库结构与初始化脚本                     |
+| 路径                | 说明                                    |
+| ------------------- | --------------------------------------- |
+| `apps/web-antd`     | JSS 管理后台（产品本体）                |
+| `apps/backend-mock` | 本地开发使用的 Mock 接口服务            |
+| `packages/`         | 共享框架包（`@vben/*`、`@vben-core/*`） |
+| `internal/`         | 共享的构建、Lint 与 TypeScript 配置     |
+| `scripts/`          | 单体仓库工具（`vsh`、`turbo-run`）      |
+| `database/`         | 数据库结构与初始化脚本                  |
 
 ## 常用命令
 
-| 命令              | 说明                                          |
-| ----------------- | --------------------------------------------- |
-| `pnpm dev:antd`   | 启动管理后台开发服务                          |
-| `pnpm build:antd` | 构建管理后台                                  |
-| `pnpm lint`       | 运行 oxlint、ESLint 与 Stylelint              |
-| `pnpm format`     | 使用 oxfmt 格式化                             |
-| `pnpm check`      | 循环依赖、依赖、类型与拼写检查                |
-| `pnpm check:type` | 全量类型检查                                  |
-| `pnpm test:unit`  | 运行单元测试（Vitest）                        |
-| `pnpm test:e2e`   | 运行端到端测试（Playwright）                  |
+| 命令              | 说明                             |
+| ----------------- | -------------------------------- |
+| `pnpm dev:antd`   | 启动管理后台开发服务             |
+| `pnpm build:antd` | 构建管理后台                     |
+| `pnpm lint`       | 运行 oxlint、ESLint 与 Stylelint |
+| `pnpm format`     | 使用 oxfmt 格式化                |
+| `pnpm check`      | 循环依赖、依赖、类型与拼写检查   |
+| `pnpm check:type` | 全量类型检查                     |
+| `pnpm test:unit`  | 运行单元测试（Vitest）           |
+| `pnpm test:e2e`   | 运行端到端测试（Playwright）     |
 
 ## 提交规范
 
-提交信息由 `commit-msg` 钩子中的 commitlint 校验，遵循
-[Conventional Commits](https://www.conventionalcommits.org/) 并带上 scope，例如
-`feat(schedule): add recurring course slots`。完整规则见
-[`.github/commit-convention.md`](./.github/commit-convention.md)。
+提交信息由 `commit-msg` 钩子中的 commitlint 校验，遵循 [Conventional Commits](https://www.conventionalcommits.org/) 并带上 scope，例如 `feat(schedule): add recurring course slots`。完整规则见 [`.github/commit-convention.md`](./.github/commit-convention.md)。
 
 ## 浏览器支持
 
@@ -73,5 +66,4 @@ pnpm dev:antd
 
 ## 许可证
 
-闭源专有授权，详见 [LICENSE](./LICENSE)。其中同时保留了上游 Vue Vben Admin 框架的
-MIT 授权声明等第三方开源许可信息。
+闭源专有授权，详见 [LICENSE](./LICENSE)。其中同时保留了上游 Vue Vben Admin 框架的 MIT 授权声明等第三方开源许可信息。

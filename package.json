@@ -1,8 +1,8 @@
 {
   "name": "jss-admin-monorepo",
   "version": "5.7.0",
-  "private": true,
   "description": "健身树（JSS）门店管理后台 / JSS gym store management admin",
+  "private": true,
   "keywords": [
     "jss",
     "jss-admin",

@@ -164,7 +164,8 @@ async function upload(file: File) {
             record.isCover ? '是' : '否'
           }}</span>
           <Space v-if="column.dataIndex === '_actions'">
-            <Button type="link" @click="openGymFile(record.fileId)">查看</Button><Button
+            <Button type="link" @click="openGymFile(record.fileId)">查看</Button
+            ><Button
               v-if="canGym('stores:write')"
               type="link"
               @click="
@@ -176,8 +177,8 @@ async function upload(file: File) {
                 )
               "
             >
-              设为封面
-</Button><Button
+              设为封面 </Button
+            ><Button
               v-if="canGym('stores:write')"
               danger
               type="link"
