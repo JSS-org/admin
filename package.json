@@ -1,28 +1,25 @@
 {
-  "name": "vben-admin-monorepo",
+  "name": "jss-admin-monorepo",
   "version": "5.7.0",
+  "description": "健身树（JSS）门店管理后台 / JSS gym store management admin",
   "private": true,
   "keywords": [
+    "jss",
+    "jss-admin",
+    "健身树",
+    "gym",
+    "gym-management",
+    "admin",
     "monorepo",
     "turbo",
-    "vben",
-    "vben admin",
-    "vben pro",
     "vue",
-    "vue admin",
-    "vue vben admin",
-    "vue vben admin pro",
-    "vue3"
+    "vue3",
+    "vite",
+    "typescript"
   ],
-  "homepage": "https://github.com/vbenjs/vue-vben-admin",
-  "bugs": "https://github.com/vbenjs/vue-vben-admin/issues",
-  "repository": "vbenjs/vue-vben-admin.git",
-  "license": "MIT",
-  "author": {
-    "name": "vben",
-    "email": "ann.vben@gmail.com",
-    "url": "https://github.com/anncwb"
-  },
+  "repository": "git+https://github.com/Churk-Ben/JSS-admin.git",
+  "license": "UNLICENSED",
+  "author": "JSS",
   "type": "module",
   "scripts": {
     "bootstrap": "pnpm install",
@@ -35,10 +32,9 @@
     "build:naive": "pnpm run build --filter=@vben/web-naive",
     "build:tdesign": "pnpm run build --filter=@vben/web-tdesign",
     "build:play": "pnpm run build --filter=@vben/playground",
-    "changeset": "pnpm exec changeset",
     "check": "pnpm run check:circular && pnpm run check:dep && pnpm run check:type && pnpm check:cspell",
     "check:circular": "vsh check-circular",
-    "check:cspell": "cspell lint \"**/*.ts\" \"**/README.md\" \".changeset/*.md\" --no-progress",
+    "check:cspell": "cspell lint \"**/*.ts\" \"**/README.md\" --no-progress",
     "check:dep": "vsh check-dep",
     "check:type": "turbo run typecheck",
     "clean": "node ./scripts/clean.mjs",
@@ -63,15 +59,12 @@
     "test:unit": "vitest run --dom",
     "test:e2e": "turbo run test:e2e",
     "update:deps": "npx taze -r -w",
-    "version": "pnpm exec changeset version && pnpm install --no-frozen-lockfile",
     "catalog": "pnpm dlx codemod pnpm/catalog"
   },
   "dependencies": {
     "sortablejs": "catalog:"
   },
   "devDependencies": {
-    "@changesets/changelog-github": "catalog:",
-    "@changesets/cli": "catalog:",
     "@tsdown/css": "catalog:",
     "@types/node": "catalog:",
     "@vben/commitlint-config": "workspace:*",
