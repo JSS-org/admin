@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { Button } from 'ant-design-vue';
-
 import { openGymFile } from '#/api/gym';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { config, initial, prepare } from './data';
 </script>
@@ -22,7 +21,7 @@ import { config, initial, prepare } from './data';
       time-filter
     >
       <template #actions="{ row }">
-        <Button v-if="row.providerCodeFileId" type="link" @click="openGymFile(row.providerCodeFileId)"> 查看码 </Button>
+        <TableAction action="preview" v-if="row.providerCodeFileId" @click="openGymFile(row.providerCodeFileId)" />
       </template>
     </ResourcePage>
   </div>

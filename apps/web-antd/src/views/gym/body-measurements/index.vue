@@ -9,6 +9,7 @@ import { Button, Descriptions, DescriptionsItem, message, Space, Table, Upload }
 import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { config, initial, prepare } from './data';
 
@@ -96,7 +97,7 @@ async function report(file: File) {
       time-filter
     >
       <template #actions="{ row }">
-        <Button type="link" @click="detail(row)"> 详情 / 报告 </Button>
+        <TableAction action="detail" @click="detail(row)" />
       </template>
     </ResourcePage>
     <AdminDrawer v-model:open="visible" title="体测详情" :confirm-loading="saving" :footer="null" @ok="saveBooking">

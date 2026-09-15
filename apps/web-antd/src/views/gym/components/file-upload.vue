@@ -54,7 +54,7 @@ async function upload(file: File) {
 }
 </script>
 <template>
-  <div class="gym-upload">
+  <div class="gym-upload gym-form-stack">
     <Upload.Dragger
       :accept="accept"
       :file-list="files"
@@ -76,7 +76,7 @@ async function upload(file: File) {
         }}
       </p>
     </Upload.Dragger>
-    <FileMedia v-if="model && category !== 'contract'" :file-id="model" :kind="category" class="mt-4" />
+    <FileMedia v-if="model && category !== 'contract'" :file-id="model" :kind="category" />
   </div>
 </template>
 <style scoped>

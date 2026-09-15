@@ -63,7 +63,11 @@ export function useResourceOptions(props: ResourcePageProps, form: Record<string
   );
 
   watch(
-    () => [props.endpoint, JSON.stringify(props.fields.map(({ key, source }) => ({ key, source }))), props.storeFilter],
+    [
+      () => props.endpoint,
+      () => JSON.stringify(props.fields.map(({ key, source }) => ({ key, source }))),
+      () => props.storeFilter,
+    ],
     () => {
       void loadOptions();
     },

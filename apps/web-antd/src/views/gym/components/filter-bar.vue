@@ -148,7 +148,7 @@ function reset() {
 
 <style scoped>
 .gym-filter {
-  padding: 16px;
+  padding: var(--gym-card-padding);
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius);
@@ -157,7 +157,7 @@ function reset() {
 .gym-filter-fields {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
-  gap: 16px;
+  gap: var(--gym-space-field);
 }
 
 .gym-filter-fields :deep(.ant-form-item) {
@@ -176,10 +176,10 @@ function reset() {
 .gym-filter-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--gym-space-action);
   align-items: center;
   justify-content: flex-end;
-  margin-top: 16px;
+  margin-top: var(--gym-space-field);
 }
 
 .gym-filter-hint {

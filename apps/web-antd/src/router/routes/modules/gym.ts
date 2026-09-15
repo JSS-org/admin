@@ -1,6 +1,18 @@
 import type { RouteRecordRaw } from 'vue-router';
 const routes: RouteRecordRaw[] = [
   {
+    name: 'GymFilePreview',
+    path: '/gym/file-preview/:id',
+    component: () => import('#/views/gym/components/file-preview.vue'),
+    meta: {
+      title: '文件预览',
+      icon: 'lucide:file-search',
+      hideInMenu: true,
+      keepAlive: false,
+      authority: ['hq', 'store'],
+    },
+  },
+  {
     name: 'GymHome',
     path: '/gym/home',
     component: () => import('#/views/gym/home/index.vue'),

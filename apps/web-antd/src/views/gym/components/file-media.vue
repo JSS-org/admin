@@ -3,7 +3,7 @@ import { onScopeDispose, ref, watch } from 'vue';
 
 import { Button, Image, Skeleton } from 'ant-design-vue';
 
-import { getGymFileUrl } from '#/api/gym';
+import { getGymFileUrl, openGymFile } from '#/api/gym';
 const props = withDefaults(defineProps<{ fileId?: null | string; kind?: 'image' | 'video'; alt?: string }>(), {
   fileId: undefined,
   kind: 'image',
@@ -46,8 +46,16 @@ onScopeDispose(() => {
   <div class="file-media">
     <Skeleton v-if="loading" active :paragraph="{ rows: 2 }" />
     <div v-else-if="failed" class="file-media-empty">媒体加载失败 <Button type="link" @click="load">重试</Button></div>
-    <Image v-else-if="url && kind === 'image'" :src="url" :alt="alt" />
-    <video v-else-if="url" :src="url" controls preload="metadata"></video>
+    <button
+      v-else-if="url"
+      type="button"
+      class="file-media-open"
+      :aria-label="`预览文件：${alt}`"
+      @click="fileId && openGymFile(fileId)"
+    >
+      <Image v-if="kind === 'image'" :src="url" :alt="alt" :preview="false" />
+      <template v-else><video :src="url" muted preload="metadata"></video><span>在标签页查看视频</span></template>
+    </button>
     <div v-else class="file-media-empty">{{ alt }}</div>
   </div>
 </template>
@@ -56,6 +64,13 @@ onScopeDispose(() => {
   overflow: hidden;
   background: hsl(var(--muted));
   border-radius: 10px;
+}
+
+.file-media-open {
+  display: block;
+  width: 100%;
+  padding: 0;
+  cursor: pointer;
 }
 
 .file-media :deep(.ant-image),

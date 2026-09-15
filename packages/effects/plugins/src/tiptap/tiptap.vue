@@ -120,7 +120,7 @@ function openPreviewModal() {
 watch(
   () => props.editable,
   (editable) => {
-    editor.value?.setEditable(editable);
+    editor.value?.setEditable(editable, false);
   },
 );
 watch(

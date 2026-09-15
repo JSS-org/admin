@@ -9,6 +9,7 @@ import { Alert, Button, DatePicker, Form, FormItem, Modal, Select, Space, Table 
 import { canGym, gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { columns, itemColumns } from './data';
 
@@ -83,21 +84,23 @@ function confirm(row: GymRow) {
       @detail="details"
       :columns="columns"
     >
-      <template #toolbar>
+      <template #create>
         <Button v-if="canGym('payroll:calculate')" type="primary" @click="calculateVisible = true"> 计算月工资 </Button>
       </template>
       <template #actions="{ row }">
         <Space>
-          <Button
+          <TableAction
+            action="calculate"
             v-if="canGym('payroll:calculate') && row.status !== 'confirmed'"
             :loading="busy"
             @click="calculate(row)"
-          >
-            重算
-          </Button>
-          <Button v-if="canGym('payroll:confirm') && row.status === 'calculated'" @click="confirm(row)">
-            确认工资
-          </Button>
+          />
+          <TableAction
+            action="confirm"
+            label="确认工资"
+            v-if="canGym('payroll:confirm') && row.status === 'calculated'"
+            @click="confirm(row)"
+          />
         </Space>
       </template>
     </ResourcePage>
@@ -116,7 +119,7 @@ function confirm(row: GymRow) {
       <p>{{ detail?.storeName }} / {{ detail?.month }} / {{ detail?.status }}；实发合计 {{ detail?.netAmount }}</p>
       <Table row-key="id" :data-source="detail?.items" :columns="itemColumns" :pagination="false">
         <template #bodyCell="{ column, record }">
-          <Button v-if="column.key === 'action'" @click="selectedItem = record"> 计算来源 </Button>
+          <TableAction action="source" v-if="column.key === 'action'" @click="selectedItem = record" />
         </template>
       </Table>
       <template v-if="selectedItem">

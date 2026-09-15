@@ -8,6 +8,7 @@ import { Alert, Button, Form, FormItem, Input, Popconfirm, Select } from 'ant-de
 import { canGym } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { config } from './data';
 import { usePage } from './use-page';
@@ -51,7 +52,7 @@ const {
       store-filter
       time-filter
     >
-      <template v-if="canGym('bookings:write')" #toolbar>
+      <template v-if="canGym('bookings:write')" #create>
         <Button v-if="canGym('bookings:write')" type="primary" @click="openBooking"> 代会员预约 </Button>
       </template>
       <template #actions="{ row }">
@@ -63,7 +64,7 @@ const {
           :disabled="cancellingIds.includes(row.id)"
           @confirm="cancel(row)"
         >
-          <Button type="link" danger :loading="cancellingIds.includes(row.id)">取消预约</Button>
+          <TableAction action="cancel" label="取消预约" danger :loading="cancellingIds.includes(row.id)" />
         </Popconfirm>
       </template>
     </ResourcePage>

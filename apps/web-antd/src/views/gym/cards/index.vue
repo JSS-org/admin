@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { Button, message } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { columns, fields } from './data';
 </script>
@@ -18,8 +19,8 @@ import { columns, fields } from './data';
     >
       <template #actions="{ row, reload }">
         <template v-if="canGym('cards:write')">
-          <Button
-            type="link"
+          <TableAction
+            action="version"
             @click="
               async () => {
                 await gymApi.post(`card-templates/${row.id}/versions`, {});
@@ -27,11 +28,9 @@ import { columns, fields } from './data';
                 await reload();
               }
             "
-          >
-            新版本
-          </Button>
-          <Button
-            type="link"
+          />
+          <TableAction
+            :action="row.status === 'published' ? 'disable' : 'publish'"
             @click="
               async () => {
                 await gymApi.patch(`card-templates/${row.id}`, {
@@ -40,9 +39,7 @@ import { columns, fields } from './data';
                 await reload();
               }
             "
-          >
-            {{ row.status === 'published' ? '停用' : '发布' }}
-          </Button>
+          />
         </template>
       </template>
     </ResourcePage>

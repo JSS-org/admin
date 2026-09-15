@@ -9,6 +9,7 @@ import { Alert, Button, Form, FormItem, Input, Select, Table } from 'ant-design-
 import { canGym } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { code, columns, fields, title } from './data';
 import { usePage } from './use-page';
@@ -32,12 +33,12 @@ const { prepare, visible, mode, current, busy, compartments, commands, reason, c
       :editable="(row) => !row.revokedAt"
     >
       <template #actions="{ row }">
-        <Button v-if="row.type === 'locker' && canGym('devices:write')" type="link" @click="open(row, 'compartments')">
-          配置柜格
-        </Button>
-        <Button v-if="['door', 'locker'].includes(row.type)" type="link" @click="open(row, 'command')">
-          远程操作 / 记录
-        </Button>
+        <TableAction
+          action="compartments"
+          v-if="row.type === 'locker' && canGym('devices:write')"
+          @click="open(row, 'compartments')"
+        />
+        <TableAction action="command" v-if="['door', 'locker'].includes(row.type)" @click="open(row, 'command')" />
       </template>
     </ResourcePage>
     <AdminDrawer

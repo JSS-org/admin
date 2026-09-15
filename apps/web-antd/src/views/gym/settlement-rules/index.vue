@@ -5,6 +5,7 @@ import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import Page from '#/views/gym/components/admin-page.vue';
 import FilterBar from '#/views/gym/components/filter-bar.vue';
 import PercentageInput from '#/views/gym/components/percentage-input.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 import TableSelectionActions from '#/views/gym/components/table-selection-actions.vue';
 
 import { usePage } from './use-page';
@@ -92,8 +93,8 @@ const {
       >
         <template #bodyCell="{ column, record }">
           <Space v-if="column.key === 'action'">
-            <Button @click="edit(record)">{{ record.status === 'draft' ? '编辑' : '查看' }}</Button>
-            <Button v-if="record.status === 'draft'" @click="activate(record)"> 启用 </Button>
+            <TableAction :action="record.status === 'draft' ? 'edit' : 'detail'" @click="edit(record)" />
+            <TableAction action="enable" v-if="record.status === 'draft'" @click="activate(record)" />
           </Space>
         </template>
       </Table>

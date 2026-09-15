@@ -3,12 +3,13 @@ import type { GymRow } from '#/api/gym';
 
 import { onScopeDispose, ref } from 'vue';
 
-import { Button, Descriptions, DescriptionsItem, Table, TabPane, Tabs, Tag } from 'ant-design-vue';
+import { Descriptions, DescriptionsItem, Table, TabPane, Tabs, Tag } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import EntityRecords from '#/views/gym/components/entity-records.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 import { displayValue, statusColor } from '#/views/gym/utils/display';
 
 import { columns, fields, filterFields } from './data';
@@ -42,7 +43,7 @@ async function open(row: GymRow) {
       :filter-fields="filterFields"
     >
       <template #actions="{ row }">
-        <Button type="link" @click="open(row)">会员详情</Button>
+        <TableAction action="detail" @click="open(row)" />
       </template>
     </ResourcePage>
     <AdminDrawer v-model:open="visible" :title="detail?.name" :footer="null" :width="900">

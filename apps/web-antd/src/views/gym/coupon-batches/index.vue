@@ -9,6 +9,7 @@ import { Alert, Button, Form, FormItem, message, Select, Table } from 'ant-desig
 import { canGym, gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { canCreateBatch, config } from './data';
 
@@ -106,11 +107,11 @@ async function submit() {
       :store-filter="true"
       time-filter
     >
-      <template v-if="canGym(canCreateBatch)" #toolbar>
-        <Button v-if="canGym(canCreateBatch)" type="primary" @click="start">{{ '创建批次' }}</Button>
+      <template v-if="canGym(canCreateBatch)" #create>
+        <Button v-if="canGym(canCreateBatch)" type="primary" @click="start">新增批次</Button>
       </template>
       <template #actions="{ row }">
-        <Button type="link" @click="details(row)"> 逐项结果 </Button>
+        <TableAction action="results" @click="details(row)" />
       </template>
     </ResourcePage>
     <AdminDrawer

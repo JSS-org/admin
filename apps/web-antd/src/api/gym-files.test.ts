@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 
-import { filePreview } from './file-preview-state';
 import { getGymFileUrl, openGymFile } from './gym';
 
 const client = vi.hoisted(() => ({ get: vi.fn() }));
+const router = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock('../router', () => ({ router }));
 vi.mock('./request', () => ({ requestClient: client }));
 vi.mock('@vben/stores', () => ({ useAccessStore: () => ({ accessCodes: [] }) }));
 beforeEach(() => {
   vi.clearAllMocks();
-  filePreview.open = false;
 });
 afterEach(() => vi.unstubAllGlobals());
 it('creates a preview URL from the binary response body, preserving the PDF MIME type', async () => {
@@ -28,6 +28,6 @@ it('creates a preview URL from the binary response body, preserving the PDF MIME
 });
 it('opens the in-app preview without relying on an asynchronous popup', async () => {
   await openGymFile('cover-file');
-  expect(filePreview).toMatchObject({ open: true, fileId: 'cover-file' });
+  expect(router.push).toHaveBeenCalledWith({ name: 'GymFilePreview', params: { id: 'cover-file' } });
   expect(client.get).not.toHaveBeenCalled();
 });

@@ -4,10 +4,9 @@ import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { useTemplateRef } from 'vue';
 
-import { Button } from 'ant-design-vue';
-
 import { canGym, gymApi } from '#/api/gym';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { config, editable, initial, prepare } from './data';
 
@@ -38,10 +37,10 @@ async function newVersion(row: GymRow) {
       time-filter
     >
       <template v-if="canGym('points:manage')" #actions="{ row, reload }">
-        <Button v-if="canGym('points:manage')" type="link" @click="newVersion(row)"> 新版本 </Button>
-        <Button
+        <TableAction action="version" v-if="canGym('points:manage')" @click="newVersion(row)" />
+        <TableAction
+          :action="row.status === 'active' ? 'disable' : 'enable'"
           v-if="canGym('points:manage')"
-          type="link"
           @click="
             async () => {
               await gymApi.patch(`point-rules/${row.id}`, {
@@ -50,8 +49,7 @@ async function newVersion(row: GymRow) {
               await reload();
             }
           "
-          >{{ row.status === 'active' ? '停用' : '启用' }}</Button
-        >
+        />
       </template>
     </ResourcePage>
   </div>

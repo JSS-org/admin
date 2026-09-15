@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { Button } from 'ant-design-vue';
-
 import { canGym, gymApi } from '#/api/gym';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { config, initial, prepare } from './data';
 </script>
@@ -23,9 +22,9 @@ import { config, initial, prepare } from './data';
       time-filter
     >
       <template v-if="canGym('points:manage')" #actions="{ row, reload }">
-        <Button
+        <TableAction
+          :action="row.status === 'active' ? 'disable' : 'enable'"
           v-if="canGym('points:manage')"
-          type="link"
           @click="
             async () => {
               await gymApi.patch(`point-products/${row.id}`, {
@@ -34,8 +33,7 @@ import { config, initial, prepare } from './data';
               await reload();
             }
           "
-          >{{ row.status === 'active' ? '停用' : '启用' }}</Button
-        >
+        />
       </template>
     </ResourcePage>
   </div>

@@ -1,6 +1,5 @@
 import { useAccessStore } from '@vben/stores';
 
-import { filePreview } from './file-preview-state';
 import { requestClient } from './request';
 
 export interface GymRow {
@@ -52,7 +51,7 @@ export async function getGymFileUrl(id: string) {
   return URL.createObjectURL(response);
 }
 export async function openGymFile(id: string) {
-  filePreview.fileId = id;
-  filePreview.open = true;
+  const { router } = await import('../router');
+  await router.push({ name: 'GymFilePreview', params: { id } });
 }
 export const canGym = (code: string) => useAccessStore().accessCodes.includes(code);

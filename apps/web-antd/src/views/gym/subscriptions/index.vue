@@ -3,11 +3,12 @@ import type { GymRow } from '#/api/gym';
 
 import { ref } from 'vue';
 
-import { Button, Descriptions, DescriptionsItem, Table } from 'ant-design-vue';
+import { Descriptions, DescriptionsItem, Table } from 'ant-design-vue';
 
 import { gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { columns } from './data';
 
@@ -40,7 +41,7 @@ async function details(row: GymRow) {
       :keyword-filter="true"
     >
       <template #actions="{ row }">
-        <Button type="link" @click="details(row)"> 详情 </Button>
+        <TableAction action="detail" @click="details(row)" />
       </template>
     </ResourcePage>
     <AdminDrawer v-model:open="visible" title="记录详情" :footer="null" :width="900">

@@ -3,11 +3,12 @@ import type { GymRow } from '#/api/gym';
 
 import { onMounted, ref } from 'vue';
 
-import { Button, CheckboxGroup, message } from 'ant-design-vue';
+import { CheckboxGroup, message } from 'ant-design-vue';
 
 import { gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { columns, fields } from './data';
 
@@ -59,7 +60,7 @@ async function save() {
       :prepare="prepare"
     >
       <template #actions="{ row }">
-        <Button type="link" @click="open(row)">配置权限</Button>
+        <TableAction action="roles" @click="open(row)" />
       </template>
     </ResourcePage>
     <AdminDrawer v-model:open="visible" title="权限配置" :width="760" @ok="save">

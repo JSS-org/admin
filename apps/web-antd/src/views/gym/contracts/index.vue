@@ -20,6 +20,7 @@ import {
 import { canGym, gymApi, openGymFile } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { columns, fields, isTemplate, title } from './data';
 
@@ -90,14 +91,12 @@ async function save() {
       :time-filter="true"
     >
       <template #actions="{ row }">
-        <Button type="link" @click="details(row)"> 详情 </Button>
-        <Button
+        <TableAction action="detail" @click="details(row)" />
+        <TableAction
+          action="remind"
           v-if="['unsigned', 'sent', 'viewed'].includes(row.status) && canGym('contracts:remind')"
-          type="link"
           @click="remind(row)"
-        >
-          未签提醒
-        </Button>
+        />
       </template>
     </ResourcePage>
     <AdminDrawer

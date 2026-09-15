@@ -7,7 +7,6 @@ import { Button, Tooltip } from 'ant-design-vue';
 
 import { useAuthStore } from '#/store';
 import LoginForm from '#/views/_core/authentication/login.vue';
-import FilePreview from '#/views/gym/components/file-preview.vue';
 
 const userStore = useUserStore();
 const accessStore = useAccessStore();
@@ -33,7 +32,6 @@ async function handleLogout() {
       </div>
     </template>
     <template #extra>
-      <FilePreview />
       <AuthenticationLoginExpiredModal v-model:open="accessStore.loginExpired">
         <LoginForm />
       </AuthenticationLoginExpiredModal>

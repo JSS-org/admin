@@ -34,9 +34,11 @@ describe('content and feedback management', () => {
     expect(() => call('hq', 'PUT', '/client-settings', data)).toThrow('HTTP');
     call('hq', 'PUT', '/client-settings', {
       ...data,
+      contentHtml: '<h2>营业介绍</h2><p>欢迎到店训练</p>',
       blocks: [{ blockType: 'text', body: '营业介绍', enabled: true }],
     });
     expect(call('hq', 'GET', '/client-settings').systemName).toBe('新展示名');
+    expect(call('hq', 'GET', '/client-settings').contentHtml).toBe('<h2>营业介绍</h2><p>欢迎到店训练</p>');
     expect(() => call('store1', 'PUT', '/client-settings', data)).toThrow('权限');
   });
   it('preserves activity registrations when capacity changes and validates franchise publishing', () => {

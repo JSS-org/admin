@@ -8,6 +8,7 @@ import { Alert, Button, Input, Table } from 'ant-design-vue';
 import { gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { config, initial, prepare } from './data';
 
@@ -65,7 +66,7 @@ function downloadCodes() {
       @saved="saved"
     >
       <template #actions="{ row }">
-        <Button type="link" @click="details(row)"> 逐项结果 </Button>
+        <TableAction action="results" @click="details(row)" />
       </template>
     </ResourcePage>
     <AdminDrawer

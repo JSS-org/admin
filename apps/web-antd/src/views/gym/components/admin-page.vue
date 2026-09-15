@@ -8,6 +8,9 @@ defineProps<{ title: string; description?: string }>();
       <h1>{{ title }}</h1>
       <p v-if="description">{{ description }}</p>
     </header>
+    <div v-if="$slots.actions" class="gym-page-actions">
+      <slot name="actions"></slot>
+    </div>
     <slot></slot>
   </Page>
 </template>

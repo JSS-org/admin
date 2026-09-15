@@ -3,11 +3,13 @@ import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { useTemplateRef } from 'vue';
 
-import { Alert, Button, Form, FormItem, Input, Select, Table } from 'ant-design-vue';
+import { Alert, Button, Descriptions, DescriptionsItem, Form, FormItem, Input, Select, Table } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
+import EntityRecords from '#/views/gym/components/entity-records.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { columns } from './data';
 import { usePage } from './use-page';
@@ -46,9 +48,11 @@ const {
       write-code="employees:write"
       store-filter
       :prepare="prepare"
+      detail
+      @detail="open($event, 'detail')"
     >
       <template #editor-extra="{ row, form }">
-        <section v-if="row && canGym('payroll:read')" class="mt-6">
+        <section v-if="row && canGym('payroll:read')" class="gym-stack">
           <Alert
             v-if="form.salaryMode === 'assign'"
             type="info"
@@ -78,14 +82,15 @@ const {
         </section>
       </template>
       <template #actions="{ row, reload }">
-        <Button v-if="canGym('employees:write')" type="link" @click="open(row, 'stores')"> 所属门店 </Button>
+        <TableAction action="stores" v-if="canGym('employees:write')" @click="open(row, 'stores')" />
         <template v-if="canGym('accounts:write')">
-          <Button v-if="!row.accountId" type="link" @click="open(row, 'account')"> 创建账号 </Button>
+          <TableAction action="account" v-if="!row.accountId" @click="open(row, 'account')" />
           <template v-else>
-            <Button type="link" @click="open(row, 'roles')">授权</Button>
-            <Button type="link" @click="open(row, 'password')">密码</Button>
-            <Button
-              type="link"
+            <TableAction action="roles" @click="open(row, 'roles')" />
+            <TableAction action="password" @click="open(row, 'password')" />
+            <TableAction
+              :action="row.accountStatus === 'active' ? 'disable' : 'enable'"
+              :label="row.accountStatus === 'active' ? '停用账号' : '启用账号'"
               @click="
                 async () => {
                   await gymApi.patch(`accounts/${row.accountId}`, {
@@ -94,15 +99,47 @@ const {
                   await reload();
                 }
               "
-            >
-              {{ row.accountStatus === 'active' ? '停用账号' : '启用账号' }}
-            </Button>
+            />
           </template>
         </template>
       </template>
     </ResourcePage>
-    <AdminDrawer v-model:open="visible" :title="titles[mode]" :confirm-loading="saving" @ok="save">
-      <Form v-if="mode === 'roles'" layout="vertical" :disabled="saving">
+    <AdminDrawer
+      v-model:open="visible"
+      :title="titles[mode]"
+      :footer="mode === 'detail' ? null : undefined"
+      :confirm-loading="saving"
+      @ok="save"
+    >
+      <template v-if="mode === 'detail' && current">
+        <Descriptions bordered :column="1">
+          <DescriptionsItem label="工号">{{ current.employeeNo }}</DescriptionsItem>
+          <DescriptionsItem label="姓名">{{ current.name }}</DescriptionsItem>
+          <DescriptionsItem label="手机号">{{ current.phone }}</DescriptionsItem>
+          <DescriptionsItem label="职位">{{ current.jobTitle || '—' }}</DescriptionsItem>
+          <DescriptionsItem label="入职日期">{{ current.hiredOn }}</DescriptionsItem>
+          <DescriptionsItem label="状态">{{ current.status === 'active' ? '在职' : '停用 / 离职' }}</DescriptionsItem>
+          <DescriptionsItem label="登录账号">{{ current.username || '未创建账号' }}</DescriptionsItem>
+          <DescriptionsItem label="所属门店">{{
+            current.storeIds.map((id: string) => stores.find((store) => store.id === id)?.name ?? '—').join('、')
+          }}</DescriptionsItem>
+        </Descriptions>
+        <template v-if="canGym('payroll:read')">
+          <h3 class="font-medium">工资模板历史</h3>
+          <EntityRecords
+            endpoint="employee-salary-assignments"
+            :params="{ employeeId: current.id }"
+            :columns="[
+              { title: '门店', dataIndex: 'storeName' },
+              { title: '模板', dataIndex: 'templateName' },
+              { title: '版本', dataIndex: 'templateVersion' },
+              { title: '生效日期', dataIndex: 'effectiveFrom' },
+              { title: '结束日期', dataIndex: 'effectiveTo' },
+            ]"
+          />
+        </template>
+      </template>
+      <Form v-else-if="mode === 'roles'" layout="vertical" :disabled="saving">
         <div v-for="(link, index) in links" :key="index" class="gym-rule-card">
           <FormItem :label="`授权 ${index + 1} · 角色`" required>
             <Select

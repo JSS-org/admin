@@ -9,6 +9,7 @@ import { Button, Form, FormItem, Input, message, Space, Table, Upload } from 'an
 import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { code, columns, fields, title } from './data';
 
@@ -94,7 +95,7 @@ async function upload(file: File) {
       :editable="(row) => !row.revokedAt"
     >
       <template #actions="{ row }">
-        <Button type="link" @click="open(row)"> 教学资料 </Button>
+        <TableAction action="teaching" @click="open(row)" />
       </template>
     </ResourcePage>
     <AdminDrawer
@@ -132,10 +133,10 @@ async function upload(file: File) {
       >
         <template #bodyCell="{ column, record }">
           <Space v-if="column.dataIndex === 'actions'">
-            <Button type="link" @click="openGymFile(record.fileId)"> 查看 </Button>
-            <Button
+            <TableAction action="preview" @click="openGymFile(record.fileId)" />
+            <TableAction
+              :action="record.status === 'active' ? 'disable' : 'enable'"
               v-if="canGym('equipment:write')"
-              type="link"
               @click="
                 async () => {
                   await gymApi.patch(`equipment/${current?.id}/tutorials/${record.id}`, {
@@ -144,8 +145,7 @@ async function upload(file: File) {
                   if (current) await open(current);
                 }
               "
-              >{{ record.status === 'active' ? '停用' : '启用' }}</Button
-            >
+            />
           </Space>
         </template>
       </Table>

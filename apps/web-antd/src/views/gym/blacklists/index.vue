@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { GymRow } from '#/api/gym';
 
-import { Button } from 'ant-design-vue';
-
 import { canGym, gymApi } from '#/api/gym';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { code, columns, fields, title } from './data';
 
@@ -38,18 +37,16 @@ function initial(row: GymRow) {
       :editable="(row) => !row.revokedAt"
     >
       <template #actions="{ row, reload }">
-        <Button
+        <TableAction
+          action="revoke"
           v-if="!row.revokedAt && canGym(code)"
-          type="link"
           @click="
             async () => {
               await gymApi.patch(`blacklists/${row.id}`, { revoked: true });
               await reload();
             }
           "
-        >
-          撤销限制
-        </Button>
+        />
       </template>
     </ResourcePage>
   </div>

@@ -8,6 +8,7 @@ import { computed, useSlots, watch } from 'vue';
 import { Alert, Button, Empty, Space, Table, Tag } from 'ant-design-vue';
 
 import { canGym } from '#/api/gym';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { useResourceEditor } from '../composables/use-resource-editor';
 import { useResourceList } from '../composables/use-resource-list';
@@ -111,6 +112,7 @@ defineExpose({ load, open, items });
       @reset="search"
     />
     <div class="gym-toolbar">
+      <slot name="create" :reload="load"></slot>
       <Button v-if="writable && create" type="primary" @click="open()"> 新增 </Button>
       <TableSelectionActions
         :selected="selectedKeys.length"
@@ -179,14 +181,12 @@ defineExpose({ load, open, items });
       </template>
       <template #bodyCell="{ column, record, text }">
         <Space v-if="column.dataIndex === '_actions'" wrap>
-          <Button
+          <TableAction
+            action="edit"
             v-if="writable && edit !== false && (!editable || editable(record as GymRow))"
-            type="link"
             @click="open(record as GymRow)"
-          >
-            编辑
-          </Button>
-          <Button v-if="detail" type="link" @click="emit('detail', record as GymRow)"> 详情 </Button>
+          />
+          <TableAction action="detail" v-if="detail" @click="emit('detail', record as GymRow)" />
           <slot name="actions" :row="record as GymRow" :reload="load"></slot>
         </Space>
         <Tag v-else-if="column.dataIndex === 'status'" :color="statusColor(text)">

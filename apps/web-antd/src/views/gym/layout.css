@@ -1,3 +1,13 @@
+:root {
+  /* 区块 / 表单 / 操作 / 紧凑控件：20 / 16 / 12 / 8px。 */
+  --gym-space-block: 20px;
+  --gym-space-field: 16px;
+  --gym-space-action: 12px;
+  --gym-space-compact: 8px;
+  --gym-page-padding: 20px;
+  --gym-card-padding: 20px;
+}
+
 .gym-view {
   min-width: 0;
   min-height: 100%;
@@ -23,14 +33,26 @@
   color: hsl(var(--muted-foreground));
 }
 
-.gym-page-content {
+.gym-page-content,
+.gym-stack {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--gym-space-block);
   min-width: 0;
 }
 
-.gym-page-content > * {
+.gym-page-content {
+  padding: var(--gym-page-padding);
+}
+
+/* 嵌套的列表页由外层页面提供留白，避免重复 padding。 */
+.gym-page-content .gym-page-content {
+  padding: 0;
+}
+
+.gym-page-content > *,
+.gym-stack > * {
+  flex-shrink: 0;
   min-width: 0;
   margin-block: 0;
 }
@@ -38,7 +60,7 @@
 .gym-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--gym-space-action);
   align-items: center;
 }
 
@@ -81,30 +103,28 @@
 }
 
 @media (width <= 640px) {
-  .gym-page-content {
-    gap: 16px;
-    padding: 12px;
+  :root {
+    --gym-space-block: 16px;
+    --gym-space-action: 8px;
+    --gym-page-padding: 12px;
+    --gym-card-padding: 16px;
   }
 
   .gym-page-heading h1 {
     font-size: 20px;
   }
-
-  .gym-toolbar {
-    gap: 8px;
-  }
 }
 
 .gym-page-content > .ant-form:not(.gym-filter, .sales-config) {
   max-width: 1120px;
-  padding: 20px;
+  padding: var(--gym-card-padding);
   border: 1px solid hsl(var(--border));
   border-radius: var(--radius);
 }
 
 .gym-page-content .ant-form-item,
 .gym-dialog .ant-form-item {
-  margin-bottom: 20px;
+  margin-bottom: var(--gym-space-field);
 }
 
 .gym-page-content .ant-form .ant-input-number,
@@ -115,7 +135,7 @@
 .gym-page-content .ant-form .ant-space-horizontal,
 .gym-dialog .ant-space-horizontal {
   flex-wrap: wrap;
-  gap: 12px !important;
+  gap: var(--gym-space-action) !important;
   max-width: 100%;
 }
 
@@ -131,18 +151,6 @@
 
 .gym-dialog .ant-space-item:has(> .ant-form-item) {
   flex: 1 1 200px;
-}
-
-.gym-dialog .ant-drawer-body > .ant-alert {
-  margin-bottom: 20px;
-}
-
-.gym-dialog .ant-drawer-body > .ant-table-wrapper + .ant-form {
-  margin-top: 20px;
-}
-
-.gym-dialog .ant-drawer-body > .ant-space {
-  margin-bottom: 16px;
 }
 
 .gym-dialog .ant-form-item .ant-select {
@@ -162,27 +170,52 @@
 
 .gym-dialog .ant-drawer-body {
   display: block;
+  padding: var(--gym-card-padding);
 }
 
+.gym-page-content .ant-card .ant-card-head {
+  padding-inline: var(--gym-card-padding);
+}
+
+.gym-page-content .ant-card .ant-card-body {
+  padding: var(--gym-card-padding);
+}
+
+/* 配置卡片内由容器负责表单间距，避免组件 margin 被重置或与 gap 叠加。 */
+.gym-page-content :is(.ant-card-body, .ant-collapse-content-box):has(> .ant-form-item) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gym-space-field);
+}
+
+.gym-page-content :is(.ant-card-body, .ant-collapse-content-box) > .ant-form-item {
+  margin-block: 0;
+}
+
+.gym-dialog .ant-form,
 .gym-form-stack,
 .gym-rule-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--gym-space-field);
   width: 100%;
   min-width: 0;
 }
 
 .gym-rule-card {
-  padding: 16px;
-  margin-block: 16px;
+  padding: var(--gym-space-field);
   background: hsl(var(--muted) / 30%);
   border: 1px solid hsl(var(--border));
   border-radius: 8px;
 }
 
-.gym-rule-card .ant-form-item {
-  margin-bottom: 0;
+.gym-dialog .ant-form > *,
+.gym-page-content .gym-form-stack > *,
+.gym-form-stack > *,
+.gym-rule-card .ant-form-item,
+.gym-rule-card > * {
+  min-width: 0;
+  margin-block: 0;
 }
 
 .gym-form-add {
@@ -235,19 +268,15 @@
   overflow-wrap: anywhere;
 }
 
-.gym-save-bar {
-  position: sticky;
-  bottom: 12px;
-  z-index: 2;
+.gym-page-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--gym-space-field);
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: var(--gym-space-field) var(--gym-card-padding);
   color: hsl(var(--muted-foreground));
   background: hsl(var(--card));
   border: 1px solid hsl(var(--border));
   border-radius: 10px;
-  box-shadow: 0 4px 24px hsl(var(--foreground) / 8%);
 }

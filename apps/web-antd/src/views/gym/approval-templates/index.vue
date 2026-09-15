@@ -4,10 +4,11 @@ import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { useTemplateRef } from 'vue';
 
-import { Button, message } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { columns, fields, initial, isTemplate, prepare, title, writeCode } from './data';
 
@@ -39,9 +40,9 @@ async function newVersion(row: GymRow) {
     >
       <template #actions="{ row, reload }">
         <template v-if="canGym(writeCode)">
-          <Button type="link" @click="newVersion(row)">新版本</Button>
-          <Button
-            type="link"
+          <TableAction action="version" @click="newVersion(row)" />
+          <TableAction
+            :action="row.status === 'published' ? 'disable' : 'publish'"
             @click="
               async () => {
                 await gymApi.patch(`approval-templates/${row.id}`, {
@@ -50,8 +51,7 @@ async function newVersion(row: GymRow) {
                 await reload();
               }
             "
-            >{{ row.status === 'published' ? '停用' : '发布' }}</Button
-          >
+          />
         </template>
       </template>
     </ResourcePage>

@@ -88,7 +88,7 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
         ]
       : []),
   ]);
-  async function loadDetail(row: GymRow) {
+  async function loadDetail(row: GymRow): Promise<GymRow> {
     const request = ++detailRequest;
     const detail = await gymApi.get(`employees/${row.id}`);
     const [history, allStores] = await Promise.all([
@@ -126,10 +126,10 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
     if (saving.value) return;
     const request = ++actionRequest;
     const [detail, allRoles, assignments, allStores] = await Promise.all([
-      action === 'stores' ? gymApi.get(`employees/${row.id}`) : row,
+      ['detail', 'stores'].includes(action) ? gymApi.get(`employees/${row.id}`) : row,
       action === 'roles' ? gymApi.listAll('roles') : [],
       action === 'roles' ? gymApi.get<{ roleId?: string; storeId?: string }[]>(`accounts/${row.accountId}/roles`) : [],
-      action === 'stores' || action === 'roles' ? gymApi.listAll('stores') : [],
+      ['detail', 'roles', 'stores'].includes(action) ? gymApi.listAll('stores') : [],
     ]);
     if (request !== actionRequest) return;
     current.value = detail;
@@ -202,6 +202,7 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
     }
   }
   const titles: Record<string, string> = {
+    detail: '员工详情',
     roles: '角色与门店授权',
     stores: '调整所属门店',
     account: '创建网页账号',

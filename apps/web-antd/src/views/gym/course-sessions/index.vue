@@ -4,12 +4,13 @@ import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { ref, useTemplateRef } from 'vue';
 
-import { Button, message } from 'ant-design-vue';
+import { message } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import EntityRecords from '#/views/gym/components/entity-records.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { config, editable, initial, prepare } from './data';
 
@@ -41,18 +42,21 @@ async function cancel(row: GymRow) {
       time-filter
     >
       <template #actions="{ row }">
-        <Button
+        <TableAction
+          action="roster"
           v-if="canGym('bookings:read')"
-          type="link"
           @click="
             session = row;
             detailVisible = true;
           "
-          >预约名单</Button
-        >
-        <Button v-if="row.status === 'scheduled' && canGym('courses:write')" type="link" danger @click="cancel(row)">
-          取消{{ '排课' }}</Button
-        >
+        />
+        <TableAction
+          action="cancel"
+          label="取消排课"
+          v-if="row.status === 'scheduled' && canGym('courses:write')"
+          danger
+          @click="cancel(row)"
+        />
       </template>
     </ResourcePage>
     <AdminDrawer

@@ -2,13 +2,18 @@
 import type { GymRow } from '#/api/gym';
 
 import { onScopeDispose, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 
-import { Alert, Button, Image, Spin } from 'ant-design-vue';
+import { useTabs } from '@vben/hooks';
 
-import { filePreview } from '#/api/file-preview-state';
+import { Alert, Button, Spin } from 'ant-design-vue';
+
 import { getGymFileUrl, gymApi } from '#/api/gym';
 
-import AdminDrawer from './admin-drawer.vue';
+import AdminPage from './admin-page.vue';
+
+const route = useRoute();
+const { setTabTitle } = useTabs();
 
 const url = ref('');
 const file = ref<GymRow>();
@@ -24,10 +29,11 @@ async function load() {
   release();
   file.value = undefined;
   failed.value = false;
-  if (!filePreview.open || !filePreview.fileId) return;
+  const fileId = String(route.params.id ?? '');
+  if (!fileId) return;
   loading.value = true;
   try {
-    const metadata = await gymApi.get(`files/${filePreview.fileId}`);
+    const metadata = await gymApi.get(`files/${fileId}`);
     if (current !== request) return;
     const result = await getGymFileUrl(metadata.id);
     if (current !== request) {
@@ -36,27 +42,25 @@ async function load() {
     }
     file.value = metadata;
     url.value = result;
+    void setTabTitle(metadata.originalName);
   } catch {
     if (current === request) failed.value = true;
   } finally {
     if (current === request) loading.value = false;
   }
 }
-watch(() => [filePreview.open, filePreview.fileId], load);
+watch(() => route.params.id, load, { immediate: true });
 onScopeDispose(() => {
   request++;
   release();
-  filePreview.open = false;
 });
 </script>
 <template>
-  <AdminDrawer
-    v-model:open="filePreview.open"
-    :title="file?.originalName ?? '文件预览'"
-    :width="1060"
-    :footer="null"
-    :z-index="1200"
-  >
+  <AdminPage :title="file?.originalName ?? '文件预览'">
+    <template v-if="url && file" #actions>
+      <span>{{ (file.byteSize / 1024).toFixed(1) }} KB</span>
+      <a :href="url" :download="file.originalName">下载原文件</a>
+    </template>
     <Spin v-if="loading" class="file-loading" tip="正在加载文件" />
     <Alert
       v-else-if="failed"
@@ -68,32 +72,19 @@ onScopeDispose(() => {
       <template #action><Button @click="load">重试</Button></template>
     </Alert>
     <template v-else-if="url && file">
-      <div class="file-toolbar">
-        <span>{{ file.originalName }} · {{ (file.byteSize / 1024).toFixed(1) }} KB</span>
-        <a :href="url" :download="file.originalName">下载原文件</a>
-      </div>
-      <Image v-if="file.mimeType.startsWith('image/')" :src="url" :alt="file.originalName" class="file-image" />
+      <img v-if="file.mimeType.startsWith('image/')" :src="url" :alt="file.originalName" class="file-image" />
       <video v-else-if="file.mimeType.startsWith('video/')" :src="url" controls class="file-video"></video>
       <template v-else-if="file.mimeType === 'application/pdf'">
-        <p class="mb-3 text-sm text-muted-foreground">如当前浏览器不支持 PDF 内嵌预览，可下载原文件查看。</p>
         <iframe :src="url" :title="file.originalName" class="file-pdf"></iframe>
       </template>
       <Alert v-else type="info" message="此文件请下载后查看" />
     </template>
-  </AdminDrawer>
+  </AdminPage>
 </template>
 <style scoped>
 .file-loading {
   display: block;
   padding: 60px;
-}
-
-.file-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: space-between;
-  margin-bottom: 20px;
 }
 
 .file-image,
@@ -104,6 +95,11 @@ onScopeDispose(() => {
 
 .file-video {
   max-height: 70vh;
+}
+
+.file-image {
+  max-height: 75vh;
+  object-fit: contain;
 }
 
 .file-pdf {

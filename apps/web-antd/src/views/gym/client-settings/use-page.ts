@@ -6,7 +6,7 @@ import { message } from 'ant-design-vue';
 
 import { gymApi } from '#/api/gym';
 
-import { prepareContent, validateContent } from './content-form';
+import { legacyContent, prepareContent, validateContent } from './content-form';
 export function usePage() {
   const stores = ref<GymRow[]>([]);
   const storeId = ref<string>();
@@ -17,7 +17,6 @@ export function usePage() {
   const uploading = ref(false);
   const error = ref(false);
   const snapshot = ref('');
-  const activeBlocks = ref<string[]>([]);
   const busy = computed(() => loading.value || saving.value || uploading.value);
   const dirty = computed(() => !!snapshot.value && JSON.stringify(data.value) !== snapshot.value);
   let request = 0;
@@ -38,10 +37,10 @@ export function usePage() {
       if (current !== request) return;
       data.value = {
         ...result,
+        contentHtml: result.contentHtml ?? legacyContent(result.blocks),
         blocks: result.blocks.map((block: GymRow) => ({ ...block, key: crypto.randomUUID() })),
       };
       snapshot.value = JSON.stringify(data.value);
-      activeBlocks.value = data.value.blocks.slice(0, 1).map((block: any) => block.key);
     } catch {
       if (current === request) error.value = true;
     } finally {
@@ -50,25 +49,6 @@ export function usePage() {
   }
   onMounted(load);
   onScopeDispose(() => request++);
-  function addBlock(type: string) {
-    const block = {
-      key: crypto.randomUUID(),
-      blockType: type,
-      title: '',
-      body: '',
-      fileId: null,
-      linkUrl: '',
-      enabled: true,
-    };
-    data.value.blocks.push(block);
-    activeBlocks.value = [block.key];
-  }
-  function moveBlock(index: number, offset: number) {
-    const blocks = data.value.blocks;
-    const target = index + offset;
-    if (target < 0 || target >= blocks.length) return;
-    [blocks[index], blocks[target]] = [blocks[target], blocks[index]];
-  }
   function restore() {
     if (snapshot.value) data.value = JSON.parse(snapshot.value);
   }
@@ -99,11 +79,8 @@ export function usePage() {
     uploading,
     error,
     dirty,
-    activeBlocks,
     load,
     save,
     restore,
-    addBlock,
-    moveBlock,
   };
 }

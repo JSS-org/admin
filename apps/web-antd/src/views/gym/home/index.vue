@@ -140,13 +140,13 @@ const visibleScenarios = computed(() =>
           <p>会员建档、到店签到、课程预约，常用服务从这里开始。</p>
         </div>
       </div> -->
-      <section v-if="allowed" aria-label="经营数据看板">
+      <section v-if="allowed" class="gym-stack" aria-label="经营数据看板">
         <div class="dashboard-toolbar">
           <div>
             <h2 class="text-base font-semibold">经营概览</h2>
             <p class="mt-1 text-sm text-muted-foreground">按北京时间统计，金额含期间退款；会员数按人去重。</p>
           </div>
-          <div class="flex flex-wrap items-center gap-3">
+          <div class="gym-toolbar">
             <Select
               v-model:value="storeId"
               placeholder="全部授权门店"
@@ -170,7 +170,7 @@ const visibleScenarios = computed(() =>
         >
         <Skeleton v-else-if="loading" active :paragraph="{ rows: 8 }" />
         <template v-else-if="data">
-          <p class="mb-4 text-sm text-muted-foreground">{{ data.from }} — {{ data.to }}</p>
+          <p class="text-sm text-muted-foreground">{{ data.from }} — {{ data.to }}</p>
           <div class="dashboard-metrics">
             <Card
               ><Statistic title="期间净实收" :value="data.metrics.netAmount" :precision="2" prefix="¥" />
@@ -203,7 +203,7 @@ const visibleScenarios = computed(() =>
               </div></Card
             >
           </div>
-          <Card v-if="canGym('courses:read')" title="接下来 7 天的课程" class="mt-5"
+          <Card v-if="canGym('courses:read')" title="接下来 7 天的课程"
             ><template #extra><RouterLink to="/gym/course-sessions">查看课程安排</RouterLink></template
             ><Table
               :data-source="data.upcoming"
@@ -230,7 +230,7 @@ const visibleScenarios = computed(() =>
           <h2>{{ scenario.title }}</h2>
           <p>{{ scenario.description }}</p>
         </div>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div class="gym-shortcuts grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
           <RouterLink
             v-for="shortcut in scenario.shortcuts"
             :key="shortcut.path"
@@ -265,16 +265,15 @@ const visibleScenarios = computed(() =>
 .dashboard-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--gym-space-action);
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
 }
 
 .dashboard-metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  gap: var(--gym-space-block);
 }
 
 .dashboard-metrics p {
@@ -286,8 +285,7 @@ const visibleScenarios = computed(() =>
 .dashboard-charts {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-  gap: 20px;
-  margin-top: 20px;
+  gap: var(--gym-space-block);
 }
 
 .dashboard-charts > * {
@@ -365,6 +363,10 @@ const visibleScenarios = computed(() =>
 .gym-shortcut {
   height: 100%;
   color: hsl(var(--card-foreground));
+}
+
+.gym-shortcuts {
+  gap: var(--gym-space-block);
 }
 
 @media (width <= 640px) {

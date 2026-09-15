@@ -38,7 +38,9 @@ function close() {
     placement="right"
     @close="close"
   >
-    <slot></slot>
+    <div class="gym-stack">
+      <slot></slot>
+    </div>
     <template v-if="footer !== null" #footer>
       <div class="gym-drawer-actions">
         <Button :disabled="confirmLoading" @click="close">取消</Button>
@@ -51,7 +53,8 @@ function close() {
 <style scoped>
 .gym-drawer-actions {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: var(--gym-space-action);
   justify-content: flex-end;
 }
 </style>

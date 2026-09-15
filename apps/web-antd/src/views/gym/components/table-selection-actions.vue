@@ -19,7 +19,7 @@ const emit = defineEmits<{ selectAll: []; clear: [] }>();
 .gym-selection-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: var(--gym-space-action);
   align-items: center;
 }
 </style>

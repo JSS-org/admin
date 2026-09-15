@@ -151,6 +151,7 @@ export function content(req: Request): any {
         'appDownloadUrl',
         'enabled',
         'blocks',
+        'contentHtml',
       ]);
       const data: Record<string, any> = {
         ...body,
@@ -160,6 +161,8 @@ export function content(req: Request): any {
         enabled: boolean(body.enabled, '启用'),
       };
       if (body.appId) data.appId = str(body.appId, '应用ID', 128);
+      if (body.contentHtml !== undefined)
+        data.contentHtml = body.contentHtml ? str(body.contentHtml, '富文本内容', 100_000) : '';
       if (body.coverFileId) data.coverFileId = media(req, body.coverFileId, storeId ?? undefined, ['image']);
       if (body.appDownloadUrl) data.appDownloadUrl = url(body.appDownloadUrl, 'App下载链接');
       for (const field of ['welcomeText', 'customerService'])

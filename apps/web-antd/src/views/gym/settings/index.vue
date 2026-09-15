@@ -17,13 +17,14 @@ import {
   Segmented,
   Select,
   Skeleton,
-  Switch,
   Tag,
   TimePicker,
 } from 'ant-design-vue';
 import dayjs from 'dayjs';
 
 import Page from '#/views/gym/components/admin-page.vue';
+import AdminSwitch from '#/views/gym/components/admin-switch.vue';
+import ConfigActions from '#/views/gym/components/config-actions.vue';
 
 import { usePage } from './use-page';
 const {
@@ -86,15 +87,23 @@ function setWindow(item: Record<string, any>, values: any) {
           ]"
           @change="loadSettings"
         />
+        <ConfigActions
+          :dirty="dirty"
+          :busy="busy"
+          :saving="saving"
+          :error="error"
+          pending-hint="有未保存的更改，保存或还原后可切换门店及配置类型。"
+          @restore="restore"
+          @save="saveSettings"
+        />
       </div>
-      <Alert v-if="dirty" type="info" show-icon message="有未保存的更改，保存或还原后可切换门店及配置类型。" />
       <Alert v-if="error" type="error" show-icon message="设置加载失败，当前无法保存"
         ><template #action><Button @click="loadSettings">重新加载</Button></template></Alert
       >
       <Skeleton v-else-if="loading" active :paragraph="{ rows: 8 }" />
       <Empty v-else-if="!storeId" description="暂无可配置的门店" />
       <template v-else>
-        <Form class="sales-config" layout="vertical" :disabled="busy">
+        <Form class="sales-config gym-stack" layout="vertical" :disabled="busy">
           <Card class="settings-intro" :bordered="false">
             <template #title
               ><span class="flex items-center gap-2"
@@ -111,12 +120,10 @@ function setWindow(item: Record<string, any>, values: any) {
               ></template
             >
             <template #extra
-              ><Switch
+              ><AdminSwitch
+                label="启用功能"
                 v-if="tab !== 'subscription-settings'"
                 v-model:checked="settings.enabled"
-                checked-children="已启用"
-                un-checked-children="已关闭"
-                aria-label="功能启用状态"
               /><Tag v-else color="blue">已启用 {{ enabledCount }} 个方案</Tag></template
             >
             <p class="text-muted-foreground">
@@ -129,19 +136,13 @@ function setWindow(item: Record<string, any>, values: any) {
               }}
             </p>
             <FormItem v-if="tab === 'online-sales-settings'" label="合同签署" class="mt-4"
-              ><Switch
-                v-model:checked="settings.contractRequired"
-                checked-children="购卡须签约"
-                un-checked-children="无需签约"
+              ><AdminSwitch label="购卡须签约" v-model:checked="settings.contractRequired"
             /></FormItem>
           </Card>
           <template v-if="tab === 'verification-settings'">
-            <Card title="核销条件" class="mt-5">
+            <Card title="核销条件">
               <FormItem label="入场要求"
-                ><Switch
-                  v-model:checked="settings.requireCheckin"
-                  checked-children="核销前须签到"
-                  un-checked-children="无需签到"
+                ><AdminSwitch label="核销前须签到" v-model:checked="settings.requireCheckin"
               /></FormItem>
               <FormItem label="支持渠道" :required="settings.enabled"
                 ><Checkbox.Group v-model:value="settings.supportedChannels" :options="channels" class="channel-options"
@@ -167,10 +168,10 @@ function setWindow(item: Record<string, any>, values: any) {
           </template>
           <template v-else>
             <Empty v-if="entries.length === 0" class="my-8" description="尚未添加方案，从已发布的卡种开始配置。" />
-            <Card v-for="(item, index) in entries" :key="index" class="mt-5" :title="`方案 ${index + 1}`">
+            <Card v-for="(item, index) in entries" :key="index" :title="`方案 ${index + 1}`">
               <template #extra
                 ><div class="flex items-center gap-3">
-                  <Switch v-model:checked="item.enabled" :aria-label="`方案 ${index + 1} 启用状态`" /><Button
+                  <AdminSwitch label="启用方案" v-model:checked="item.enabled" /><Button
                     danger
                     type="text"
                     @click="entries.splice(index, 1)"
@@ -252,7 +253,7 @@ function setWindow(item: Record<string, any>, values: any) {
                 </div>
               </template>
             </Card>
-            <Button block type="dashed" class="mt-5" :disabled="busy || cardOptions.length === 0" @click="addSetting"
+            <Button block type="dashed" :disabled="busy || cardOptions.length === 0" @click="addSetting"
               >添加{{ tab === 'online-sales-settings' ? '售卡' : '包月' }}方案</Button
             >
             <p v-if="cardOptions.length === 0" class="mt-3 text-sm text-muted-foreground">
@@ -260,15 +261,6 @@ function setWindow(item: Record<string, any>, values: any) {
             </p>
           </template>
         </Form>
-        <div class="gym-save-bar">
-          <span>{{ dirty ? '更改尚未保存' : '当前配置已同步' }}</span>
-          <div class="flex gap-3">
-            <Button :disabled="busy || !dirty" @click="restore">还原更改</Button
-            ><Button type="primary" :loading="saving" :disabled="loading || !dirty" @click="saveSettings"
-              >保存设置</Button
-            >
-          </div>
-        </div>
       </template>
     </Page>
   </div>
@@ -277,7 +269,7 @@ function setWindow(item: Record<string, any>, values: any) {
 .settings-scope {
   display: flex;
   flex-wrap: wrap;
-  gap: 24px;
+  gap: var(--gym-space-field);
   align-items: flex-end;
 }
 
@@ -297,7 +289,11 @@ function setWindow(item: Record<string, any>, values: any) {
 .settings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
-  gap: 20px;
+  gap: var(--gym-space-field);
+}
+
+.settings-grid > :deep(.ant-form-item) {
+  margin-bottom: 0;
 }
 
 .sales-config {
@@ -316,6 +312,6 @@ function setWindow(item: Record<string, any>, values: any) {
 .channel-options {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--gym-space-action);
 }
 </style>

@@ -1,5 +1,6 @@
 import { seedContent } from './content-state';
 import { fileContents, find, insert, now, passwordHash, rows, seedId, tables } from './core';
+import { seedDemo } from './demo-state';
 import { seedDevices } from './devices-state';
 import { seedGovernance } from './governance-state';
 import { seedMarketing } from './marketing-state';
@@ -233,7 +234,10 @@ export function reset() {
   seedSettlement();
   seedPayroll();
 }
-if (rows('stores').length === 0) reset();
+if (rows('stores').length === 0) {
+  reset();
+  seedDemo();
+}
 
 function permissionName(code: string) {
   const names: Record<string, string> = {

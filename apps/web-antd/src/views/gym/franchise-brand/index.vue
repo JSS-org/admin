@@ -65,7 +65,7 @@ async function save() {
   <div class="gym-view">
     <Page :title="title">
       <Alert type="info" message="当前仅管理展示资料，尚未提供小程序/App前台服务。" class="mb-4" />
-      <Form layout="vertical">
+      <Form layout="vertical" class="gym-form-stack">
         <FormItem label="品牌名称">
           <Input v-model:value="data.name" />
         </FormItem>
@@ -93,7 +93,7 @@ async function save() {
             <Button>上传标志</Button>
           </Upload>
         </FormItem>
-        <div v-for="(model, index) in data.models" :key="index" class="my-4">
+        <div v-for="(model, index) in data.models" :key="index" class="gym-rule-card">
           <Space wrap>
             <FormItem label="模型编号">
               <Input v-model:value="model.modelCode" />
@@ -119,16 +119,12 @@ async function save() {
           >
             <Button>上传立体图 / 视频</Button>
           </Upload>
-          <Space v-for="(fileId, fileIndex) in model.fileIds" :key="fileId" class="my-2">
+          <Space v-for="(fileId, fileIndex) in model.fileIds" :key="fileId">
             <Button type="link" @click="openGymFile(fileId)"> 视图 {{ Number(fileIndex) + 1 }}</Button>
             <Button @click="model.fileIds.splice(fileIndex, 1)"> 移除 </Button>
           </Space>
         </div>
-        <Button
-          v-if="data.models.length < 3"
-          class="my-3"
-          @click="data.models.push({ modelCode: '', name: '', fileIds: [] })"
-        >
+        <Button v-if="data.models.length < 3" @click="data.models.push({ modelCode: '', name: '', fileIds: [] })">
           增加模型
         </Button>
         <FormItem>

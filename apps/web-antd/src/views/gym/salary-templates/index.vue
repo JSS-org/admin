@@ -9,6 +9,7 @@ import { canGym } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import PercentageInput from '#/views/gym/components/percentage-input.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { labels, templateColumns } from './data';
 import { usePage } from './use-page';
@@ -28,14 +29,14 @@ const { visible, busy, form, edit, saveTemplate, publish } = usePage(list);
       :create="false"
       :edit="false"
     >
-      <template #toolbar>
+      <template #create>
         <Button v-if="canGym('payroll:templates')" type="primary" @click="edit()"> 新增模板 </Button>
       </template>
       <template #actions="{ row }">
         <Space>
-          <Button @click="edit(row)">{{ row.status === 'draft' ? '编辑' : '查看规则' }}</Button>
-          <Button v-if="row.status === 'draft'" @click="publish(row)"> 发布 </Button>
-          <Button @click="edit(row, true)">创建新版本</Button>
+          <TableAction :action="row.status === 'draft' ? 'edit' : 'detail'" @click="edit(row)" />
+          <TableAction action="publish" v-if="row.status === 'draft'" @click="publish(row)" />
+          <TableAction action="version" @click="edit(row, true)" />
         </Space>
       </template>
     </ResourcePage>

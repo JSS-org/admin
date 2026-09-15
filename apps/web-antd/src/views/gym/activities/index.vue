@@ -4,7 +4,7 @@ import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { ref, useTemplateRef } from 'vue';
 
-import { Button, Descriptions, DescriptionsItem, Form, FormItem, message, Tag } from 'ant-design-vue';
+import { Descriptions, DescriptionsItem, Form, FormItem, message, Tag } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
@@ -12,6 +12,7 @@ import EntityRecords from '#/views/gym/components/entity-records.vue';
 import FileMedia from '#/views/gym/components/file-media.vue';
 import FileUpload from '#/views/gym/components/file-upload.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 import { displayValue, statusColor } from '#/views/gym/utils/display';
 
 import { columns, fields, initial, prepare, title } from './data';
@@ -65,23 +66,29 @@ async function setStatus(row: GymRow, status: string) {
       time-filter
     >
       <template #actions="{ row }">
-        <Button type="link" @click="open(row, 'detail')">活动详情</Button>
+        <TableAction action="detail" @click="open(row, 'detail')" />
         <template v-if="canGym('activities:manage')">
-          <Button type="link" @click="open(row, 'cover')">编辑封面</Button>
-          <Button v-if="row.status === 'draft'" type="link" :disabled="busy" @click="setStatus(row, 'published')"
-            >发布</Button
-          >
-          <Button v-if="row.status === 'published'" type="link" :disabled="busy" @click="setStatus(row, 'closed')"
-            >结束报名</Button
-          >
-          <Button
+          <TableAction action="cover" @click="open(row, 'cover')" />
+          <TableAction
+            action="publish"
+            v-if="row.status === 'draft'"
+            :disabled="busy"
+            @click="setStatus(row, 'published')"
+          />
+          <TableAction
+            action="end"
+            v-if="row.status === 'published'"
+            :disabled="busy"
+            @click="setStatus(row, 'closed')"
+          />
+          <TableAction
+            action="cancel"
+            label="取消活动"
             v-if="['draft', 'published'].includes(row.status)"
-            type="link"
             danger
             :disabled="busy"
             @click="setStatus(row, 'cancelled')"
-            >取消活动</Button
-          >
+          />
         </template>
       </template>
     </ResourcePage>

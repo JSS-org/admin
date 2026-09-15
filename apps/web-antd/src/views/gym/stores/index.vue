@@ -24,6 +24,7 @@ import { canGym, getGymFileUrl, gymApi, openGymFile, uploadGymFile } from '#/api
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import EntityRecords from '#/views/gym/components/entity-records.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { columns, fields } from './data';
 
@@ -175,11 +176,16 @@ async function upload(file: File) {
           v-if="cover?.category === 'image' && urls[cover.fileId]"
           :src="urls[cover.fileId]"
           :alt="`${selected?.name}封面`"
+          :preview="false"
+          class="cursor-pointer"
+          @click="openGymFile(cover.fileId)"
         />
         <video
           v-else-if="cover?.category === 'video' && urls[cover.fileId]"
           :src="urls[cover.fileId]"
-          controls
+          class="cursor-pointer"
+          muted
+          @click="openGymFile(cover.fileId)"
           preload="metadata"
         ></video>
         <div v-else class="store-cover-placeholder">
@@ -198,96 +204,98 @@ async function upload(file: File) {
       </div>
       <Tabs v-model:active-key="activeTab" class="store-detail-tabs">
         <TabPane key="overview" tab="门店概览">
-          <p class="mb-5 leading-7 text-muted-foreground">{{ selected?.description || '暂未填写门店介绍' }}</p>
-          <div class="mb-5 flex flex-wrap gap-2">
-            <Tag v-for="feature in selected?.features" :key="feature" color="blue">{{ feature }}</Tag>
+          <div class="gym-stack">
+            <p class="leading-7 text-muted-foreground">{{ selected?.description || '暂未填写门店介绍' }}</p>
+            <div v-if="selected?.features?.length" class="flex flex-wrap gap-2">
+              <Tag v-for="feature in selected?.features" :key="feature" color="blue">{{ feature }}</Tag>
+            </div>
+            <Descriptions bordered :column="1">
+              <DescriptionsItem label="门店位置"
+                ><div class="flex items-start gap-3">
+                  <IconifyIcon icon="lucide:map-pin" class="size-5 shrink-0 text-primary" />
+                  <div>
+                    <p>{{ selected?.address || '暂未填写地址' }}</p>
+                    <a v-if="selected?.address" :href="mapUrl" target="_blank" rel="noopener noreferrer"
+                      >高德地图查看位置</a
+                    >
+                  </div>
+                </div></DescriptionsItem
+              >
+              <DescriptionsItem label="位置坐标"
+                >{{ selected?.longitude ?? '—' }}，{{ selected?.latitude ?? '—' }}</DescriptionsItem
+              >
+              <DescriptionsItem label="营业时间"
+                >{{ selected?.businessHours?.opens ?? '—' }} –
+                {{ selected?.businessHours?.closes ?? '—' }}</DescriptionsItem
+              >
+              <DescriptionsItem label="联系电话">{{ selected?.servicePhone || '—' }}</DescriptionsItem>
+              <DescriptionsItem label="客服微信">{{ selected?.serviceWechat || '—' }}</DescriptionsItem>
+            </Descriptions>
           </div>
-          <Descriptions bordered :column="1">
-            <DescriptionsItem label="门店位置"
-              ><div class="flex items-start gap-3">
-                <IconifyIcon icon="lucide:map-pin" class="size-5 shrink-0 text-primary" />
-                <div>
-                  <p>{{ selected?.address || '暂未填写地址' }}</p>
-                  <a v-if="selected?.address" :href="mapUrl" target="_blank" rel="noopener noreferrer"
-                    >高德地图查看位置</a
-                  >
-                </div>
-              </div></DescriptionsItem
-            >
-            <DescriptionsItem label="位置坐标"
-              >{{ selected?.longitude ?? '—' }}，{{ selected?.latitude ?? '—' }}</DescriptionsItem
-            >
-            <DescriptionsItem label="营业时间"
-              >{{ selected?.businessHours?.opens ?? '—' }} –
-              {{ selected?.businessHours?.closes ?? '—' }}</DescriptionsItem
-            >
-            <DescriptionsItem label="联系电话">{{ selected?.servicePhone || '—' }}</DescriptionsItem>
-            <DescriptionsItem label="客服微信">{{ selected?.serviceWechat || '—' }}</DescriptionsItem>
-          </Descriptions>
         </TabPane>
         <TabPane key="media" tab="环境照片与视频">
-          <Upload
-            v-if="canGym('stores:write') && canGym('files:upload')"
-            :before-upload="upload"
-            :disabled="busy"
-            :show-upload-list="false"
-            accept="image/png,image/jpeg,video/mp4"
-          >
-            <Button :loading="busy">上传图片或视频</Button>
-          </Upload>
-          <Table
-            :data-source="media"
-            :loading="busy"
-            row-key="fileId"
-            :pagination="false"
-            :columns="[
-              { title: '预览', dataIndex: 'preview', width: 100 },
-              { title: '文件', dataIndex: 'name' },
-              { title: '封面', dataIndex: 'isCover' },
-              { title: '操作', dataIndex: '_actions' },
-            ]"
-          >
-            <template #bodyCell="{ column, record }">
-              <template v-if="column.dataIndex === 'preview'">
-                <Image
-                  v-if="record.category === 'image' && urls[record.fileId]"
-                  :src="urls[record.fileId]"
-                  :width="72"
-                  :height="52"
-                  class="store-thumbnail"
-                />
-                <Tag v-else>{{ record.category === 'video' ? '视频' : '图片' }}</Tag>
+          <div class="gym-stack">
+            <Upload
+              v-if="canGym('stores:write') && canGym('files:upload')"
+              :before-upload="upload"
+              :disabled="busy"
+              :show-upload-list="false"
+              accept="image/png,image/jpeg,video/mp4"
+            >
+              <Button :loading="busy">上传图片或视频</Button>
+            </Upload>
+            <Table
+              :data-source="media"
+              :loading="busy"
+              row-key="fileId"
+              :pagination="false"
+              :columns="[
+                { title: '预览', dataIndex: 'preview', width: 100 },
+                { title: '文件', dataIndex: 'name' },
+                { title: '封面', dataIndex: 'isCover' },
+                { title: '操作', dataIndex: '_actions' },
+              ]"
+            >
+              <template #bodyCell="{ column, record }">
+                <template v-if="column.dataIndex === 'preview'">
+                  <Image
+                    v-if="record.category === 'image' && urls[record.fileId]"
+                    :src="urls[record.fileId]"
+                    :width="72"
+                    :height="52"
+                    :preview="false"
+                    class="store-thumbnail"
+                    @click="openGymFile(record.fileId)"
+                  />
+                  <Tag v-else>{{ record.category === 'video' ? '视频' : '图片' }}</Tag>
+                </template>
+                <span v-if="column.dataIndex === 'isCover'">{{ record.isCover ? '是' : '否' }}</span>
+                <Space v-if="column.dataIndex === '_actions'">
+                  <TableAction action="preview" v-if="canGym('files:read')" @click="openGymFile(record.fileId)" />
+                  <TableAction
+                    action="setCover"
+                    v-if="canGym('stores:write')"
+                    :disabled="busy || record.isCover"
+                    @click="
+                      changeMedia(
+                        media.map((m) => ({
+                          ...m,
+                          isCover: m.fileId === record.fileId,
+                        })),
+                      )
+                    "
+                  />
+                  <TableAction
+                    action="remove"
+                    v-if="canGym('stores:write')"
+                    danger
+                    :disabled="busy"
+                    @click="changeMedia(media.filter((m) => m.fileId !== record.fileId))"
+                  />
+                </Space>
               </template>
-              <span v-if="column.dataIndex === 'isCover'">{{ record.isCover ? '是' : '否' }}</span>
-              <Space v-if="column.dataIndex === '_actions'">
-                <Button v-if="canGym('files:read')" type="link" @click="openGymFile(record.fileId)">查看</Button>
-                <Button
-                  v-if="canGym('stores:write')"
-                  type="link"
-                  :disabled="busy || record.isCover"
-                  @click="
-                    changeMedia(
-                      media.map((m) => ({
-                        ...m,
-                        isCover: m.fileId === record.fileId,
-                      })),
-                    )
-                  "
-                >
-                  设为封面
-                </Button>
-                <Button
-                  v-if="canGym('stores:write')"
-                  danger
-                  type="link"
-                  :disabled="busy"
-                  @click="changeMedia(media.filter((m) => m.fileId !== record.fileId))"
-                >
-                  移除
-                </Button>
-              </Space>
-            </template>
-          </Table>
+            </Table>
+          </div>
         </TabPane>
         <TabPane v-if="selected && canGym('employees:read')" key="employees" tab="本店员工"
           ><EntityRecords
@@ -337,7 +345,7 @@ async function upload(file: File) {
 .store-cover-placeholder {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--gym-space-action);
   align-items: center;
   justify-content: center;
   height: 220px;
@@ -347,10 +355,9 @@ async function upload(file: File) {
 
 .store-heading {
   display: flex;
-  gap: 16px;
+  gap: var(--gym-space-field);
   align-items: center;
   justify-content: space-between;
-  margin-block: 20px;
 }
 
 .store-heading h2 {

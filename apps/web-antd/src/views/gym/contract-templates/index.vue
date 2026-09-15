@@ -9,6 +9,7 @@ import { canGym, gymApi, openGymFile } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import FileUpload from '#/views/gym/components/file-upload.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
+import TableAction from '#/views/gym/components/table-action.vue';
 
 import { columns, fields, isTemplate, title, writeCode } from './data';
 import { usePage } from './use-page';
@@ -44,14 +45,14 @@ const {
       :store-filter="false"
       :time-filter="false"
     >
-      <template #toolbar>
-        <Button v-if="canGym(writeCode)" type="primary" @click="createContract"> 上传合同模板 </Button>
+      <template #create>
+        <Button v-if="canGym(writeCode)" type="primary" @click="createContract"> 新增合同模板 </Button>
       </template>
       <template #actions="{ row, reload }">
         <template v-if="canGym(writeCode)">
-          <Button type="link" @click="newVersion(row)">新版本</Button>
-          <Button
-            type="link"
+          <TableAction action="version" @click="newVersion(row)" />
+          <TableAction
+            :action="row.status === 'published' ? 'disable' : 'publish'"
             @click="
               async () => {
                 await gymApi.patch(`contract-templates/${row.id}`, {
@@ -60,11 +61,10 @@ const {
                 await reload();
               }
             "
-            >{{ row.status === 'published' ? '停用' : '发布' }}</Button
-          >
-          <Button v-if="row.status === 'draft'" type="link" @click="replaceFile(row)"> 替换PDF </Button>
+          />
+          <TableAction action="replace" v-if="row.status === 'draft'" @click="replaceFile(row)" />
         </template>
-        <Button v-if="canGym('files:read')" type="link" @click="openGymFile(row.fileId)">预览 PDF</Button>
+        <TableAction action="preview" v-if="canGym('files:read')" @click="openGymFile(row.fileId)" />
       </template>
     </ResourcePage>
     <AdminDrawer

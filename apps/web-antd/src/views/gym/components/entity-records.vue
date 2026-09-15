@@ -52,34 +52,36 @@ onScopeDispose(() => {
 });
 </script>
 <template>
-  <Alert v-if="failed" type="error" message="关联记录加载失败"
-    ><template #action><Button @click="load">重试</Button></template></Alert
-  >
-  <Table
-    :data-source="items"
-    :columns="columns"
-    :loading="loading"
-    row-key="id"
-    :scroll="{ x: 'max-content' }"
-    :pagination="{
-      current: page,
-      pageSize: 10,
-      total,
-      showSizeChanger: false,
-      showTotal: (count: number) => `共 ${count} 条`,
-    }"
-    @change="
-      (pagination) => {
-        page = pagination.current ?? 1;
-        load();
-      }
-    "
-  >
-    <template #bodyCell="{ column, text }">
-      <Tag v-if="column.dataIndex === 'status'" :color="statusColor(text)">{{
-        displayValue(text, 'status', [], {})
-      }}</Tag>
-      <span v-else>{{ displayValue(text, String(column.dataIndex), [], {}) }}</span>
-    </template>
-  </Table>
+  <div class="gym-stack">
+    <Alert v-if="failed" type="error" message="关联记录加载失败"
+      ><template #action><Button @click="load">重试</Button></template></Alert
+    >
+    <Table
+      :data-source="items"
+      :columns="columns"
+      :loading="loading"
+      row-key="id"
+      :scroll="{ x: 'max-content' }"
+      :pagination="{
+        current: page,
+        pageSize: 10,
+        total,
+        showSizeChanger: false,
+        showTotal: (count: number) => `共 ${count} 条`,
+      }"
+      @change="
+        (pagination) => {
+          page = pagination.current ?? 1;
+          load();
+        }
+      "
+    >
+      <template #bodyCell="{ column, text }">
+        <Tag v-if="column.dataIndex === 'status'" :color="statusColor(text)">{{
+          displayValue(text, 'status', [], {})
+        }}</Tag>
+        <span v-else>{{ displayValue(text, String(column.dataIndex), [], {}) }}</span>
+      </template>
+    </Table>
+  </div>
 </template>
