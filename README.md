@@ -45,16 +45,16 @@ The dev server prints the local URL on startup. `pnpm build:antd` produces the p
 
 ## Scripts
 
-| Script | Description |
-| --- | --- |
-| `pnpm dev:antd` | Start the admin console in dev mode |
-| `pnpm build:antd` | Build the admin console |
-| `pnpm lint` | Run oxlint, ESLint and Stylelint |
-| `pnpm format` | Format with oxfmt |
-| `pnpm check` | Circular dependency, dependency, type and spelling checks |
-| `pnpm check:type` | Type-check all packages |
-| `pnpm test:unit` | Run unit tests (Vitest) |
-| `pnpm test:e2e` | Run end-to-end tests (Playwright) |
+| Script            | Description                                               |
+| ----------------- | --------------------------------------------------------- |
+| `pnpm dev:antd`   | Start the admin console in dev mode                       |
+| `pnpm build:antd` | Build the admin console                                   |
+| `pnpm lint`       | Run oxlint, ESLint and Stylelint                          |
+| `pnpm format`     | Format with oxfmt                                         |
+| `pnpm check`      | Circular dependency, dependency, type and spelling checks |
+| `pnpm check:type` | Type-check all packages                                   |
+| `pnpm test:unit`  | Run unit tests (Vitest)                                   |
+| `pnpm test:e2e`   | Run end-to-end tests (Playwright)                         |
 
 ## Commit Convention
 
