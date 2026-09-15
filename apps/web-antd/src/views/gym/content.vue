@@ -329,30 +329,30 @@ const scopeFilter = computed({
       <Form layout="vertical">
         <template v-if="resource === 'client-settings'">
           <FormItem label="展示名称">
-            <Input v-model:value="data.systemName" />
-</FormItem><FormItem label="应用ID">
-            <Input v-model:value="data.appId" />
-</FormItem><FormItem label="欢迎文字">
-            <Input.TextArea v-model:value="data.welcomeText" />
-</FormItem><FormItem label="客服信息">
-            <Input v-model:value="data.customerService" />
-</FormItem><FormItem label="App下载链接">
-            <Input v-model:value="data.appDownloadUrl" />
-</FormItem><FormItem label="封面">
+            <Input v-model:value="data.systemName" /> </FormItem
+          ><FormItem label="应用ID">
+            <Input v-model:value="data.appId" /> </FormItem
+          ><FormItem label="欢迎文字">
+            <Input.TextArea v-model:value="data.welcomeText" /> </FormItem
+          ><FormItem label="客服信息">
+            <Input v-model:value="data.customerService" /> </FormItem
+          ><FormItem label="App下载链接">
+            <Input v-model:value="data.appDownloadUrl" /> </FormItem
+          ><FormItem label="封面">
             <Upload
               :before-upload="(file) => upload(file, data, 'coverFileId')"
               :show-upload-list="false"
               accept=".png,.jpg,.jpeg"
             >
-              <Button>上传封面</Button>
-</Upload><Button
+              <Button>上传封面</Button> </Upload
+            ><Button
               v-if="data.coverFileId"
               type="link"
               @click="openGymFile(data.coverFileId)"
             >
               查看封面
-            </Button>
-</FormItem><Checkbox v-model:checked="data.enabled">启用展示</Checkbox>
+            </Button> </FormItem
+          ><Checkbox v-model:checked="data.enabled">启用展示</Checkbox>
           <div v-for="(block, index) in data.blocks" :key="index" class="my-4">
             <Space wrap>
               <Select
@@ -367,10 +367,11 @@ const scopeFilter = computed({
               /><Input
                 v-model:value="block.title"
                 placeholder="标题"
-              /><Checkbox v-model:checked="block.enabled"> 启用 </Checkbox><Button @click="data.blocks.splice(index, 1)">
+              /><Checkbox v-model:checked="block.enabled"> 启用 </Checkbox
+              ><Button @click="data.blocks.splice(index, 1)">
                 移除区块
-              </Button>
-</Space><Input.TextArea
+              </Button> </Space
+            ><Input.TextArea
               v-model:value="block.body"
               placeholder="内容"
               class="my-2"
@@ -383,8 +384,8 @@ const scopeFilter = computed({
                 :show-upload-list="false"
                 accept=".png,.jpg,.jpeg,.mp4"
               >
-                <Button>上传图片/视频</Button>
-</Upload><Button v-if="block.fileId" @click="openGymFile(block.fileId)">
+                <Button>上传图片/视频</Button> </Upload
+              ><Button v-if="block.fileId" @click="openGymFile(block.fileId)">
                 查看媒体
               </Button>
             </Space>
@@ -405,20 +406,20 @@ const scopeFilter = computed({
         </template>
         <template v-else>
           <FormItem label="品牌名称">
-            <Input v-model:value="data.name" />
-</FormItem><FormItem label="品牌介绍">
-            <Input.TextArea v-model:value="data.introduction" />
-</FormItem><FormItem label="联系电话">
-            <Input v-model:value="data.contactPhone" />
-</FormItem><FormItem label="发布状态">
+            <Input v-model:value="data.name" /> </FormItem
+          ><FormItem label="品牌介绍">
+            <Input.TextArea v-model:value="data.introduction" /> </FormItem
+          ><FormItem label="联系电话">
+            <Input v-model:value="data.contactPhone" /> </FormItem
+          ><FormItem label="发布状态">
             <Select
               v-model:value="data.status"
               :options="[
                 { label: '草稿', value: 'draft' },
                 { label: '发布（三种模型均需图片/视频）', value: 'published' },
               ]"
-            />
-</FormItem><FormItem label="品牌标志">
+            /> </FormItem
+          ><FormItem label="品牌标志">
             <Upload
               :before-upload="(file) => upload(file, data, 'logoFileId')"
               :show-upload-list="false"
@@ -430,34 +431,34 @@ const scopeFilter = computed({
           <div v-for="(model, index) in data.models" :key="index" class="my-4">
             <Space wrap>
               <FormItem label="模型编号">
-                <Input v-model:value="model.modelCode" />
-</FormItem><FormItem label="模型名称">
-                <Input v-model:value="model.name" />
-</FormItem><FormItem label="面积（㎡）">
-                <Input v-model:value="model.areaSqm" />
-</FormItem><Button @click="data.models.splice(index, 1)">
+                <Input v-model:value="model.modelCode" /> </FormItem
+              ><FormItem label="模型名称">
+                <Input v-model:value="model.name" /> </FormItem
+              ><FormItem label="面积（㎡）">
+                <Input v-model:value="model.areaSqm" /> </FormItem
+              ><Button @click="data.models.splice(index, 1)">
                 移除模型
-              </Button>
-</Space><FormItem label="模型说明">
-              <Input.TextArea v-model:value="model.description" />
-</FormItem><FormItem label="投资说明">
+              </Button> </Space
+            ><FormItem label="模型说明">
+              <Input.TextArea v-model:value="model.description" /> </FormItem
+            ><FormItem label="投资说明">
               <Input.TextArea
                 v-model:value="model.investmentDescription"
-              />
-</FormItem><Upload
+              /> </FormItem
+            ><Upload
               :before-upload="(file) => upload(file, model, 'fileIds', true)"
               :show-upload-list="false"
               accept=".png,.jpg,.jpeg,.mp4"
             >
-              <Button>上传立体图 / 视频</Button>
-</Upload><Space
+              <Button>上传立体图 / 视频</Button> </Upload
+            ><Space
               v-for="(fileId, fileIndex) in model.fileIds"
               :key="fileId"
               class="my-2"
             >
               <Button type="link" @click="openGymFile(fileId)">
-                视图 {{ Number(fileIndex) + 1 }}
-</Button><Button @click="model.fileIds.splice(fileIndex, 1)">
+                视图 {{ Number(fileIndex) + 1 }} </Button
+              ><Button @click="model.fileIds.splice(fileIndex, 1)">
                 移除
               </Button>
             </Space>
@@ -509,8 +510,10 @@ const scopeFilter = computed({
       </template>
       <template v-if="resource === 'activities'" #actions="{ row, reload }">
         <template v-if="resource === 'activities'">
-          <Button type="link" @click="detail(row)">报名记录</Button><template v-if="canGym('activities:manage')">
-            <Button type="link" @click="cover(row)">封面</Button><Button
+          <Button type="link" @click="detail(row)">报名记录</Button
+          ><template v-if="canGym('activities:manage')">
+            <Button type="link" @click="cover(row)">封面</Button
+            ><Button
               type="link"
               @click="
                 async () => {
@@ -521,8 +524,8 @@ const scopeFilter = computed({
                 }
               "
             >
-              发布
-</Button><Button
+              发布 </Button
+            ><Button
               type="link"
               @click="
                 async () => {
@@ -554,15 +557,15 @@ const scopeFilter = computed({
           :show-upload-list="false"
           accept=".png,.jpg,.jpeg"
         >
-          <Button>上传活动封面</Button>
-</Upload><Button
+          <Button>上传活动封面</Button> </Upload
+        ><Button
           v-if="current.coverFileId"
           type="link"
           @click="openGymFile(current.coverFileId)"
         >
           查看封面
-        </Button>
-</template><Table
+        </Button> </template
+      ><Table
         v-else
         :data-source="registrations"
         row-key="id"

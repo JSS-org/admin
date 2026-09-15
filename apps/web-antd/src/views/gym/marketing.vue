@@ -538,14 +538,14 @@ async function newVersion(row: GymRow) {
           type="link"
           @click="details(row)"
         >
-          逐项结果
-</Button><Button
+          逐项结果 </Button
+        ><Button
           v-if="resource === 'point-rules' && canGym('points:manage')"
           type="link"
           @click="newVersion(row)"
         >
-          新版本
-</Button><Button
+          新版本 </Button
+        ><Button
           v-if="
             ['point-rules', 'point-products', 'coupon-templates'].includes(
               resource,
@@ -608,20 +608,20 @@ async function newVersion(row: GymRow) {
                 { label: '所有启用且适用的门店', value: 'allEligible' },
                 { label: '指定门店', value: 'selected' },
               ]"
-            />
-</FormItem><FormItem v-if="targetMode === 'selected'" label="目标门店">
+            /> </FormItem
+          ><FormItem v-if="targetMode === 'selected'" label="目标门店">
             <Select
               v-model:value="storeIds"
               mode="multiple"
               :options="stores.map((s) => ({ label: s.name, value: s.id }))"
-            />
-</FormItem><FormItem label="每店追加可发张数">
+            /> </FormItem
+          ><FormItem label="每店追加可发张数">
             <InputNumber
               v-model:value="quantity"
               :min="1"
               :max="1000000"
-            />
-</FormItem><Alert
+            /> </FormItem
+          ><Alert
             type="info"
             message="本操作只分配门店发券额度；实际发给会员时才消耗额度。"
           />
@@ -633,8 +633,8 @@ async function newVersion(row: GymRow) {
                 v-model:value="target.storeId"
                 :options="stores.map((s) => ({ label: s.name, value: s.id }))"
                 @change="target.memberIds = []"
-              />
-</FormItem><FormItem label="本店会员">
+              /> </FormItem
+            ><FormItem label="本店会员">
               <Select
                 v-model:value="target.memberIds"
                 mode="multiple"
@@ -648,8 +648,8 @@ async function newVersion(row: GymRow) {
                       value: m.id,
                     }))
                 "
-              />
-</FormItem><Button
+              /> </FormItem
+            ><Button
               v-if="targets.length > 1"
               @click="targets.splice(index, 1)"
             >
@@ -671,8 +671,8 @@ async function newVersion(row: GymRow) {
                 { label: '私信（一位会员）', value: 'private' },
                 { label: '批量通知', value: 'bulk' },
               ]"
-            />
-</FormItem><FormItem label="发送渠道">
+            /> </FormItem
+          ><FormItem label="发送渠道">
             <Select
               v-model:value="channel"
               :options="[
@@ -680,10 +680,11 @@ async function newVersion(row: GymRow) {
                 { label: 'App', value: 'app' },
                 { label: '短信', value: 'sms' },
               ]"
-            />
-</FormItem><FormItem label="标题"><Input v-model:value="subject" /></FormItem><FormItem label="内容">
-            <Input.TextArea v-model:value="content" :rows="4" />
-</FormItem><Alert
+            /> </FormItem
+          ><FormItem label="标题"><Input v-model:value="subject" /></FormItem
+          ><FormItem label="内容">
+            <Input.TextArea v-model:value="content" :rows="4" /> </FormItem
+          ><Alert
             type="info"
             message="未配置真实渠道的消息会记录发送失败，不会发送到会员。"
           />

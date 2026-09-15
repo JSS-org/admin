@@ -273,8 +273,8 @@ const scopeFilter = computed({
           <FormItem label="入场要求">
             <Checkbox v-model:checked="settings.requireCheckin">
               核销前须签到
-            </Checkbox>
-</FormItem><FormItem label="支持渠道">
+            </Checkbox> </FormItem
+          ><FormItem label="支持渠道">
             <Select
               v-model:value="settings.supportedChannels"
               mode="multiple"
@@ -284,14 +284,14 @@ const scopeFilter = computed({
                 { label: '美团', value: 'meituan' },
                 { label: '抖音', value: 'douyin' },
               ]"
-            />
-</FormItem><Space>
+            /> </FormItem
+          ><Space>
             <FormItem label="允许开始时间">
               <Input
                 v-model:value="settings.allowedStart"
                 type="time"
-              />
-</FormItem><FormItem label="允许结束时间">
+              /> </FormItem
+            ><FormItem label="允许结束时间">
               <Input v-model:value="settings.allowedEnd" type="time" />
             </FormItem>
           </Space>
@@ -310,13 +310,14 @@ const scopeFilter = computed({
                   v-model:value="item.cardTemplateId"
                   :options="cardOptions"
                   style="min-width: 220px"
-                />
-</FormItem><FormItem label="售价（元）">
+                /> </FormItem
+              ><FormItem label="售价（元）">
                 <Input
                   v-if="tab === 'online-sales-settings'"
                   v-model:value="item.salePrice"
-                /><Input v-else v-model:value="item.price" />
-</FormItem><Checkbox v-model:checked="item.enabled">启用</Checkbox><Button
+                /><Input v-else v-model:value="item.price" /> </FormItem
+              ><Checkbox v-model:checked="item.enabled">启用</Checkbox
+              ><Button
                 danger
                 @click="
                   (tab === 'online-sales-settings'
@@ -334,14 +335,14 @@ const scopeFilter = computed({
                   v-model:value="item.billingDay"
                   :min="1"
                   :max="28"
-                />
-</FormItem><FormItem label="提前通知天数">
+                /> </FormItem
+              ><FormItem label="提前通知天数">
                 <InputNumber
                   v-model:value="item.renewalNoticeDays"
                   :min="0"
                   :max="30"
-                />
-</FormItem><FormItem label="宽限天数">
+                /> </FormItem
+              ><FormItem label="宽限天数">
                 <InputNumber
                   v-model:value="item.graceDays"
                   :min="0"

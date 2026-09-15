@@ -170,7 +170,9 @@ const titles: Record<string, string> = {
             创建账号
           </Button>
           <template v-else>
-            <Button type="link" @click="open(row, 'roles')">授权</Button><Button type="link" @click="open(row, 'password')">密码</Button><Button
+            <Button type="link" @click="open(row, 'roles')">授权</Button
+            ><Button type="link" @click="open(row, 'password')">密码</Button
+            ><Button
               type="link"
               @click="
                 async () => {
@@ -216,8 +218,8 @@ const titles: Record<string, string> = {
             "
             style="min-width: 150px"
           />
-          <Button danger @click="links.splice(index, 1)">移除</Button>
-</Space><Button @click="links.push({})">增加授权</Button>
+          <Button danger @click="links.splice(index, 1)">移除</Button> </Space
+        ><Button @click="links.push({})">增加授权</Button>
       </template>
       <Select
         v-else-if="mode === 'stores'"
@@ -228,8 +230,8 @@ const titles: Record<string, string> = {
       />
       <Form v-else layout="vertical">
         <FormItem v-if="mode === 'account'" label="用户名">
-          <Input v-model:value="username" />
-</FormItem><FormItem label="密码（至少6位）">
+          <Input v-model:value="username" /> </FormItem
+        ><FormItem label="密码（至少6位）">
           <Input.Password v-model:value="password" />
         </FormItem>
       </Form>

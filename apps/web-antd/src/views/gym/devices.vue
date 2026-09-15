@@ -316,8 +316,8 @@ async function upload(file: File) {
             type="link"
             @click="open(row, 'compartments')"
           >
-            配置柜格
-</Button><Button
+            配置柜格 </Button
+          ><Button
             v-if="['door', 'locker'].includes(row.type)"
             type="link"
             @click="open(row, 'command')"
@@ -366,8 +366,8 @@ async function upload(file: File) {
             style="min-width: 120px"
           /><Button danger @click="compartments.splice(index, 1)">
             移除
-          </Button>
-</Space><Button
+          </Button> </Space
+        ><Button
           @click="compartments.push({ number: '', status: 'available' })"
         >
           增加柜格
@@ -426,10 +426,10 @@ async function upload(file: File) {
       <template v-if="mode === 'tutorials'">
         <Form v-if="canGym('equipment:write')" layout="vertical">
           <FormItem label="教学标题">
-            <Input v-model:value="tutorialTitle" />
-</FormItem><FormItem label="说明">
-            <Input.TextArea v-model:value="instructions" />
-</FormItem><FormItem label="图片/视频">
+            <Input v-model:value="tutorialTitle" /> </FormItem
+          ><FormItem label="说明">
+            <Input.TextArea v-model:value="instructions" /> </FormItem
+          ><FormItem label="图片/视频">
             <Upload
               :before-upload="upload"
               :show-upload-list="false"
@@ -437,8 +437,8 @@ async function upload(file: File) {
             >
               <Button :loading="busy">上传教学文件</Button>
             </Upload>
-            {{ filename }}
-</FormItem><Button type="primary" :loading="busy" @click="save">
+            {{ filename }} </FormItem
+          ><Button type="primary" :loading="busy" @click="save">
             保存教学
           </Button>
         </Form>
@@ -455,8 +455,8 @@ async function upload(file: File) {
           <template #bodyCell="{ column, record }">
             <Space v-if="column.dataIndex === 'actions'">
               <Button type="link" @click="openGymFile(record.fileId)">
-                查看
-</Button><Button
+                查看 </Button
+              ><Button
                 v-if="canGym('equipment:write')"
                 type="link"
                 @click="
