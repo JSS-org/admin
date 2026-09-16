@@ -2,7 +2,25 @@
 import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
-import { IconifyIcon } from '@vben/icons';
+import {
+  ArrowUpRight,
+  Building2,
+  CalendarCheck,
+  CalendarDays,
+  ChartNoAxesCombined,
+  ClipboardCheck,
+  ContactRound,
+  CreditCard,
+  DoorOpen,
+  FileCheck,
+  Flag,
+  Gift,
+  HeartPulse,
+  PanelsTopLeft,
+  ScanLine,
+  Ticket,
+  Users,
+} from '@vben/icons';
 import { useAccessStore } from '@vben/stores';
 
 import { Alert, Button, Card, Empty, Segmented, Select, Skeleton, Statistic, Table } from 'ant-design-vue';
@@ -51,70 +69,70 @@ const scenarios = [
 const accessStore = useAccessStore();
 
 const shortcuts = [
-  { title: '门店资料', description: '门店位置、营业时间、环境与封面', icon: 'lucide:building-2', path: '/gym/stores' },
+  { title: '门店资料', description: '门店位置、营业时间、环境与封面', icon: Building2, path: '/gym/stores' },
   {
     title: '员工资料',
     description: '人员资料、门店归属与工资模板',
-    icon: 'lucide:contact-round',
+    icon: ContactRound,
     path: '/gym/employees',
   },
-  { title: '智能设备', description: '设备状态、柜格和指令记录', icon: 'lucide:door-open', path: '/gym/devices' },
+  { title: '智能设备', description: '设备状态、柜格和指令记录', icon: DoorOpen, path: '/gym/devices' },
   {
     title: '展示配置',
     description: '编排小程序与 App 内容并预览',
-    icon: 'lucide:panels-top-left',
+    icon: PanelsTopLeft,
     path: '/gym/client-settings',
   },
   {
     title: '体测记录',
     description: '会员身体数据与报告文件',
-    icon: 'lucide:heart-pulse',
+    icon: HeartPulse,
     path: '/gym/body-measurements',
   },
-  { title: '会员卡模板', description: '维护卡种、适用门店及价格版本', icon: 'lucide:credit-card', path: '/gym/cards' },
-  { title: '积分兑换', description: '管理兑换商品、积分价格与库存', icon: 'lucide:gift', path: '/gym/point-products' },
-  { title: '售卡与核销', description: '配置售卡方案、包月及核销条件', icon: 'lucide:scan-line', path: '/gym/settings' },
+  { title: '会员卡模板', description: '维护卡种、适用门店及价格版本', icon: CreditCard, path: '/gym/cards' },
+  { title: '积分兑换', description: '管理兑换商品、积分价格与库存', icon: Gift, path: '/gym/point-products' },
+  { title: '售卡与核销', description: '配置售卡方案、包月及核销条件', icon: ScanLine, path: '/gym/settings' },
   {
     title: '优惠券额度',
     description: '查看、分配门店额度与变动流水',
-    icon: 'lucide:ticket',
+    icon: Ticket,
     path: '/gym/coupon-store-quotas',
   },
-  { title: '门店活动', description: '安排活动、维护封面和报名记录', icon: 'lucide:flag', path: '/gym/activities' },
+  { title: '门店活动', description: '安排活动、维护封面和报名记录', icon: Flag, path: '/gym/activities' },
   {
     title: '会员管理',
     description: '会员建档、资料查询与持卡详情',
-    icon: 'lucide:users',
+    icon: Users,
     path: '/gym/members',
   },
   {
     title: '课程安排',
     description: '查看与维护课程排期、教练和场地',
-    icon: 'lucide:calendar-days',
+    icon: CalendarDays,
     path: '/gym/course-sessions',
   },
   {
     title: '预约管理',
     description: '办理代预约，查询与取消课程预约',
-    icon: 'lucide:calendar-check',
+    icon: CalendarCheck,
     path: '/gym/bookings',
   },
   {
     title: '签到记录',
     description: '查看到店签到与当天签到汇总',
-    icon: 'lucide:clipboard-check',
+    icon: ClipboardCheck,
     path: '/gym/checkins',
   },
   {
     title: '合同记录',
     description: '查看合同原件、签署信息与未签提醒',
-    icon: 'lucide:file-check',
+    icon: FileCheck,
     path: '/gym/contracts',
   },
   {
     title: '门店与员工业绩',
     description: '查询门店和员工的销售业绩汇总',
-    icon: 'lucide:chart-no-axes-combined',
+    icon: ChartNoAxesCombined,
     path: '/gym/reports/performance',
   },
 ];
@@ -133,7 +151,7 @@ const visibleScenarios = computed(() =>
   <div class="gym-view">
     <AdminPage title="门店工作台" description="围绕会员服务与课程运营，开始今天的工作。">
       <!-- <div class="gym-home-banner">
-        <div class="gym-home-banner-icon"><IconifyIcon icon="lucide:activity" class="size-7" aria-hidden="true" /></div>
+        <div class="gym-home-banner-icon"><Activity class="size-7" aria-hidden="true" /></div>
         <div>
           <p class="gym-home-eyebrow">日常运营</p>
           <h2>让每一次到店，都衔接顺畅</h2>
@@ -238,7 +256,7 @@ const visibleScenarios = computed(() =>
             class="gym-shortcut bg-card text-card-foreground hover:border-primary focus-visible:ring-ring flex items-start gap-4 rounded-lg border p-5 transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
           >
             <span class="bg-primary/10 text-primary rounded-lg p-3">
-              <IconifyIcon :icon="shortcut.icon" class="size-6" aria-hidden="true" />
+              <component :is="shortcut.icon" class="size-6" aria-hidden="true" />
             </span>
             <div class="min-w-0 flex-1">
               <h3 class="mb-2 text-base font-medium">{{ shortcut.title }}</h3>
@@ -246,11 +264,7 @@ const visibleScenarios = computed(() =>
                 {{ shortcut.description }}
               </p>
             </div>
-            <IconifyIcon
-              icon="lucide:arrow-up-right"
-              class="text-muted-foreground mt-1 size-4 shrink-0"
-              aria-hidden="true"
-            />
+            <ArrowUpRight class="text-muted-foreground mt-1 size-4 shrink-0" aria-hidden="true" />
           </RouterLink>
         </div>
       </section>

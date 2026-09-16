@@ -3,8 +3,6 @@ import type { TableActionName } from './table-actions';
 
 import { computed } from 'vue';
 
-import { IconifyIcon } from '@vben/icons';
-
 import { Button, Tooltip } from 'ant-design-vue';
 
 import { tableActions } from './table-actions';
@@ -33,7 +31,7 @@ const title = computed(() => props.label ?? definition.value.label);
         :loading="loading"
         :danger="danger"
       >
-        <template #icon><IconifyIcon :icon="definition.icon" class="size-4" aria-hidden="true" /></template>
+        <template #icon><component :is="definition.icon" class="size-4" aria-hidden="true" /></template>
       </Button>
     </span>
   </Tooltip>

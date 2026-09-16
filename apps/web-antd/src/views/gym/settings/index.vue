@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-import { IconifyIcon } from '@vben/icons';
+import { CreditCard, ScanLine } from '@vben/icons';
 
 import {
   Alert,
@@ -107,8 +107,8 @@ function setWindow(item: Record<string, any>, values: any) {
           <Card class="settings-intro" :bordered="false">
             <template #title
               ><span class="flex items-center gap-2"
-                ><IconifyIcon
-                  :icon="tab === 'verification-settings' ? 'lucide:scan-line' : 'lucide:credit-card'"
+                ><component
+                  :is="tab === 'verification-settings' ? ScanLine : CreditCard"
                   class="size-5 text-primary"
                 />{{
                   tab === 'online-sales-settings'

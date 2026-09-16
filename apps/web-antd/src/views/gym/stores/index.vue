@@ -3,7 +3,7 @@ import type { GymRow } from '#/api/gym';
 
 import { computed, onScopeDispose, ref } from 'vue';
 
-import { IconifyIcon } from '@vben/icons';
+import { Building2, MapPin } from '@vben/icons';
 
 import {
   Alert,
@@ -189,7 +189,7 @@ async function upload(file: File) {
           preload="metadata"
         ></video>
         <div v-else class="store-cover-placeholder">
-          <IconifyIcon icon="lucide:building-2" class="size-12" /><span>门店环境展示</span
+          <Building2 class="size-12" /><span>门店环境展示</span
           ><span class="text-xs">上传门店环境照片，展示真实到店体验</span>
         </div>
       </div>
@@ -212,7 +212,7 @@ async function upload(file: File) {
             <Descriptions bordered :column="1">
               <DescriptionsItem label="门店位置"
                 ><div class="flex items-start gap-3">
-                  <IconifyIcon icon="lucide:map-pin" class="size-5 shrink-0 text-primary" />
+                  <MapPin class="size-5 shrink-0 text-primary" />
                   <div>
                     <p>{{ selected?.address || '暂未填写地址' }}</p>
                     <a v-if="selected?.address" :href="mapUrl" target="_blank" rel="noopener noreferrer"

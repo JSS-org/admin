@@ -1,7 +1,10 @@
 import { defineOverridesPreferences } from '@vben/preferences';
 
+import defaultAvatar from './assets/default-avatar.svg';
+
 export const adminPreferences = {
   app: {
+    defaultAvatar,
     defaultHomePath: '/gym/home',
     layout: 'sidebar-nav' as const,
     locale: 'zh-CN' as const,

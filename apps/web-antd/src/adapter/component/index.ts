@@ -53,7 +53,7 @@ import {
 
 import { ApiComponent, globalShareState, IconPicker, VCropper } from '@vben/common-ui';
 import { useSortable } from '@vben/hooks';
-import { IconifyIcon } from '@vben/icons';
+import { Upload as UploadIcon } from '@vben/icons';
 import { $t } from '@vben/locales';
 import { isEmpty } from '@vben/utils';
 
@@ -155,8 +155,7 @@ function createDefaultUploadSlots(listType: string, placeholder: string) {
       h(
         Button,
         {
-          icon: h(IconifyIcon, {
-            icon: 'ant-design:upload-outlined',
+          icon: h(UploadIcon, {
             class: 'mb-1 size-4',
           }),
         },

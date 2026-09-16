@@ -3,7 +3,7 @@ import type { UploadFile } from 'ant-design-vue';
 
 import { computed, ref } from 'vue';
 
-import { IconifyIcon } from '@vben/icons';
+import { CloudUpload } from '@vben/icons';
 
 import { message, Upload } from 'ant-design-vue';
 
@@ -68,7 +68,7 @@ async function upload(file: File) {
         }
       "
     >
-      <IconifyIcon icon="lucide:cloud-upload" class="mx-auto mb-3 size-8 text-primary" />
+      <CloudUpload class="mx-auto mb-3 size-8 text-primary" />
       <p class="font-medium">{{ busy ? '正在上传…' : title || '点击或拖入文件' }}</p>
       <p class="mt-2 text-xs text-muted-foreground">
         {{

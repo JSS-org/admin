@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconifyIcon } from '@vben/icons';
+import { Activity } from '@vben/icons';
 
 import { Alert, Button, Card, Form, FormItem, Input, Segmented, Select, Skeleton, Tag } from 'ant-design-vue';
 
@@ -101,9 +101,7 @@ const { stores, storeId, platform, data, busy, loading, saving, uploading, error
             <div class="preview-title">{{ data.systemName || '门店名称' }}</div>
             <div class="preview-scroll" tabindex="0" aria-label="草稿预览内容">
               <FileMedia v-if="data.coverFileId" :file-id="data.coverFileId" alt="首页封面" />
-              <div v-else class="preview-hero">
-                <IconifyIcon icon="lucide:activity" class="size-9" /><span>门店首页</span>
-              </div>
+              <div v-else class="preview-hero"><Activity class="size-9" /><span>门店首页</span></div>
               <div class="preview-content">
                 <h3>{{ data.welcomeText || '欢迎来到门店' }}</h3>
                 <Tag v-if="!data.enabled">展示已关闭</Tag>

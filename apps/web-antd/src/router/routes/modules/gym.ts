@@ -1,4 +1,7 @@
 import type { RouteRecordRaw } from 'vue-router';
+
+import '#/icons/route-icons';
+
 const routes: RouteRecordRaw[] = [
   {
     name: 'GymFilePreview',
