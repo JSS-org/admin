@@ -1,5 +1,7 @@
 # Gym 页面维护指南
 
+跨项目复用请参阅 [后台组件库使用规范：JSS Admin 风格](../../../../../docs/PROJECT-UI-GUIDE.md)，包含组件契约、迁移步骤和验收清单。
+
 每个路由对应一个目录。打开 `/gym/bookings`，直接修改 `bookings/index.vue`；打开 `/gym/reports/members`，修改 `reports/members/index.vue`。原来的 `training.vue`、`marketing.vue` 等跨功能分支页面已拆除。
 
 ## 修改入口
