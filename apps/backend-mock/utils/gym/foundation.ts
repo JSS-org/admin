@@ -509,14 +509,10 @@ export function foundation(req: Request): unknown {
               name: find('stores', l.storeId).name,
             })),
           cards: memberCards(req, rid),
-          coursePacks: scopeRows(actor, rows('memberCoursePacks')).filter((c) => c.memberId === rid),
+          coursePacks: memberCoursePacks(req, rid),
         };
       if (method === 'GET' && child === 'cards') return page(memberCards(req, rid), query);
-      if (method === 'GET' && child === 'course-packs')
-        return page(
-          scopeRows(actor, rows('memberCoursePacks')).filter((c) => c.memberId === rid),
-          query,
-        );
+      if (method === 'GET' && child === 'course-packs') return page(memberCoursePacks(req, rid), query);
       if (method === 'PATCH' && !child) {
         only(
           body,
@@ -603,6 +599,14 @@ function validateCodes(value: unknown, scope: string, actor: Request['actor']) {
   )
     fail('包含未知、越权或不适用于门店的权限');
   return [...new Set(value)];
+}
+function memberCoursePacks(req: Request, memberId: string) {
+  return scopeRows(req.actor, rows('memberCoursePacks'))
+    .filter((pack) => pack.memberId === memberId)
+    .map((pack) => ({
+      ...pack,
+      assignedCoachName: rows('employees').find((employee) => employee.id === pack.assignedCoachId)?.name ?? null,
+    }));
 }
 function memberCards(req: Request, memberId: string) {
   const permitted = accessibleStores(req.actor);

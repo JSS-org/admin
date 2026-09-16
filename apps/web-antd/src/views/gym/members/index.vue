@@ -81,12 +81,16 @@ async function open(row: GymRow) {
             row-key="id"
             :columns="[
               { title: '产品', dataIndex: 'name' },
+              { title: '私教教练（员工）', dataIndex: 'assignedCoachName' },
               { title: '剩余课时', dataIndex: 'remainingSessions' },
               { title: '到期时间', dataIndex: 'expiresAt' },
             ]"
           >
-            <template #bodyCell="{ column, text }">
-              {{ displayValue(text, String(column.dataIndex ?? ''), [], {}) }}
+            <template #bodyCell="{ column, text, record }">
+              <span v-if="column.dataIndex === 'assignedCoachName'">
+                {{ text || (record.assignedCoachId ? '员工信息不可用' : '未分配教练') }}
+              </span>
+              <span v-else>{{ displayValue(text, String(column.dataIndex ?? ''), [], {}) }}</span>
             </template>
           </Table>
         </TabPane>

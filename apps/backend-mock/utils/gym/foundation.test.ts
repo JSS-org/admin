@@ -58,6 +58,59 @@ describe('management authentication and scope', () => {
   });
 });
 describe('foundation workflows', () => {
+  it('returns each course pack coach in member details and the course pack list', () => {
+    const memberId = seedId(101);
+    const coach = find('employees', seedId(21));
+    const otherCoach = find('employees', seedId(23));
+    otherCoach.status = 'inactive';
+    const extraPack = insert('memberCoursePacks', {
+      memberId,
+      storeId: seedId(1),
+      assignedCoachId: otherCoach.id,
+    });
+    const detail = request('store1', 'GET', `/members/${memberId}`);
+    const packs = request('store1', 'GET', `/members/${memberId}/course-packs`).items;
+    for (const result of [detail.coursePacks, packs]) {
+      expect(result).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: seedId(331), assignedCoachId: coach.id, assignedCoachName: coach.name }),
+          expect.objectContaining({
+            id: extraPack.id,
+            assignedCoachId: otherCoach.id,
+            assignedCoachName: otherCoach.name,
+          }),
+        ]),
+      );
+    }
+  });
+  it('handles unassigned and unavailable coaches without failing member details', () => {
+    const pack = find('memberCoursePacks', seedId(331));
+    for (const coachId of [null, seedId(9999)]) {
+      pack.assignedCoachId = coachId;
+      expect(request('store1', 'GET', `/members/${seedId(101)}`).coursePacks[0]).toMatchObject({
+        assignedCoachId: coachId,
+        assignedCoachName: null,
+      });
+    }
+  });
+  it('keeps another store course pack and coach out of member details', () => {
+    const foreignPack = insert('memberCoursePacks', {
+      memberId: seedId(101),
+      storeId: seedId(2),
+      assignedCoachId: seedId(22),
+    });
+    expect(request('hq', 'GET', `/members/${seedId(101)}`).coursePacks).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: foreignPack.id, assignedCoachName: find('employees', seedId(22)).name }),
+      ]),
+    );
+    for (const packs of [
+      request('store1', 'GET', `/members/${seedId(101)}`).coursePacks,
+      request('store1', 'GET', `/members/${seedId(101)}/course-packs`).items,
+    ]) {
+      expect(packs.map((pack: Row) => pack.id)).toEqual([seedId(331)]);
+    }
+  });
   it('persists edits and validates fields instead of mass assignment', () => {
     request('hq', 'PATCH', `/stores/${seedId(1)}`, { name: '新名称' });
     expect(request('store1', 'GET', `/stores/${seedId(1)}`).name).toBe('新名称');
