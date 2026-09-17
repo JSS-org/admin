@@ -104,9 +104,9 @@ erDiagram
 | member_card_stores 持卡门店权益 | member_card_id→member_cards, store_id→stores | UQ(持卡,门店)；selected 通卡发卡时复制；all 语义由快照指定，不靠模板后续修改 |
 | card_usage_records 卡使用 | member_card_id→member_cards, store_id→stores, checkin_id?→checkins, verification_id?→verifications, delta_uses int, source_key, occurred_at | source_key UQ；扣次与余额同事务；计时卡 delta 可为0 |
 | card_status_events 卡状态历史 | member_card_id→member_cards, from_status, to_status, reason, source_type, source_id uuid?, actor_id?→admin_accounts, occurred_at | 记录冻结/解冻/到期等来源 |
-| online_sales_settings 在线售卡 | store_id→stores, enabled boolean, maintenance_message?, contract_required boolean, status | store_id UQ |
-| online_card_offers 在线卡配置 | store_id→stores, card_template_id→card_templates, sale_price, starts_at?, ends_at?, enabled boolean | UQ(门店,卡种版本)；价格非负 |
-| subscription_settings 包月配置 | store_id→stores, card_template_id→card_templates, price, billing_day int?, renewal_notice_days int, grace_days int, enabled boolean | 配置与授权分离；天数非负；billing_day 1..28 或空为授权日语义 |
+| online_sales_settings 在线售卡 | store_id→stores, maintenance_message?, status | store_id UQ；售卡开关、合同要求均由 online_card_offers 方案推导，无门店级总开关 |
+| online_card_offers 在线卡配置 | store_id→stores, card_template_id→card_templates, sale_price, starts_at?, ends_at?, enabled boolean, contract_required boolean, approval_required boolean | UQ(门店,卡种版本)；价格非负；方案独立启停、签约与审批要求（未签约时审批恒为否） |
+| subscription_settings 包月配置 | store_id→stores, card_template_id→card_templates, price, billing_day int?, renewal_notice_days int, grace_days int, enabled boolean, contract_required boolean, approval_required boolean | 配置与授权分离；天数非负；billing_day 1..28 或空为授权日语义；方案独立启停、签约与审批要求（未签约时审批恒为否） |
 | verification_settings 自助核销配置 | store_id→stores, enabled boolean, require_checkin boolean, supported_channels jsonb, allowed_start time?, allowed_end time? | store_id UQ；渠道白名单 |
 | orders 订单 | order_no, member_id→members, store_id→stores, channel, status, currency, total_amount, discount_amount, payable_amount, paid_amount, refunded_amount, ordered_at, paid_at?, source_key? | order_no UQ；金额非负、退款≤实收；来源 web/miniapp/app/group_buy/gift/points；source_key 非空时 UQ |
 | order_items 订单项 | order_id→orders, product_type, card_template_id?→card_templates, course_product_id?→course_products, point_product_id?→point_products, product_name_snapshot, quantity int, unit_price, discount_amount, payable_amount, product_snapshot jsonb | 按 product_type 外键恰好一个；数量>0；订单金额与明细服务层校验 |

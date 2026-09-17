@@ -170,10 +170,10 @@
 
 | 方法 | 路径 | 权限 | 主要入参 / 功能 |
 | --- | --- | --- | --- |
-| GET | /stores/:storeId/online-sales-settings | H sales:settings | 售卡开关/适用卡种/合同要求 |
-| PUT | /stores/:storeId/online-sales-settings | H sales:settings | enabled,contractRequired,offers[{cardTemplateId,salePrice,startsAt?,endsAt?,enabled}] |
+| GET | /stores/:storeId/online-sales-settings | H sales:settings | 售卡方案集合 |
+| PUT | /stores/:storeId/online-sales-settings | H sales:settings | offers[{cardTemplateId,salePrice,startsAt?,endsAt?,enabled,contractRequired,approvalRequired}] |
 | GET | /stores/:storeId/subscription-settings | H sales:settings | 包月配置集合 |
-| PUT | /stores/:storeId/subscription-settings | H sales:settings | items[{cardTemplateId,price,billingDay?,renewalNoticeDays,graceDays,enabled}] |
+| PUT | /stores/:storeId/subscription-settings | H sales:settings | items[{cardTemplateId,price,billingDay?,renewalNoticeDays,graceDays,enabled,contractRequired,approvalRequired}] |
 | GET | /stores/:storeId/verification-settings | H sales:settings | 自助核销配置 |
 | PUT | /stores/:storeId/verification-settings | H sales:settings | enabled,requireCheckin,supportedChannels,allowedStart?,allowedEnd? |
 | GET | /self-service-card-orders | H/S sales:read | storeId,memberId,status,from/to；自主办卡记录（miniapp/app来源），含卡与金额 |

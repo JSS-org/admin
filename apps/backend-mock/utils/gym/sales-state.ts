@@ -7,9 +7,7 @@ export function seedSales() {
       id: seedId(600 + i),
       storeId,
       kind: 'online-sales-settings',
-      enabled: true,
-      contractRequired: true,
-      offers: [{ cardTemplateId, salePrice: '199.00', enabled: true }],
+      offers: [{ cardTemplateId, salePrice: '199.00', enabled: true, contractRequired: true, approvalRequired: false }],
     });
     insert('salesSettings', {
       id: seedId(610 + i),
@@ -24,6 +22,8 @@ export function seedSales() {
           renewalNoticeDays: 3,
           graceDays: 3,
           enabled: true,
+          contractRequired: true,
+          approvalRequired: false,
         },
       ],
     });

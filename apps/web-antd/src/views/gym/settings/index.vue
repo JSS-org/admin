@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-
-import { CreditCard, ScanLine } from '@vben/icons';
-
 import {
   Alert,
   Button,
@@ -17,7 +13,6 @@ import {
   Segmented,
   Select,
   Skeleton,
-  Tag,
   TimePicker,
 } from 'ant-design-vue';
 import dayjs from 'dayjs';
@@ -50,7 +45,6 @@ const channels = [
   { label: '美团', value: 'meituan' },
   { label: '抖音', value: 'douyin' },
 ];
-const enabledCount = computed(() => entries.value.filter((item) => item.enabled).length);
 function saleWindow(item: Record<string, any>): [string, string] | undefined {
   return item.startsAt && item.endsAt
     ? [dayjs(item.startsAt).format('YYYY-MM-DDTHH:mm:ss'), dayjs(item.endsAt).format('YYYY-MM-DDTHH:mm:ss')]
@@ -59,6 +53,10 @@ function saleWindow(item: Record<string, any>): [string, string] | undefined {
 function setWindow(item: Record<string, any>, values: any) {
   item.startsAt = values?.[0];
   item.endsAt = values?.[1];
+}
+function setContractRequired(item: Record<string, any>, value: boolean) {
+  item.contractRequired = value;
+  if (!value) item.approvalRequired = false;
 }
 </script>
 <template>
@@ -104,43 +102,11 @@ function setWindow(item: Record<string, any>, values: any) {
       <Empty v-else-if="!storeId" description="暂无可配置的门店" />
       <template v-else>
         <Form class="sales-config gym-stack" layout="vertical" :disabled="busy">
-          <Card class="settings-intro" :bordered="false">
-            <template #title
-              ><span class="flex items-center gap-2"
-                ><component
-                  :is="tab === 'verification-settings' ? ScanLine : CreditCard"
-                  class="size-5 text-primary"
-                />{{
-                  tab === 'online-sales-settings'
-                    ? '在线售卡'
-                    : tab === 'subscription-settings'
-                      ? '连续包月方案'
-                      : '自助核销'
-                }}</span
-              ></template
-            >
-            <template #extra
-              ><AdminSwitch
-                label="启用功能"
-                v-if="tab !== 'subscription-settings'"
-                v-model:checked="settings.enabled"
-              /><Tag v-else color="blue">已启用 {{ enabledCount }} 个方案</Tag></template
-            >
-            <p class="text-muted-foreground">
-              {{
-                tab === 'online-sales-settings'
-                  ? '选择本店可售卡种，设置价格与上架时间；关闭功能时保留已配置方案。'
-                  : tab === 'subscription-settings'
-                    ? '仅支持已发布的 28～31 天期限卡。每个方案独立设置扣款日、通知与宽限规则。'
-                    : '设置会员自助核销的渠道、每日开放时段及入场要求。'
-              }}
-            </p>
-            <FormItem v-if="tab === 'online-sales-settings'" label="合同签署" class="mt-4"
-              ><AdminSwitch label="购卡须签约" v-model:checked="settings.contractRequired"
-            /></FormItem>
-          </Card>
           <template v-if="tab === 'verification-settings'">
             <Card title="核销条件">
+              <FormItem label="功能状态"
+                ><AdminSwitch label="启用自助核销" v-model:checked="settings.enabled"
+              /></FormItem>
               <FormItem label="入场要求"
                 ><AdminSwitch label="核销前须签到" v-model:checked="settings.requireCheckin"
               /></FormItem>
@@ -170,13 +136,16 @@ function setWindow(item: Record<string, any>, values: any) {
             <Empty v-if="entries.length === 0" class="my-8" description="尚未添加方案，从已发布的卡种开始配置。" />
             <Card v-for="(item, index) in entries" :key="index" :title="`方案 ${index + 1}`">
               <template #extra
-                ><div class="flex items-center gap-3">
-                  <AdminSwitch label="启用方案" v-model:checked="item.enabled" /><Button
-                    danger
-                    type="text"
-                    @click="entries.splice(index, 1)"
-                    >移除方案</Button
-                  >
+                ><div class="flex flex-wrap items-center gap-3">
+                  <AdminSwitch label="启用方案" v-model:checked="item.enabled" /><AdminSwitch
+                    label="需要签约"
+                    :checked="item.contractRequired"
+                    @update:checked="(value) => setContractRequired(item, value)"
+                  /><AdminSwitch
+                    v-if="item.contractRequired"
+                    label="签约需要审批"
+                    v-model:checked="item.approvalRequired"
+                  /><Button danger type="text" @click="entries.splice(index, 1)">移除方案</Button>
                 </div></template
               >
               <div class="settings-grid">

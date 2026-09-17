@@ -1,10 +1,10 @@
 -- Development sales records. No real payment was made.
 BEGIN;
-INSERT INTO online_sales_settings (id,store_id,enabled,contract_required) VALUES ('00000000-0000-4000-8000-000000000601','00000000-0000-4000-8000-000000000001',true,true) ON CONFLICT DO NOTHING;
+INSERT INTO online_sales_settings (id,store_id) VALUES ('00000000-0000-4000-8000-000000000601','00000000-0000-4000-8000-000000000001') ON CONFLICT DO NOTHING;
 INSERT INTO online_card_offers (store_id,card_template_id,sale_price,enabled) VALUES ('00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000040','199.00',true) ON CONFLICT DO NOTHING;
 INSERT INTO subscription_settings (id,store_id,card_template_id,price,billing_day,renewal_notice_days,grace_days,enabled) VALUES ('00000000-0000-4000-8000-000000000621','00000000-0000-4000-8000-000000000001','00000000-0000-4000-8000-000000000040','199.00',NULL,3,3,true) ON CONFLICT DO NOTHING;
 INSERT INTO verification_settings (id,store_id,enabled,require_checkin,supported_channels) VALUES ('00000000-0000-4000-8000-000000000631','00000000-0000-4000-8000-000000000001',true,true,'["miniapp","app"]') ON CONFLICT DO NOTHING;
-INSERT INTO online_sales_settings (id,store_id,enabled,contract_required) VALUES ('00000000-0000-4000-8000-000000000602','00000000-0000-4000-8000-000000000002',true,true) ON CONFLICT DO NOTHING;
+INSERT INTO online_sales_settings (id,store_id) VALUES ('00000000-0000-4000-8000-000000000602','00000000-0000-4000-8000-000000000002') ON CONFLICT DO NOTHING;
 INSERT INTO online_card_offers (store_id,card_template_id,sale_price,enabled) VALUES ('00000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000040','199.00',true) ON CONFLICT DO NOTHING;
 INSERT INTO subscription_settings (id,store_id,card_template_id,price,billing_day,renewal_notice_days,grace_days,enabled) VALUES ('00000000-0000-4000-8000-000000000622','00000000-0000-4000-8000-000000000002','00000000-0000-4000-8000-000000000040','199.00',NULL,3,3,true) ON CONFLICT DO NOTHING;
 INSERT INTO verification_settings (id,store_id,enabled,require_checkin,supported_channels) VALUES ('00000000-0000-4000-8000-000000000632','00000000-0000-4000-8000-000000000002',true,true,'["miniapp","app"]') ON CONFLICT DO NOTHING;

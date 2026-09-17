@@ -20,18 +20,48 @@ describe('sales settings and reports', () => {
     expect(() => call('store1', 'PUT', path, {})).toThrow('权限');
     expect(() =>
       call('hq', 'PUT', path, {
-        enabled: true,
-        contractRequired: true,
-        offers: [{ cardTemplateId: seedId(41), salePrice: '10.00', enabled: true }],
+        offers: [
+          {
+            cardTemplateId: seedId(41),
+            salePrice: '10.00',
+            enabled: true,
+            contractRequired: true,
+            approvalRequired: false,
+          },
+        ],
       }),
     ).toThrow('不适用');
     expect(call('hq', 'GET', path).offers[0].salePrice).toBe('199.00');
+    call('hq', 'PUT', path, { offers: [] });
+    expect(call('hq', 'GET', path).offers).toHaveLength(0);
     call('hq', 'PUT', path, {
-      enabled: false,
-      contractRequired: true,
-      offers: [],
+      offers: [
+        {
+          cardTemplateId: seedId(40),
+          salePrice: '199.00',
+          enabled: true,
+          contractRequired: true,
+          approvalRequired: true,
+        },
+      ],
     });
-    expect(call('hq', 'GET', path).enabled).toBe(false);
+    const saved = call('hq', 'GET', path).offers[0];
+    expect(saved.contractRequired).toBe(true);
+    expect(saved.approvalRequired).toBe(true);
+    call('hq', 'PUT', path, {
+      offers: [
+        {
+          cardTemplateId: seedId(40),
+          salePrice: '199.00',
+          enabled: true,
+          contractRequired: false,
+          approvalRequired: true,
+        },
+      ],
+    });
+    const noContract = call('hq', 'GET', path).offers[0];
+    expect(noContract.contractRequired).toBe(false);
+    expect(noContract.approvalRequired).toBe(false);
   });
   it('filters self service card orders and financial totals by store', () => {
     expect(call('store1', 'GET', '/self-service-card-orders').total).toBe(5);

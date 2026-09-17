@@ -46,11 +46,7 @@ function settings(req: Request, storeId: string, kind: string) {
   storeScope(actor, uuid(storeId));
   const existing = rows('salesSettings').find((s) => s.storeId === storeId && s.kind === kind);
   const defaults: Record<string, any> = {
-    'online-sales-settings': {
-      enabled: false,
-      contractRequired: true,
-      offers: [],
-    },
+    'online-sales-settings': { offers: [] },
     'subscription-settings': { items: [] },
     'verification-settings': {
       enabled: false,
@@ -62,17 +58,18 @@ function settings(req: Request, storeId: string, kind: string) {
   if (method !== 'PUT') fail('接口不存在', 404);
   let data: Record<string, any> = {};
   if (kind === 'online-sales-settings') {
-    only(body, ['enabled', 'contractRequired', 'offers']);
-    const enabled = boolean(body.enabled, '售卡开关');
-    const contractRequired = boolean(body.contractRequired, '合同要求');
+    only(body, ['offers']);
     if (!Array.isArray(body.offers) || body.offers.length > 1000) fail('售卡配置必须为列表且不超过1000项');
     const offers = body.offers.map((o: Row) => {
-      only(o, ['cardTemplateId', 'salePrice', 'startsAt', 'endsAt', 'enabled']);
+      only(o, ['cardTemplateId', 'salePrice', 'startsAt', 'endsAt', 'enabled', 'contractRequired', 'approvalRequired']);
       cardForStore(o.cardTemplateId, storeId);
+      const contractRequired = boolean(o.contractRequired, '合同要求');
       const item: Row = {
         ...o,
         salePrice: money(o.salePrice),
         enabled: boolean(o.enabled, '启用'),
+        contractRequired,
+        approvalRequired: contractRequired && boolean(o.approvalRequired, '审批要求'),
       };
       if (item.startsAt) item.startsAt = new Date(date(item.startsAt, '开始时间')).toISOString();
       if (item.endsAt) item.endsAt = new Date(date(item.endsAt, '结束时间')).toISOString();
@@ -80,14 +77,24 @@ function settings(req: Request, storeId: string, kind: string) {
       return item;
     });
     if (new Set(offers.map((o) => o.cardTemplateId)).size !== offers.length) fail('卡种不可重复');
-    data = { enabled, contractRequired, offers };
+    data = { offers };
   }
   if (kind === 'subscription-settings') {
     only(body, ['items']);
     if (!Array.isArray(body.items) || body.items.length > 1000) fail('包月配置必须为列表且不超过1000项');
     const items = body.items.map((item: Row): Row => {
-      only(item, ['cardTemplateId', 'price', 'billingDay', 'renewalNoticeDays', 'graceDays', 'enabled']);
+      only(item, [
+        'cardTemplateId',
+        'price',
+        'billingDay',
+        'renewalNoticeDays',
+        'graceDays',
+        'enabled',
+        'contractRequired',
+        'approvalRequired',
+      ]);
       cardForStore(item.cardTemplateId, storeId, true);
+      const contractRequired = boolean(item.contractRequired, '合同要求');
       return {
         ...item,
         price: money(item.price),
@@ -95,6 +102,8 @@ function settings(req: Request, storeId: string, kind: string) {
         renewalNoticeDays: integer(item.renewalNoticeDays, '提前通知天数', 0, 30),
         graceDays: integer(item.graceDays, '宽限天数', 0, 30),
         enabled: boolean(item.enabled, '启用'),
+        contractRequired,
+        approvalRequired: contractRequired && boolean(item.approvalRequired, '审批要求'),
       };
     });
     if (new Set(items.map((i) => i.cardTemplateId)).size !== items.length) fail('卡种不可重复');

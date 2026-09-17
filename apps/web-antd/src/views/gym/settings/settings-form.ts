@@ -8,8 +8,6 @@ export function validateSettings(tab: string, settings: Record<string, any>): st
     return;
   }
   const entries = tab === 'online-sales-settings' ? settings.offers : settings.items;
-  if (settings.enabled && tab === 'online-sales-settings' && !entries.some((item: any) => item.enabled))
-    return '请至少添加一个启用的售卡方案';
   if (entries.some((item: any) => !item.cardTemplateId)) return '请为每个方案选择卡种';
   if (new Set(entries.map((item: any) => item.cardTemplateId)).size !== entries.length) return '同一卡种不能重复配置';
   for (const [index, item] of entries.entries()) {
@@ -39,12 +37,12 @@ export function validateSettings(tab: string, settings: Record<string, any>): st
 export function prepareSettings(tab: string, settings: Record<string, any>) {
   if (tab === 'online-sales-settings')
     return {
-      enabled: settings.enabled,
-      contractRequired: settings.contractRequired,
       offers: settings.offers.map((item: any) => ({
         cardTemplateId: item.cardTemplateId,
         salePrice: item.salePrice,
         enabled: item.enabled,
+        contractRequired: !!item.contractRequired,
+        approvalRequired: !!item.contractRequired && !!item.approvalRequired,
         startsAt: item.timing === 'scheduled' && item.startsAt ? new Date(item.startsAt).toISOString() : null,
         endsAt: item.timing === 'scheduled' && item.endsAt ? new Date(item.endsAt).toISOString() : null,
       })),
@@ -58,6 +56,8 @@ export function prepareSettings(tab: string, settings: Record<string, any>) {
         renewalNoticeDays: item.renewalNoticeDays,
         graceDays: item.graceDays,
         enabled: item.enabled,
+        contractRequired: !!item.contractRequired,
+        approvalRequired: !!item.contractRequired && !!item.approvalRequired,
       })),
     };
   return {

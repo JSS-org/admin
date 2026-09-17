@@ -72,7 +72,14 @@ export function usePage() {
   function addSetting() {
     entries.value.push(
       tab.value === 'online-sales-settings'
-        ? { cardTemplateId: undefined, salePrice: '0.00', enabled: true, timing: 'always' }
+        ? {
+            cardTemplateId: undefined,
+            salePrice: '0.00',
+            enabled: true,
+            contractRequired: true,
+            approvalRequired: false,
+            timing: 'always',
+          }
         : {
             cardTemplateId: undefined,
             price: '0.00',
@@ -80,6 +87,8 @@ export function usePage() {
             renewalNoticeDays: 3,
             graceDays: 3,
             enabled: true,
+            contractRequired: true,
+            approvalRequired: false,
           },
     );
   }

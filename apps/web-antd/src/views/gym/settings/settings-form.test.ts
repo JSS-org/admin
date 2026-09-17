@@ -8,39 +8,56 @@ describe('sales configuration forms', () => {
     expect(validateSettings('subscription-settings', { items: [{ ...item, graceDays: null }] })).toContain('天数');
     expect(validateSettings('subscription-settings', { items: [{ ...item, billingDay: 31 }] })).toContain('扣款日');
   });
-  it('rejects duplicate products, empty offers and invalid selling periods', () => {
+  it('rejects duplicate products and invalid selling periods', () => {
     const item = { cardTemplateId: 'card', salePrice: '199.00', enabled: true, timing: 'always' };
-    expect(validateSettings('online-sales-settings', { enabled: true, offers: [] })).toContain('至少');
-    expect(validateSettings('online-sales-settings', { enabled: true, offers: [item, item] })).toContain('重复');
+    expect(validateSettings('online-sales-settings', { offers: [] })).toBeUndefined();
+    expect(validateSettings('online-sales-settings', { offers: [item, item] })).toContain('重复');
     expect(
       validateSettings('online-sales-settings', {
-        enabled: true,
         offers: [{ ...item, timing: 'scheduled', startsAt: '2026-10-02', endsAt: '2026-10-01' }],
       }),
     ).toContain('结束时间');
   });
-  it('clears dates when a timed offer is switched to always available', () => {
-    const body = prepareSettings('online-sales-settings', {
+  it('maps contract and approval flags and clears dates when always available', () => {
+    const offer = {
+      cardTemplateId: 'card',
+      salePrice: '199.00',
       enabled: true,
       contractRequired: true,
-      offers: [
-        {
-          cardTemplateId: 'card',
-          salePrice: '199.00',
-          enabled: true,
-          timing: 'always',
-          startsAt: '2026-10-01',
-          endsAt: '2026-10-31',
-        },
-      ],
-    });
+      approvalRequired: true,
+      timing: 'always',
+      startsAt: '2026-10-01',
+      endsAt: '2026-10-31',
+    };
+    const body = prepareSettings('online-sales-settings', { offers: [offer] });
     expect(body.offers?.[0]).toEqual({
       cardTemplateId: 'card',
       salePrice: '199.00',
       enabled: true,
+      contractRequired: true,
+      approvalRequired: true,
       startsAt: null,
       endsAt: null,
     });
+    const noContract = prepareSettings('online-sales-settings', {
+      offers: [{ ...offer, contractRequired: false }],
+    });
+    expect(noContract.offers?.[0]?.approvalRequired).toBe(false);
+    const subscription = prepareSettings('subscription-settings', {
+      items: [
+        {
+          cardTemplateId: 'card',
+          price: '199.00',
+          billingDay: null,
+          renewalNoticeDays: 3,
+          graceDays: 3,
+          enabled: true,
+          contractRequired: true,
+          approvalRequired: true,
+        },
+      ],
+    });
+    expect(subscription.items?.[0]).toMatchObject({ contractRequired: true, approvalRequired: true });
   });
   it('requires channels and a complete valid daily verification window', () => {
     expect(
