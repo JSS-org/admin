@@ -42,16 +42,20 @@ describe.each(['sales', 'content'])('%s configuration request lifecycle', (kind)
   });
   it('discards a late response after switching stores', async () => {
     const { page, load, data } = setup();
-    await load();
     let finish!: (value: any) => void;
-    api.get.mockReturnValueOnce(
-      new Promise((resolve) => {
-        finish = resolve;
-      }),
-    );
-    const old = load();
+    api.get.mockImplementation((path: string, query?: Record<string, any>) => {
+      const store = String(query?.storeId ?? '');
+      if (store === 'store2' || path.includes('store2'))
+        return new Promise((resolve) => {
+          finish = resolve;
+        });
+      if (store === 'store3' || path.includes('store3')) return Promise.resolve({ id: 'new', blocks: [] });
+      return Promise.resolve({ id: 'config', blocks: [], offers: [], items: [], supportedChannels: [] });
+    });
+    await load();
     page.storeId.value = 'store2';
-    api.get.mockResolvedValueOnce({ id: 'new', blocks: [] });
+    const old = load();
+    page.storeId.value = 'store3';
     await load();
     finish({ id: 'old', blocks: [] });
     await old;
