@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { GymRow } from '#/api/gym';
+
 import { Alert, Button, DatePicker, Empty, Form, FormItem, InputNumber, Select, Space, Table } from 'ant-design-vue';
 
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
@@ -33,6 +35,16 @@ const {
   activate,
   scopeFilter,
 } = usePage();
+
+function rowRuleAction(record: GymRow) {
+  return record.status === 'draft' ? 'edit' : 'detail';
+}
+
+function handleRulesChange(p: { current?: number; pageSize?: number }) {
+  clearRulesSelection();
+  rulesPage.value = p.current ?? 1;
+  rulesPageSize.value = p.pageSize ?? 20;
+}
 </script>
 <template>
   <div class="gym-view">
@@ -74,13 +86,7 @@ const {
           showSizeChanger: true,
           showTotal: (n: number) => `共 ${n} 条`,
         }"
-        @change="
-          (p) => {
-            clearRulesSelection();
-            rulesPage = p.current ?? 1;
-            rulesPageSize = p.pageSize ?? 20;
-          }
-        "
+        @change="handleRulesChange"
         :columns="[
           { title: '版本', dataIndex: 'version' },
           { title: '周期', dataIndex: 'cycleUnit' },
@@ -93,7 +99,7 @@ const {
       >
         <template #bodyCell="{ column, record }">
           <Space v-if="column.key === 'action'">
-            <TableAction :action="record.status === 'draft' ? 'edit' : 'detail'" @click="edit(record)" />
+            <TableAction :action="rowRuleAction(record as GymRow)" @click="edit(record)" />
             <TableAction action="enable" v-if="record.status === 'draft'" @click="activate(record)" />
           </Space>
         </template>

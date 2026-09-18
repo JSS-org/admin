@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { GymRow } from '#/api/gym';
+
 import { canGym, gymApi } from '#/api/gym';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
@@ -13,6 +15,17 @@ function prepare(values: Record<string, any>) {
   else Reflect.deleteProperty(data, 'discountAmount');
   if (data.scope === 'all') data.storeIds = [];
   return data;
+}
+
+function rowStatusAction(row: GymRow) {
+  return row.status === 'active' ? 'disable' : 'enable';
+}
+
+async function handleToggleStatus(row: GymRow, reload: () => Promise<void>) {
+  await gymApi.patch(`coupon-templates/${row.id}`, {
+    status: row.status === 'active' ? 'inactive' : 'active',
+  });
+  await reload();
 }
 </script>
 <template>
@@ -34,16 +47,9 @@ function prepare(values: Record<string, any>) {
     >
       <template v-if="canGym('coupons:manage')" #actions="{ row, reload }">
         <TableAction
-          :action="row.status === 'active' ? 'disable' : 'enable'"
+          :action="rowStatusAction(row)"
           v-if="canGym('coupons:manage')"
-          @click="
-            async () => {
-              await gymApi.patch(`coupon-templates/${row.id}`, {
-                status: row.status === 'active' ? 'inactive' : 'active',
-              });
-              await reload();
-            }
-          "
+          @click="handleToggleStatus(row, reload)"
         />
       </template>
     </ResourcePage>

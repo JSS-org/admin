@@ -41,6 +41,14 @@ async function upload(file: File, target: Record<string, any>, key: string, list
   return false;
 }
 
+function uploadLogo(file: File) {
+  return upload(file, data.value, 'logoFileId');
+}
+
+function uploadModel(target: Record<string, any>) {
+  return (file: File) => upload(file, target, 'fileIds', true);
+}
+
 async function save() {
   busy.value = true;
   try {
@@ -87,11 +95,7 @@ async function save() {
           />
         </FormItem>
         <FormItem label="品牌标志">
-          <Upload
-            :before-upload="(file) => upload(file, data, 'logoFileId')"
-            :show-upload-list="false"
-            accept=".png,.jpg,.jpeg"
-          >
+          <Upload :before-upload="uploadLogo" :show-upload-list="false" accept=".png,.jpg,.jpeg">
             <Button>上传标志</Button>
           </Upload>
         </FormItem>
@@ -114,11 +118,7 @@ async function save() {
           <FormItem label="投资说明">
             <Input.TextArea v-model:value="model.investmentDescription" />
           </FormItem>
-          <Upload
-            :before-upload="(file) => upload(file, model, 'fileIds', true)"
-            :show-upload-list="false"
-            accept=".png,.jpg,.jpeg,.mp4"
-          >
+          <Upload :before-upload="uploadModel(model)" :show-upload-list="false" accept=".png,.jpg,.jpeg,.mp4">
             <Button>上传立体图 / 视频</Button>
           </Upload>
           <Space v-for="(fileId, fileIndex) in model.fileIds" :key="fileId">

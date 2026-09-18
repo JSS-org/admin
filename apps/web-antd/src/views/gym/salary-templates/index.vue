@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { GymRow } from '#/api/gym';
 import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { useTemplateRef } from 'vue';
@@ -17,6 +18,10 @@ import { usePage } from './use-page';
 const list = useTemplateRef<ResourcePageHandle>('list');
 
 const { visible, busy, form, edit, saveTemplate, publish } = usePage(list);
+
+function rowTemplateAction(row: GymRow) {
+  return row.status === 'draft' ? 'edit' : 'detail';
+}
 </script>
 <template>
   <div class="gym-view">
@@ -34,7 +39,7 @@ const { visible, busy, form, edit, saveTemplate, publish } = usePage(list);
       </template>
       <template #actions="{ row }">
         <Space>
-          <TableAction :action="row.status === 'draft' ? 'edit' : 'detail'" @click="edit(row)" />
+          <TableAction :action="rowTemplateAction(row)" @click="edit(row)" />
           <TableAction action="publish" v-if="row.status === 'draft'" @click="publish(row)" />
           <TableAction action="version" @click="edit(row, true)" />
         </Space>

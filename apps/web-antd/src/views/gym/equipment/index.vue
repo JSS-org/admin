@@ -81,6 +81,21 @@ async function upload(file: File) {
   }
   return false;
 }
+
+function isEditable(row: GymRow) {
+  return !row.revokedAt;
+}
+
+function rowStatusAction(row: GymRow) {
+  return row.status === 'active' ? 'disable' : 'enable';
+}
+
+async function handleToggleTutorialStatus(record: GymRow) {
+  await gymApi.patch(`equipment/${current.value?.id}/tutorials/${record.id}`, {
+    status: record.status === 'active' ? 'inactive' : 'active',
+  });
+  if (current.value) await open(current.value);
+}
 </script>
 <template>
   <div class="gym-view">
@@ -93,7 +108,7 @@ async function upload(file: File) {
       :write-code="code"
       :store-filter="true"
       :prepare="prepare"
-      :editable="(row) => !row.revokedAt"
+      :editable="isEditable"
     >
       <template #actions="{ row }">
         <TableAction action="teaching" @click="open(row)" />
@@ -136,16 +151,9 @@ async function upload(file: File) {
           <Space v-if="column.dataIndex === 'actions'">
             <TableAction action="preview" @click="openGymFile(record.fileId)" />
             <TableAction
-              :action="record.status === 'active' ? 'disable' : 'enable'"
+              :action="rowStatusAction(record as GymRow)"
               v-if="canGym('equipment:write')"
-              @click="
-                async () => {
-                  await gymApi.patch(`equipment/${current?.id}/tutorials/${record.id}`, {
-                    status: record.status === 'active' ? 'inactive' : 'active',
-                  });
-                  if (current) await open(current);
-                }
-              "
+              @click="handleToggleTutorialStatus(record as GymRow)"
             />
           </Space>
         </template>

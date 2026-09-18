@@ -22,6 +22,15 @@ function initial(row: GymRow) {
     }
   return result;
 }
+
+function isEditable(row: GymRow) {
+  return !row.revokedAt;
+}
+
+async function revoke(row: GymRow, reload: () => Promise<void>) {
+  await gymApi.patch(`blacklists/${row.id}`, { revoked: true });
+  await reload();
+}
 </script>
 <template>
   <div class="gym-view">
@@ -34,19 +43,10 @@ function initial(row: GymRow) {
       :store-filter="false"
       :prepare="prepare"
       :initial="initial"
-      :editable="(row) => !row.revokedAt"
+      :editable="isEditable"
     >
       <template #actions="{ row, reload }">
-        <TableAction
-          action="revoke"
-          v-if="!row.revokedAt && canGym(code)"
-          @click="
-            async () => {
-              await gymApi.patch(`blacklists/${row.id}`, { revoked: true });
-              await reload();
-            }
-          "
-        />
+        <TableAction action="revoke" v-if="!row.revokedAt && canGym(code)" @click="revoke(row, reload)" />
       </template>
     </ResourcePage>
   </div>

@@ -17,6 +17,17 @@ async function newVersion(row: GymRow) {
   await page.value?.load();
   await page.value?.open(next);
 }
+
+function rowStatusAction(row: GymRow) {
+  return row.status === 'active' ? 'disable' : 'enable';
+}
+
+async function handleToggleStatus(row: GymRow, reload: () => Promise<void>) {
+  await gymApi.patch(`point-rules/${row.id}`, {
+    status: row.status === 'active' ? 'inactive' : 'active',
+  });
+  await reload();
+}
 </script>
 <template>
   <div class="gym-view">
@@ -39,16 +50,9 @@ async function newVersion(row: GymRow) {
       <template v-if="canGym('points:manage')" #actions="{ row, reload }">
         <TableAction action="version" v-if="canGym('points:manage')" @click="newVersion(row)" />
         <TableAction
-          :action="row.status === 'active' ? 'disable' : 'enable'"
+          :action="rowStatusAction(row)"
           v-if="canGym('points:manage')"
-          @click="
-            async () => {
-              await gymApi.patch(`point-rules/${row.id}`, {
-                status: row.status === 'active' ? 'inactive' : 'active',
-              });
-              await reload();
-            }
-          "
+          @click="handleToggleStatus(row, reload)"
         />
       </template>
     </ResourcePage>

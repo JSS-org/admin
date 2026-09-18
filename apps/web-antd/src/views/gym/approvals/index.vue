@@ -87,6 +87,14 @@ async function save() {
     busy.value = false;
   }
 }
+
+function rowApprovalAction(row: GymRow) {
+  return row.canDecide ? 'approve' : 'detail';
+}
+
+function rowApprovalLabel(row: GymRow) {
+  return row.canDecide ? '查看并审批' : '查看详情';
+}
 </script>
 <template>
   <div class="gym-view">
@@ -104,11 +112,7 @@ async function save() {
     >
       <template #create><ApprovalCreate @submitted="page?.load()" /></template>
       <template #actions="{ row }">
-        <TableAction
-          :action="row.canDecide ? 'approve' : 'detail'"
-          :label="row.canDecide ? '查看并审批' : '查看详情'"
-          @click="details(row)"
-        />
+        <TableAction :action="rowApprovalAction(row)" :label="rowApprovalLabel(row)" @click="details(row)" />
       </template>
     </ResourcePage>
     <AdminDrawer

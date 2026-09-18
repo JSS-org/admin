@@ -22,12 +22,14 @@ const uploading = ref(false);
 const visible = ref(false);
 const current = ref<GymRow>();
 const mode = ref('');
+
 function open(row: GymRow, action: string) {
   if (busy.value || uploading.value) return;
   current.value = { ...row };
   mode.value = action;
   visible.value = true;
 }
+
 async function saveCover() {
   if (!current.value || busy.value || uploading.value) return;
   busy.value = true;
@@ -40,6 +42,7 @@ async function saveCover() {
     busy.value = false;
   }
 }
+
 async function setStatus(row: GymRow, status: string) {
   if (busy.value) return;
   busy.value = true;
@@ -51,6 +54,7 @@ async function setStatus(row: GymRow, status: string) {
   }
 }
 </script>
+
 <template>
   <div class="gym-view">
     <ResourcePage
@@ -100,27 +104,36 @@ async function setStatus(row: GymRow, status: string) {
       :confirm-loading="busy || uploading"
       @ok="saveCover"
     >
-      <Form v-if="mode === 'cover' && current" layout="vertical"
-        ><FormItem label="活动封面"
-          ><FileUpload
+      <Form v-if="mode === 'cover' && current" layout="vertical">
+        <FormItem label="活动封面">
+          <FileUpload
             v-model="current.coverFileId"
             category="image"
             :disabled="busy || uploading"
-            @uploading="uploading = $event" /></FormItem
-      ></Form>
+            @uploading="uploading = $event"
+          />
+        </FormItem>
+      </Form>
       <template v-else-if="current">
         <FileMedia v-if="current.coverFileId" :file-id="current.coverFileId" :alt="current.name" class="mb-5" />
-        <Tag :color="statusColor(current.status)">{{ displayValue(current.status, 'status', [], {}) }}</Tag>
-        <p class="my-4 whitespace-pre-wrap leading-7">{{ current.description }}</p>
-        <Descriptions :column="1" bordered class="mb-5"
-          ><DescriptionsItem label="活动门店">{{ current.storeNames }}</DescriptionsItem
-          ><DescriptionsItem label="活动时间"
-            >{{ displayValue(current.startsAt, 'startsAt', [], {}) }} —
-            {{ displayValue(current.endsAt, 'endsAt', [], {}) }}</DescriptionsItem
-          ><DescriptionsItem label="报名情况"
-            >{{ current.registrationCount }} / {{ current.capacity ?? '不限' }}</DescriptionsItem
-          ></Descriptions
-        >
+        <Tag :color="statusColor(current.status)">
+          {{ displayValue(current.status, 'status', [], {}) }}
+        </Tag>
+        <p class="my-4 whitespace-pre-wrap leading-7">
+          {{ current.description }}
+        </p>
+        <Descriptions :column="1" bordered class="mb-5">
+          <DescriptionsItem label="活动门店">
+            {{ current.storeNames }}
+          </DescriptionsItem>
+          <DescriptionsItem label="活动时间">
+            {{ displayValue(current.startsAt, 'startsAt', [], {}) }} —
+            {{ displayValue(current.endsAt, 'endsAt', [], {}) }}
+          </DescriptionsItem>
+          <DescriptionsItem label="报名情况">
+            {{ current.registrationCount }} / {{ current.capacity ?? '不限' }}
+          </DescriptionsItem>
+        </Descriptions>
         <h3 class="mb-3 font-medium">报名记录</h3>
         <EntityRecords
           :endpoint="`activities/${current.id}/registrations`"

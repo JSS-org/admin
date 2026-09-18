@@ -95,6 +95,12 @@ function resetFilters() {
   search();
 }
 
+function handleTableChange(pagination: { current?: number; pageSize?: number }) {
+  page.value = pagination.current ?? 1;
+  pageSize.value = pagination.pageSize ?? 20;
+  load();
+}
+
 watch([page, pageSize], clearSelection, { flush: 'sync' });
 
 defineExpose({ load, open, items });
@@ -162,13 +168,7 @@ defineExpose({ load, open, items });
         showSizeChanger: true,
         showTotal: (n: number) => `共 ${n} 条`,
       }"
-      @change="
-        (p) => {
-          page = p.current ?? 1;
-          pageSize = p.pageSize ?? 20;
-          load();
-        }
-      "
+      @change="handleTableChange"
     >
       <template #emptyText>
         <Empty

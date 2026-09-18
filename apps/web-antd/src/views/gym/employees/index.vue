@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { GymRow } from '#/api/gym';
 import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { useTemplateRef } from 'vue';
@@ -34,6 +35,21 @@ const {
   save,
   titles,
 } = usePage(view);
+
+function rowAccountAction(row: GymRow) {
+  return row.accountStatus === 'active' ? 'disable' : 'enable';
+}
+
+function rowAccountLabel(row: GymRow) {
+  return row.accountStatus === 'active' ? '停用账号' : '启用账号';
+}
+
+async function toggleAccount(row: GymRow, reload: () => Promise<void>) {
+  await gymApi.patch(`accounts/${row.accountId}`, {
+    status: row.accountStatus === 'active' ? 'inactive' : 'active',
+  });
+  await reload();
+}
 </script>
 <template>
   <div class="gym-view">
@@ -88,16 +104,9 @@ const {
             <TableAction action="roles" @click="open(row, 'roles')" />
             <TableAction action="password" @click="open(row, 'password')" />
             <TableAction
-              :action="row.accountStatus === 'active' ? 'disable' : 'enable'"
-              :label="row.accountStatus === 'active' ? '停用账号' : '启用账号'"
-              @click="
-                async () => {
-                  await gymApi.patch(`accounts/${row.accountId}`, {
-                    status: row.accountStatus === 'active' ? 'inactive' : 'active',
-                  });
-                  await reload();
-                }
-              "
+              :action="rowAccountAction(row)"
+              :label="rowAccountLabel(row)"
+              @click="toggleAccount(row, reload)"
             />
           </template>
         </template>

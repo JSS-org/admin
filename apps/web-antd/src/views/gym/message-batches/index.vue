@@ -104,6 +104,10 @@ async function submit() {
     busy.value = false;
   }
 }
+
+function setPrivateMember(target: { memberIds: string[] }, value: unknown) {
+  target.memberIds = value ? [String(value)] : [];
+}
 </script>
 <template>
   <div class="gym-view">
@@ -166,7 +170,7 @@ async function submit() {
                   .filter((m) => m.storeIds?.includes(target.storeId))
                   .map((m) => ({ label: `${m.name} ${m.phone}`, value: m.id }))
               "
-              @change="(value) => (target.memberIds = value ? [String(value)] : [])"
+              @change="setPrivateMember(target, $event)"
             />
             <Select
               v-else

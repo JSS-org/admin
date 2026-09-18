@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { GymRow } from '#/api/gym';
+
 import { message } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
@@ -7,6 +9,27 @@ import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
 
 import { columns, fields } from './data';
+
+function isEditable(row: GymRow) {
+  return row.status === 'draft';
+}
+
+function rowPublishAction(row: GymRow) {
+  return row.status === 'published' ? 'disable' : 'publish';
+}
+
+async function handleCreateVersion(row: GymRow, reload: () => Promise<void>) {
+  await gymApi.post(`card-templates/${row.id}/versions`, {});
+  message.success('已复制为新版本草稿，可编辑');
+  await reload();
+}
+
+async function handleTogglePublish(row: GymRow, reload: () => Promise<void>) {
+  await gymApi.patch(`card-templates/${row.id}`, {
+    status: row.status === 'published' ? 'inactive' : 'published',
+  });
+  await reload();
+}
 </script>
 <template>
   <div class="gym-view">
@@ -16,7 +39,7 @@ import { columns, fields } from './data';
       :fields="fields"
       :columns="columns"
       write-code="cards:write"
-      :editable="(row) => row.status === 'draft'"
+      :editable="isEditable"
     >
       <template #actions="{ row, reload }">
         <ApprovalCreate
@@ -27,27 +50,8 @@ import { columns, fields } from './data';
           label="申请开卡"
         />
         <template v-if="canGym('cards:write')">
-          <TableAction
-            action="version"
-            @click="
-              async () => {
-                await gymApi.post(`card-templates/${row.id}/versions`, {});
-                message.success('已复制为新版本草稿，可编辑');
-                await reload();
-              }
-            "
-          />
-          <TableAction
-            :action="row.status === 'published' ? 'disable' : 'publish'"
-            @click="
-              async () => {
-                await gymApi.patch(`card-templates/${row.id}`, {
-                  status: row.status === 'published' ? 'inactive' : 'published',
-                });
-                await reload();
-              }
-            "
-          />
+          <TableAction action="version" @click="handleCreateVersion(row, reload)" />
+          <TableAction :action="rowPublishAction(row)" @click="handleTogglePublish(row, reload)" />
         </template>
       </template>
     </ResourcePage>

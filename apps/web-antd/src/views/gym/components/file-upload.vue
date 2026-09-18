@@ -51,6 +51,9 @@ async function upload(file: File) {
   }
   return false;
 }
+function clearFile() {
+  model.value = null;
+}
 </script>
 <template>
   <div class="gym-upload gym-form-stack">
@@ -61,11 +64,7 @@ async function upload(file: File) {
       :max-count="1"
       :disabled="disabled || busy"
       @preview="model && openGymFile(model)"
-      @remove="
-        () => {
-          model = null;
-        }
-      "
+      @remove="clearFile"
     >
       <component :is="gymIcons.upload" class="mx-auto mb-3 size-8 text-primary" />
       <p class="font-medium">{{ busy ? '正在上传…' : title || '点击或拖入文件' }}</p>

@@ -1,9 +1,22 @@
 <script setup lang="ts">
+import type { GymRow } from '#/api/gym';
+
 import { canGym, gymApi } from '#/api/gym';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
 
 import { config, initial, prepare } from './data';
+
+function rowStatusAction(row: GymRow) {
+  return row.status === 'active' ? 'disable' : 'enable';
+}
+
+async function handleToggleStatus(row: GymRow, reload: () => Promise<void>) {
+  await gymApi.patch(`point-products/${row.id}`, {
+    status: row.status === 'active' ? 'inactive' : 'active',
+  });
+  await reload();
+}
 </script>
 <template>
   <div class="gym-view">
@@ -23,16 +36,9 @@ import { config, initial, prepare } from './data';
     >
       <template v-if="canGym('points:manage')" #actions="{ row, reload }">
         <TableAction
-          :action="row.status === 'active' ? 'disable' : 'enable'"
+          :action="rowStatusAction(row)"
           v-if="canGym('points:manage')"
-          @click="
-            async () => {
-              await gymApi.patch(`point-products/${row.id}`, {
-                status: row.status === 'active' ? 'inactive' : 'active',
-              });
-              await reload();
-            }
-          "
+          @click="handleToggleStatus(row, reload)"
         />
       </template>
     </ResourcePage>

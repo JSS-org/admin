@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { GymRow } from '#/api/gym';
 import type { ResourcePageHandle } from '#/views/gym/types';
 
 import { useTemplateRef } from 'vue';
@@ -29,6 +30,21 @@ const {
   replaceFile,
   save,
 } = usePage(page);
+
+function isEditable(row: GymRow) {
+  return row.status === 'draft';
+}
+
+function rowPublishAction(row: GymRow) {
+  return row.status === 'published' ? 'disable' : 'publish';
+}
+
+async function handleTogglePublish(row: GymRow, reload: () => Promise<void>) {
+  await gymApi.patch(`contract-templates/${row.id}`, {
+    status: row.status === 'published' ? 'inactive' : 'published',
+  });
+  await reload();
+}
 </script>
 <template>
   <div class="gym-view">
@@ -41,7 +57,7 @@ const {
       :write-code="writeCode"
       :create="false"
       :edit="isTemplate"
-      :editable="(row) => row.status === 'draft'"
+      :editable="isEditable"
       :store-filter="false"
       :time-filter="false"
     >
@@ -51,17 +67,7 @@ const {
       <template #actions="{ row, reload }">
         <template v-if="canGym(writeCode)">
           <TableAction action="version" @click="newVersion(row)" />
-          <TableAction
-            :action="row.status === 'published' ? 'disable' : 'publish'"
-            @click="
-              async () => {
-                await gymApi.patch(`contract-templates/${row.id}`, {
-                  status: row.status === 'published' ? 'inactive' : 'published',
-                });
-                await reload();
-              }
-            "
-          />
+          <TableAction :action="rowPublishAction(row)" @click="handleTogglePublish(row, reload)" />
           <TableAction action="replace" v-if="row.status === 'draft'" @click="replaceFile(row)" />
         </template>
         <TableAction action="preview" v-if="canGym('files:read')" @click="openGymFile(row.fileId)" />

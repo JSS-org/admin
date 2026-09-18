@@ -50,6 +50,11 @@ watch(
 onScopeDispose(() => {
   request++;
 });
+
+function handleTableChange(pagination: { current?: number }) {
+  page.value = pagination.current ?? 1;
+  load();
+}
 </script>
 <template>
   <div class="gym-stack">
@@ -69,12 +74,7 @@ onScopeDispose(() => {
         showSizeChanger: false,
         showTotal: (count: number) => `共 ${count} 条`,
       }"
-      @change="
-        (pagination) => {
-          page = pagination.current ?? 1;
-          load();
-        }
-      "
+      @change="handleTableChange"
     >
       <template #bodyCell="{ column, text }">
         <Tag v-if="column.dataIndex === 'status'" :color="statusColor(text)">{{

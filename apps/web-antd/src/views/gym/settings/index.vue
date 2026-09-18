@@ -58,6 +58,9 @@ function setContractRequired(item: Record<string, any>, value: boolean) {
   item.contractRequired = value;
   if (!value) item.approvalRequired = false;
 }
+function setBillingDay(item: Record<string, any>, event: { target?: { value?: unknown } }) {
+  item.billingDay = event.target?.value === 'fixed' ? 1 : null;
+}
 </script>
 <template>
   <div class="gym-view">
@@ -140,7 +143,7 @@ function setContractRequired(item: Record<string, any>, value: boolean) {
                   <AdminSwitch label="启用方案" v-model:checked="item.enabled" /><AdminSwitch
                     label="需要签约"
                     :checked="item.contractRequired"
-                    @update:checked="(value) => setContractRequired(item, value)"
+                    @update:checked="setContractRequired(item, $event)"
                   /><AdminSwitch
                     v-if="item.contractRequired"
                     label="签约需要审批"
@@ -190,7 +193,7 @@ function setContractRequired(item: Record<string, any>, value: boolean) {
                     show-time
                     value-format="YYYY-MM-DDTHH:mm:ss"
                     :placeholder="['开始售卖', '结束售卖']"
-                    @change="(values) => setWindow(item, values)"
+                    @change="setWindow(item, $event)"
                 /></FormItem>
               </template>
               <template v-else>
@@ -202,7 +205,7 @@ function setContractRequired(item: Record<string, any>, value: boolean) {
                       { label: '授权当日', value: 'authorization' },
                       { label: '固定日期', value: 'fixed' },
                     ]"
-                    @change="(event) => (item.billingDay = event.target.value === 'fixed' ? 1 : null)"
+                    @change="setBillingDay(item, $event)"
                 /></FormItem>
                 <div class="settings-grid">
                   <FormItem v-if="item.billingDay" label="固定扣款日" required

@@ -18,6 +18,14 @@ const page = useTemplateRef<ResourcePageHandle>('page');
 
 const { prepare, visible, mode, current, busy, compartments, commands, reason, compartmentId, result, open, save } =
   usePage(page);
+
+function isEditable(row: GymRow) {
+  return !row.revokedAt;
+}
+
+function resultType(row: GymRow) {
+  return row.status === 'succeeded' ? 'success' : 'error';
+}
 </script>
 <template>
   <div class="gym-view">
@@ -30,7 +38,7 @@ const { prepare, visible, mode, current, busy, compartments, commands, reason, c
       :write-code="code"
       :store-filter="true"
       :prepare="prepare"
-      :editable="(row) => !row.revokedAt"
+      :editable="isEditable"
     >
       <template #actions="{ row }">
         <TableAction
@@ -99,7 +107,7 @@ const { prepare, visible, mode, current, busy, compartments, commands, reason, c
         <Alert
           v-if="result"
           class="my-3"
-          :type="result.status === 'succeeded' ? 'success' : 'error'"
+          :type="resultType(result)"
           :message="
             result.simulated && result.status === 'succeeded'
               ? '模拟执行成功（未控制真实设备）'

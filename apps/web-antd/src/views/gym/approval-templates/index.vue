@@ -21,7 +21,23 @@ async function newVersion(row: GymRow) {
   await page.value?.load();
   await page.value?.open(result);
 }
+
+function isEditable(row: GymRow) {
+  return row.status === 'draft';
+}
+
+function rowPublishAction(row: GymRow) {
+  return row.status === 'published' ? 'disable' : 'publish';
+}
+
+async function handleTogglePublish(row: GymRow, reload: () => Promise<void>) {
+  await gymApi.patch(`approval-templates/${row.id}`, {
+    status: row.status === 'published' ? 'inactive' : 'published',
+  });
+  await reload();
+}
 </script>
+
 <template>
   <div class="gym-view">
     <ResourcePage
@@ -33,7 +49,7 @@ async function newVersion(row: GymRow) {
       :write-code="writeCode"
       :create="true"
       :edit="isTemplate"
-      :editable="(row) => row.status === 'draft'"
+      :editable="isEditable"
       :prepare="prepare"
       :initial="initial"
       :store-filter="false"
@@ -55,17 +71,7 @@ async function newVersion(row: GymRow) {
       <template #actions="{ row, reload }">
         <template v-if="canGym(writeCode)">
           <TableAction action="version" @click="newVersion(row)" />
-          <TableAction
-            :action="row.status === 'published' ? 'disable' : 'publish'"
-            @click="
-              async () => {
-                await gymApi.patch(`approval-templates/${row.id}`, {
-                  status: row.status === 'published' ? 'inactive' : 'published',
-                });
-                await reload();
-              }
-            "
-          />
+          <TableAction :action="rowPublishAction(row)" @click="handleTogglePublish(row, reload)" />
         </template>
       </template>
     </ResourcePage>
