@@ -10,6 +10,7 @@ import { canGym, gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
+import { textOrDash } from '#/views/gym/utils/display';
 
 import { code, columns, fields, title } from './data';
 
@@ -57,7 +58,7 @@ async function save() {
     await gymApi.post(`equipment/${current.value.id}/tutorials`, {
       title: tutorialTitle.value,
       fileId: fileId.value,
-      instructions: instructions.value,
+      instructions: textOrDash(instructions.value),
       sortOrder: tutorials.value.length,
     });
     await open(current.value);

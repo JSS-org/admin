@@ -104,7 +104,7 @@ async function report(file: File) {
       <template v-if="current">
         <Descriptions :column="1" bordered>
           <DescriptionsItem v-for="{ title, dataIndex: key } in config.columns" :key="key" :label="title">{{
-            current[key ?? ''] ?? '—'
+            current[key ?? ''] ?? '-'
           }}</DescriptionsItem>
           <DescriptionsItem label="备注">{{ current.note }}</DescriptionsItem>
         </Descriptions>

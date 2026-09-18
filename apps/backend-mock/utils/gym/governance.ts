@@ -1,5 +1,6 @@
 import type { Request, Row } from './core';
 
+import { approvalOptions, createApproval } from './approval-submissions';
 import {
   allowed,
   choice,
@@ -74,15 +75,24 @@ function contractTemplate(req: Request, data: Row) {
 export function governance(req: Request): any {
   const { actor, method, body, query } = req;
   const [resource = '', rid, action, extra] = req.path.split('/').filter(Boolean);
+  if (resource === 'approval-options' && method === 'GET' && !rid) return approvalOptions(req);
   if (!['approval-templates', 'approvals', 'contract-templates', 'contracts'].includes(resource)) return undefined;
   if (extra) fail('接口不存在', 404);
   if (rid) uuid(rid);
+  if (resource === 'approvals' && !rid && method === 'POST') return createApproval(req);
   if (resource.endsWith('-templates')) {
     const contract = resource === 'contract-templates';
     headquarters(req, contract ? 'contracts:templates' : 'approvals:templates');
     const table = contract ? 'contractTemplates' : 'approvalTemplates';
     const row = rid ? find(table, rid) : undefined;
-    if (method === 'GET' && !action) return row ?? page(rows(table), query);
+    if (method === 'GET' && !action)
+      return (
+        row ??
+        page(
+          rows(table).filter((item) => !query.businessType || item.businessType === query.businessType),
+          query,
+        )
+      );
     const fields = contract ? ['name', 'fileId', 'applicableType', 'reminderDays'] : ['name', 'businessType', 'steps'];
     if (
       (!rid && method === 'POST') ||
@@ -99,7 +109,11 @@ export function governance(req: Request): any {
       choice(data.status, ['draft', 'published', 'inactive']);
       if (contract) contractTemplate(req, data);
       else {
-        data.businessType = choice(data.businessType, ['price_change', 'contract', 'other_configured'], '审批类型');
+        data.businessType = choice(
+          data.businessType,
+          ['card_opening', 'price_change', 'contract', 'other_configured'],
+          '审批类型',
+        );
         data.steps = steps(data.steps);
       }
       if (method === 'PATCH' && row) return Object.assign(row, data, { updatedAt: now() });
@@ -131,10 +145,26 @@ export function governance(req: Request): any {
   const table = contract ? 'contracts' : 'approvals';
   const row = rid ? find(table, rid) : undefined;
   if (row) storeScope(actor, row.storeId);
+  function display(item: Row) {
+    if (contract) return decorate(item);
+    const task = rows('approvalTasks').find(
+      (t) => t.instanceId === item.id && t.stepNo === item.currentStep && t.status === 'pending',
+    );
+    return {
+      ...decorate(item),
+      applicantName: rows('employees').find((employee) => employee.id === item.applicantEmployeeId)?.name,
+      approverName: rows('employees').find((employee) => employee.id === task?.approverEmployeeId)?.name,
+      canDecide:
+        item.status === 'pending' &&
+        actor.globalCodes.includes('approvals:decide') &&
+        !!task &&
+        task.approverEmployeeId === find('accounts', actor.id).employeeId,
+    };
+  }
   if (method === 'GET' && !action) {
     if (row)
       return {
-        ...decorate(row),
+        ...display(row),
         ...(contract
           ? {
               events: rows('contractEvents').filter((e) => e.contractId === row.id),
@@ -155,7 +185,7 @@ export function governance(req: Request): any {
         (r) => r.status !== 'signed' && r.status !== 'cancelled' && r.dueAt && Date.parse(r.dueAt) < Date.now(),
       );
     return page(
-      data.map((r) => decorate(r)),
+      data.map((r) => display(r)),
       query,
       contract ? 'sentAt' : 'submittedAt',
     );
@@ -197,7 +227,10 @@ export function governance(req: Request): any {
     headquarters(req, 'approvals:decide');
     only(body, ['decision', 'comment']);
     const decision = choice(body.decision, ['approve', 'reject'], '审批决定');
-    const comment = str(body.comment, '审批意见', 2000);
+    const comment =
+      body.comment === null || body.comment === undefined || (typeof body.comment === 'string' && !body.comment.trim())
+        ? ''
+        : str(body.comment, '审批意见', 2000);
     if (row.status !== 'pending') fail('审批已结束，不能重复处理', 409);
     const task = rows('approvalTasks').find(
       (t) => t.instanceId === row.id && t.stepNo === row.currentStep && t.status === 'pending',
@@ -225,8 +258,13 @@ export function governance(req: Request): any {
     }
     row.updatedAt = now();
     return {
-      ...decorate(row),
-      tasks: rows('approvalTasks').filter((t) => t.instanceId === row.id),
+      ...display(row),
+      tasks: rows('approvalTasks')
+        .filter((t) => t.instanceId === row.id)
+        .map((t) => ({
+          ...t,
+          approverName: find('employees', t.approverEmployeeId).name,
+        })),
     };
   }
   fail('接口不存在', 404);

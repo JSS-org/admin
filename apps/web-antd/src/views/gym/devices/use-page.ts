@@ -8,6 +8,7 @@ import { ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
 
 import { gymApi } from '#/api/gym';
+import { textOrDash } from '#/views/gym/utils/display';
 
 export function usePage(page: Readonly<Ref<null | ResourcePageHandle>>) {
   function prepare(values: Record<string, any>, row?: GymRow) {
@@ -72,7 +73,7 @@ export function usePage(page: Readonly<Ref<null | ResourcePageHandle>>) {
           {
             command: current.value.type === 'locker' ? 'open_locker' : 'open_door',
             ...(current.value.type === 'locker' ? { compartmentId: compartmentId.value } : {}),
-            reason: reason.value,
+            reason: textOrDash(reason.value),
           },
           requestKey,
         );

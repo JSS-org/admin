@@ -5,7 +5,7 @@ const title = '门店活动';
 
 const fields: Field[] = [
   { key: 'name', label: '活动名称', required: true },
-  { key: 'description', label: '活动介绍', type: 'textarea', required: true },
+  { key: 'description', label: '活动介绍', type: 'textarea' },
   { key: 'storeIds', label: '活动门店', type: 'multi', source: 'stores', required: true },
   { key: 'registrationStartsAt', label: '报名开始', type: 'datetime', required: true },
   { key: 'registrationEndsAt', label: '报名结束', type: 'datetime', required: true },

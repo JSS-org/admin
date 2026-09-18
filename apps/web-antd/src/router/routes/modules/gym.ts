@@ -204,19 +204,20 @@ const routes: RouteRecordRaw[] = [
   {
     name: 'GymGroup-approval-management',
     path: '/gym/approval-management',
-    meta: { title: '审批管理', icon: 'lucide:file-check', order: 6, authority: ['hq', 'store'], hideInMenu: true },
+    redirect: '/gym/approvals',
+    meta: { title: '审批管理', icon: 'lucide:file-check', order: 6, authority: ['hq', 'store'] },
     children: [
       {
         name: 'Gym-approval-templates',
         path: '/gym/approval-templates',
         component: () => import('#/views/gym/approval-templates/index.vue'),
-        meta: { title: '审批模板', authority: ['hq'], order: 0 },
+        meta: { title: '审批模板', authority: ['hq'], order: 1 },
       },
       {
         name: 'Gym-approvals',
         path: '/gym/approvals',
         component: () => import('#/views/gym/approvals/index.vue'),
-        meta: { title: '审批记录', authority: ['hq', 'store'], order: 1 },
+        meta: { title: '审批记录', authority: ['hq', 'store'], order: 0 },
       },
     ],
   },

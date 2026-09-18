@@ -2,16 +2,30 @@
 import type { GymRow } from '#/api/gym';
 import type { ResourcePageHandle } from '#/views/gym/types';
 
-import { ref, useTemplateRef } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 
-import { Descriptions, DescriptionsItem, Form, FormItem, Input, message, Select, Table } from 'ant-design-vue';
+import {
+  Descriptions,
+  DescriptionsItem,
+  Empty,
+  Form,
+  FormItem,
+  Input,
+  message,
+  Select,
+  Table,
+  Tag,
+} from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
+import { displayValue, statusColor, textOrDash } from '#/views/gym/utils/display';
 
-import { columns, fields, isTemplate, title } from './data';
+import Attachments from './attachments.vue';
+import ApprovalCreate from './create.vue';
+import { columns, fields, filterFields, title } from './data';
 
 const page = useTemplateRef<ResourcePageHandle>('page');
 
@@ -19,39 +33,55 @@ const current = ref<GymRow>();
 
 const visible = ref(false);
 
-const mode = ref('');
-
 const busy = ref(false);
 
 const decision = ref('approve');
 
 const comment = ref('');
 
-async function details(row: GymRow) {
-  current.value = await gymApi.get(`approvals/${row.id}`);
-  mode.value = 'detail';
-  visible.value = true;
+const snapshotFields = computed(() => {
+  const snapshot = current.value?.requestSnapshot ?? {};
+  return [
+    { key: 'memberName', label: '会员姓名' },
+    { key: 'memberPhone', label: '会员手机号' },
+    { key: 'cardName', label: '会员卡' },
+    { key: 'cardType', label: '卡类型' },
+    { key: 'courseName', label: '课程名称' },
+    { key: 'orderNo', label: '关联订单' },
+    { key: 'contractNo', label: '合同编号' },
+    { key: 'contractName', label: '合同名称' },
+    { key: 'amount', label: '申请金额（元）' },
+    { key: 'originalPrice', label: '原价（元）' },
+    { key: 'requestedPrice', label: '申请价（元）' },
+    { key: 'startsAt', label: '生效时间' },
+    { key: 'endsAt', label: '到期时间' },
+    { key: 'reason', label: '申请原因' },
+  ].filter((field) => snapshot[field.key] !== undefined && snapshot[field.key] !== null);
+});
+
+function format(value: unknown, key: string) {
+  if (value === 'waiting' && key === 'status') return '待前序审批';
+  return displayValue(value, key, fields, {});
 }
 
-function openDecision(row: GymRow) {
-  current.value = row;
-  mode.value = 'decision';
+async function details(row: GymRow) {
+  current.value = await gymApi.get(`approvals/${row.id}`);
   comment.value = '';
   decision.value = 'approve';
   visible.value = true;
 }
 
 async function save() {
+  if (busy.value || !current.value?.canDecide) return;
   busy.value = true;
   try {
-    if (current.value && mode.value === 'decision') {
-      await gymApi.post(`approvals/${current.value.id}/decisions`, {
-        decision: decision.value,
-        comment: comment.value,
-      });
-    }
-    message.success('已保存');
-    visible.value = false;
+    const result = await gymApi.post(`approvals/${current.value.id}/decisions`, {
+      decision: decision.value,
+      comment: textOrDash(comment.value),
+    });
+    current.value = result;
+    message.success(decision.value === 'approve' ? '已通过当前审批步骤' : '已拒绝申请');
+    comment.value = '';
     await page.value?.load();
   } finally {
     busy.value = false;
@@ -67,52 +97,44 @@ async function save() {
       :fields="fields"
       :columns="columns"
       :create="false"
-      :edit="isTemplate"
+      :edit="false"
+      :filter-fields="filterFields"
       :store-filter="true"
       :time-filter="true"
     >
+      <template #create><ApprovalCreate @submitted="page?.load()" /></template>
       <template #actions="{ row }">
-        <TableAction action="detail" @click="details(row)" />
         <TableAction
-          action="approve"
-          v-if="row.status === 'pending' && canGym('approvals:decide')"
-          @click="openDecision(row)"
+          :action="row.canDecide ? 'approve' : 'detail'"
+          :label="row.canDecide ? '查看并审批' : '查看详情'"
+          @click="details(row)"
         />
       </template>
     </ResourcePage>
     <AdminDrawer
       v-model:open="visible"
-      :title="mode === 'detail' ? '审批记录详情' : '管理操作'"
+      title="审批详情"
       :width="760"
-      :footer="mode === 'detail' ? null : undefined"
+      :footer="current?.canDecide && canGym('approvals:decide') ? undefined : null"
+      ok-text="提交审批结果"
       :confirm-loading="busy"
       @ok="save"
     >
-      <Form v-if="mode === 'decision'" layout="vertical">
-        <FormItem label="决定">
-          <Select
-            v-model:value="decision"
-            :options="[
-              { label: '通过', value: 'approve' },
-              { label: '拒绝', value: 'reject' },
-            ]"
-          />
-        </FormItem>
-        <FormItem label="审批意见">
-          <Input.TextArea v-model:value="comment" />
-        </FormItem>
-      </Form>
-      <template v-else-if="current">
+      <template v-if="current">
         <Descriptions :column="2" bordered>
           <DescriptionsItem v-for="column in columns" :key="column.dataIndex" :label="column.title">{{
-            current[column.dataIndex] ?? '—'
+            format(current[column.dataIndex], column.dataIndex)
           }}</DescriptionsItem>
         </Descriptions>
-        <Descriptions :column="1" bordered class="my-3">
-          <DescriptionsItem label="原价">{{ current.requestSnapshot.originalPrice }}</DescriptionsItem>
-          <DescriptionsItem label="申请价">{{ current.requestSnapshot.requestedPrice }}</DescriptionsItem>
-          <DescriptionsItem label="原因">{{ current.requestSnapshot.reason }}</DescriptionsItem>
+        <Descriptions v-if="snapshotFields.length" title="申请内容" :column="1" bordered class="my-4">
+          <DescriptionsItem v-for="field in snapshotFields" :key="field.key" :label="field.label">
+            {{ format(current.requestSnapshot[field.key], field.key) }}
+          </DescriptionsItem>
         </Descriptions>
+        <Empty v-else class="my-4" :image="Empty.PRESENTED_IMAGE_SIMPLE" description="暂无申请内容" />
+        <h3 class="mb-3 font-medium">附件材料</h3>
+        <Attachments :key="current.id" :model-value="current.attachments ?? []" />
+        <h3 class="mb-3 font-medium">审批流程</h3>
         <Table
           :data-source="current.tasks"
           row-key="id"
@@ -124,7 +146,33 @@ async function save() {
             { title: '意见', dataIndex: 'comment' },
             { title: '时间', dataIndex: 'decidedAt' },
           ]"
-        />
+        >
+          <template #bodyCell="{ column, text }">
+            <Tag v-if="column.dataIndex === 'status'" :color="statusColor(text)">{{ format(text, 'status') }}</Tag>
+            <span v-else>{{ format(text, String(column.dataIndex)) }}</span>
+          </template>
+        </Table>
+        <Form v-if="current.canDecide && canGym('approvals:decide')" layout="vertical" :disabled="busy" class="mt-4">
+          <h3 class="mb-3 font-medium">处理审批</h3>
+          <FormItem label="审批结果" required>
+            <Select
+              v-model:value="decision"
+              :options="[
+                { label: '通过', value: 'approve' },
+                { label: '拒绝', value: 'reject' },
+              ]"
+            />
+          </FormItem>
+          <FormItem label="审批意见">
+            <Input.TextArea
+              v-model:value="comment"
+              :rows="3"
+              :maxlength="2000"
+              show-count
+              placeholder="可填写通过或拒绝的原因"
+            />
+          </FormItem>
+        </Form>
       </template>
     </AdminDrawer>
   </div>

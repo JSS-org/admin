@@ -100,7 +100,8 @@ export default defineEventHandler(async (event) => {
       else if (isMp4) mime = 'video/mp4';
       if (
         !mime ||
-        !['body_report', 'contract', 'image', 'video'].includes(category) ||
+        !['approval', 'body_report', 'contract', 'image', 'video'].includes(category) ||
+        (category === 'approval' && !isPdf && !isPng && !isJpg) ||
         (category === 'image' && !mime.startsWith('image/')) ||
         (category === 'video' && !isMp4) ||
         (category === 'contract' && !isPdf)

@@ -28,6 +28,28 @@ it('serves the seeded contract as a valid PDF binary instead of a JSON wrapper',
   expect(bytes.toString()).toContain('xref');
   expect(bytes.toString()).toContain('%%EOF');
 });
+it('lets a store upload approval PDFs and prevents another store from reading them', async () => {
+  const form = new FormData();
+  form.append('file', new Blob(['%PDF-1.4\n%%EOF'], { type: 'application/pdf' }), '签约合同.pdf');
+  form.append('category', 'approval');
+  form.append('storeId', seedId(1));
+  const result = await request('files', { method: 'POST', body: form }, 'store1');
+  expect(result.status).toBe(201);
+  const { data: file } = await result.json();
+  expect(file.category).toBe('approval');
+  const own = await request(`files/${file.id}/content`, {}, 'store1');
+  expect(own.status).toBe(200);
+  const other = await request(`files/${file.id}/content`, {}, 'store2');
+  expect(other.status).toBe(404);
+});
+it('rejects video bytes disguised as an approval PDF', async () => {
+  const form = new FormData();
+  form.append('file', new Blob(['0000ftyp0000'], { type: 'application/pdf' }), 'fake.pdf');
+  form.append('category', 'approval');
+  form.append('storeId', seedId(1));
+  const rejected = await request('files', { method: 'POST', body: form }, 'store1');
+  expect(rejected.status).toBe(415);
+});
 it('uploads an image, sets it as a store cover and delivers the original bytes', async () => {
   const png = Buffer.from(
     'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aSioAAAAASUVORK5CYII=',

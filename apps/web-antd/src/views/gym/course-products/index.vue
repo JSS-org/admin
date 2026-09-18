@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { canGym, gymApi } from '#/api/gym';
+import ApprovalCreate from '#/views/gym/approvals/create.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
 
@@ -20,6 +21,13 @@ import { config, editable } from './data';
       time-filter
     >
       <template #actions="{ row, reload }">
+        <ApprovalCreate
+          v-if="row.status === 'active'"
+          business-type="price_change"
+          source-type="course-products"
+          :record="row"
+          label="申请改价"
+        />
         <TableAction
           :action="row.status === 'active' ? 'disable' : 'enable'"
           v-if="row.kind === 'group' && canGym('courses:write')"

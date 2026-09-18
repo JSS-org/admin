@@ -22,6 +22,49 @@ const assignment = () => ({
   effectiveTo: null,
 });
 describe('employee profile and salary configuration', () => {
+  const storeAssignments = () => [
+    { storeId: seedId(1), isPrimary: false, isManager: true, joinedOn: '2026-01-01' },
+    { storeId: seedId(2), isPrimary: true, isManager: false, joinedOn: '2026-09-18' },
+  ];
+  it('saves profile, store membership and salary for a newly selected store together', () => {
+    save({
+      jobTitle: '跨店教练',
+      storeAssignments: storeAssignments(),
+      salaryAssignment: { ...assignment(), storeId: seedId(2) },
+    });
+    const employee = find('employees', seedId(21));
+    expect(employee.jobTitle).toBe('跨店教练');
+    expect(employee.storeIds).toEqual([seedId(1), seedId(2)]);
+    expect(employee.storeAssignments[0]).toMatchObject({ isManager: true, joinedOn: '2026-01-01' });
+    expect(employee.storeAssignments[1].isPrimary).toBe(true);
+    expect(
+      rows('employeeSalaryAssignments').some((row) => row.employeeId === employee.id && row.storeId === seedId(2)),
+    ).toBe(true);
+  });
+  it('does not save profile or salary changes when a removed store still has account authorization', () => {
+    const employee = structuredClone(find('employees', seedId(21)));
+    const salaries = structuredClone(rows('employeeSalaryAssignments'));
+    expect(() =>
+      save({ name: '不能保存', storeAssignments: [storeAssignments()[1]], salaryAssignment: assignment() }),
+    ).toThrow('门店授权');
+    expect(find('employees', seedId(21))).toEqual(employee);
+    expect(rows('employeeSalaryAssignments')).toEqual(salaries);
+  });
+  it('rolls back new store membership when salary validation fails', () => {
+    const employee = structuredClone(find('employees', seedId(21)));
+    const salaries = structuredClone(rows('employeeSalaryAssignments'));
+    const logs = structuredClone(rows('operationLogs'));
+    expect(() =>
+      save({
+        jobTitle: '不能保存',
+        storeAssignments: storeAssignments(),
+        salaryAssignment: { ...assignment(), storeId: seedId(2), templateId: seedId(9999) },
+      }),
+    ).toThrow('记录不存在');
+    expect(find('employees', seedId(21))).toEqual(employee);
+    expect(rows('employeeSalaryAssignments')).toEqual(salaries);
+    expect(rows('operationLogs')).toEqual(logs);
+  });
   it('saves a profile and switches salary periods while retaining history', () => {
     save({ jobTitle: '高级教练', salaryAssignment: assignment() });
     expect(find('employees', seedId(21)).jobTitle).toBe('高级教练');

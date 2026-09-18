@@ -1,8 +1,13 @@
 import { fileContents, find, insert, now, seedId } from './core';
 
 // A visibly marked development PDF, not a legal contract or signed evidence.
-export function examplePdf(kind: 'CONTRACT' | 'REPORT' = 'CONTRACT') {
-  const stream = `BT /F1 20 Tf 60 740 Td (MOCK ${kind} - DEVELOPMENT ONLY) Tj ET`;
+export function examplePdf(kind: 'APPROVAL' | 'CONTRACT' | 'REPORT' = 'CONTRACT', lines: string[] = []) {
+  const escape = (line: string) =>
+    line
+      .replaceAll('\\', String.raw`\\`)
+      .replaceAll('(', String.raw`\(`)
+      .replaceAll(')', String.raw`\)`);
+  const stream = `BT /F1 20 Tf 60 740 Td (MOCK ${kind} - DEVELOPMENT ONLY) Tj /F1 12 Tf ${lines.map((line) => `0 -30 Td (${escape(line)}) Tj`).join(' ')} ET`;
   const objects = [
     '<< /Type /Catalog /Pages 2 0 R >>',
     '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
@@ -68,6 +73,21 @@ export function seedGovernance() {
     steps: [{ stepNo: 1, approverEmployeeId: seedId(23) }],
     status: 'published',
   });
+  const approvalTypes = [
+    { businessType: 'card_opening', name: '开卡审批', templateId: seedId(15_001) },
+    { businessType: 'contract', name: '签约审批', templateId: seedId(15_002) },
+  ];
+  for (const type of approvalTypes) {
+    insert('approvalTemplates', {
+      id: type.templateId,
+      templateKey: type.templateId,
+      version: 1,
+      name: type.name,
+      businessType: type.businessType,
+      steps: [{ stepNo: 1, approverEmployeeId: seedId(23) }],
+      status: 'published',
+    });
+  }
   for (let i = 1; i <= 2; i++) {
     const memberId = seedId(i === 1 ? 101 : 106);
     const storeId = seedId(i);
@@ -78,6 +98,43 @@ export function seedGovernance() {
       storageKey: `mock-contract-${i}`,
     });
     fileContents.set(copy.id, pdf);
+    function attachment(offset: number, name: string, lines: string[]) {
+      const contents = examplePdf('APPROVAL', [
+        `Store: Shanghai ${i}`,
+        `Member: MOCK MEMBER ${i === 1 ? 1 : 6}`,
+        ...lines,
+        'Sample material only. Not a signed contract or payment receipt.',
+      ]);
+      const row = insert('files', {
+        id: seedId(15_200 + i * 10 + offset),
+        storeId,
+        uploadedBy: seedId(30 + i),
+        originalName: name,
+        mimeType: 'application/pdf',
+        byteSize: contents.length,
+        category: 'approval',
+        status: 'active',
+        storageKey: `mock-approval-${i}-${offset}`,
+      });
+      fileContents.set(row.id, contents);
+      return { id: row.id, originalName: row.originalName, mimeType: row.mimeType, byteSize: row.byteSize };
+    }
+    const cardAttachment = attachment(0, '开卡申请单（模拟）.pdf', [
+      'Application: monthly membership card',
+      'Requested amount: CNY 299.00',
+      'Reason: new membership application',
+    ]);
+    const contractAttachment = attachment(1, '签约审核说明（模拟）.pdf', [
+      `Contract: MOCK-CONTRACT-${i}`,
+      'Please review the attached membership service agreement.',
+      'Review checklist: member details, service period, price and signature fields.',
+    ]);
+    const priceAttachment = attachment(2, '课程优惠方案（模拟）.pdf', [
+      'Product: personal training - 10 sessions',
+      'Original price: CNY 2000.00',
+      'Requested price: CNY 1800.00',
+      'Reason: promotional discount for this application',
+    ]);
     insert('contracts', {
       id: seedId(430 + i),
       contractNo: `MOCK-CONTRACT-${i}`,
@@ -104,6 +161,7 @@ export function seedGovernance() {
       applicantEmployeeId: seedId(20 + i),
       businessType: 'price_change',
       title: '私教课程改价申请（模拟）',
+      attachments: [priceAttachment],
       requestSnapshot: {
         originalPrice: '2000.00',
         requestedPrice: '1800.00',
@@ -121,5 +179,43 @@ export function seedGovernance() {
       approverEmployeeId: seedId(23),
       status: 'pending',
     });
+    for (const [index, type] of approvalTypes.entries()) {
+      const instanceId = seedId(15_010 + i * 10 + index);
+      insert('approvals', {
+        id: instanceId,
+        templateId: type.templateId,
+        storeId,
+        memberId,
+        applicantEmployeeId: seedId(20 + i),
+        businessType: type.businessType,
+        title: `${type.name}申请（模拟）`,
+        attachments:
+          type.businessType === 'card_opening'
+            ? [cardAttachment]
+            : [
+                { id: copy.id, originalName: copy.originalName, mimeType: copy.mimeType, byteSize: copy.byteSize },
+                contractAttachment,
+              ],
+        requestSnapshot: {
+          memberName: find('members', memberId).name,
+          ...(type.businessType === 'card_opening'
+            ? { cardName: '会员月卡（模拟）', cardType: 'period', amount: '299.00' }
+            : { contractNo: `MOCK-CONTRACT-${i}`, contractName: '会员服务合同（示例）' }),
+          reason: type.businessType === 'card_opening' ? '会员开卡申请' : '会员服务合同签约申请',
+          templateSteps: [{ stepNo: 1, approverEmployeeId: seedId(23) }],
+        },
+        status: 'pending',
+        currentStep: 1,
+        submittedAt: now(),
+        simulated: true,
+      });
+      insert('approvalTasks', {
+        id: seedId(15_110 + i * 10 + index),
+        instanceId,
+        stepNo: 1,
+        approverEmployeeId: seedId(23),
+        status: 'pending',
+      });
+    }
   }
 }

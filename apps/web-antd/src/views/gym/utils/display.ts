@@ -54,13 +54,17 @@ export function statusColor(value: unknown) {
   return undefined;
 }
 
+export function textOrDash(value: unknown) {
+  return typeof value === 'string' && value.trim() ? value.trim() : '-';
+}
+
 export function displayValue(
   value: any,
   key: string,
   fields: Field[],
   options: Record<string, { label: string; value: any }[]>,
 ) {
-  if (value === undefined || value === null || value === '') return '—';
+  if (value === undefined || value === null || value === '') return '-';
   if (Array.isArray(value))
     return value.map((v) => options[key]?.find((o) => o.value === v)?.label ?? statuses[v] ?? v).join('、');
   if (typeof value === 'boolean') return value ? '是' : '否';

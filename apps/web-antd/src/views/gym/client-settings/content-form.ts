@@ -1,3 +1,5 @@
+import { textOrDash } from '#/views/gym/utils/display';
+
 export function validateContent(data: Record<string, any>, platform: string) {
   if (!String(data.systemName ?? '').trim()) return '请填写展示名称';
   const validUrl = (value: string) => {
@@ -24,7 +26,7 @@ export function prepareContent(data: Record<string, any>, platform: string, stor
     systemName: data.systemName,
     appId: data.appId || '',
     coverFileId: data.coverFileId ?? null,
-    welcomeText: data.welcomeText || '',
+    welcomeText: textOrDash(data.welcomeText),
     customerService: data.customerService || '',
     appDownloadUrl: platform === 'app' ? data.appDownloadUrl || null : null,
     enabled: data.enabled,

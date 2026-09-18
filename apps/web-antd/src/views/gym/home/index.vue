@@ -2,31 +2,13 @@
 import { computed } from 'vue';
 import { RouterLink } from 'vue-router';
 
-import {
-  ArrowUpRight,
-  Building2,
-  CalendarCheck,
-  CalendarDays,
-  ChartNoAxesCombined,
-  ClipboardCheck,
-  ContactRound,
-  CreditCard,
-  DoorOpen,
-  FileCheck,
-  Flag,
-  Gift,
-  HeartPulse,
-  PanelsTopLeft,
-  ScanLine,
-  Ticket,
-  Users,
-} from '@vben/icons';
 import { useAccessStore } from '@vben/stores';
 
 import { Alert, Button, Card, Empty, Segmented, Select, Skeleton, Statistic, Table } from 'ant-design-vue';
 
 import { canGym } from '#/api/gym';
 import AdminPage from '#/views/gym/components/admin-page.vue';
+import { gymIcons } from '#/views/gym/icons';
 import { displayValue } from '#/views/gym/utils/display';
 
 import DashboardChart from './dashboard-chart.vue';
@@ -69,70 +51,80 @@ const scenarios = [
 const accessStore = useAccessStore();
 
 const shortcuts = [
-  { title: '门店资料', description: '门店位置、营业时间、环境与封面', icon: Building2, path: '/gym/stores' },
+  { title: '门店资料', description: '门店位置、营业时间、环境与封面', icon: gymIcons.store, path: '/gym/stores' },
   {
     title: '员工资料',
     description: '人员资料、门店归属与工资模板',
-    icon: ContactRound,
+    icon: gymIcons.employees,
     path: '/gym/employees',
   },
-  { title: '智能设备', description: '设备状态、柜格和指令记录', icon: DoorOpen, path: '/gym/devices' },
+  { title: '智能设备', description: '设备状态、柜格和指令记录', icon: gymIcons.device, path: '/gym/devices' },
   {
     title: '展示配置',
     description: '编排小程序与 App 内容并预览',
-    icon: PanelsTopLeft,
+    icon: gymIcons.display,
     path: '/gym/client-settings',
   },
   {
     title: '体测记录',
     description: '会员身体数据与报告文件',
-    icon: HeartPulse,
+    icon: gymIcons.bodyMeasurement,
     path: '/gym/body-measurements',
   },
-  { title: '会员卡模板', description: '维护卡种、适用门店及价格版本', icon: CreditCard, path: '/gym/cards' },
-  { title: '积分兑换', description: '管理兑换商品、积分价格与库存', icon: Gift, path: '/gym/point-products' },
-  { title: '售卡与核销', description: '配置售卡方案、包月及核销条件', icon: ScanLine, path: '/gym/settings' },
+  { title: '会员卡模板', description: '维护卡种、适用门店及价格版本', icon: gymIcons.card, path: '/gym/cards' },
+  {
+    title: '积分兑换',
+    description: '管理兑换商品、积分价格与库存',
+    icon: gymIcons.pointProduct,
+    path: '/gym/point-products',
+  },
+  {
+    title: '售卡与核销',
+    description: '配置售卡方案、包月及核销条件',
+    icon: gymIcons.saleRedeem,
+    path: '/gym/settings',
+  },
   {
     title: '优惠券额度',
     description: '查看、分配门店额度与变动流水',
-    icon: Ticket,
+    icon: gymIcons.coupon,
     path: '/gym/coupon-store-quotas',
   },
-  { title: '门店活动', description: '安排活动、维护封面和报名记录', icon: Flag, path: '/gym/activities' },
+  { title: '门店活动', description: '安排活动、维护封面和报名记录', icon: gymIcons.activity, path: '/gym/activities' },
   {
     title: '会员管理',
     description: '会员建档、资料查询与持卡详情',
-    icon: Users,
+    icon: gymIcons.member,
     path: '/gym/members',
   },
   {
     title: '课程安排',
     description: '查看与维护课程排期、教练和场地',
-    icon: CalendarDays,
+    icon: gymIcons.courseSchedule,
     path: '/gym/course-sessions',
   },
   {
     title: '预约管理',
     description: '办理代预约，查询与取消课程预约',
-    icon: CalendarCheck,
+    icon: gymIcons.booking,
     path: '/gym/bookings',
   },
   {
     title: '签到记录',
     description: '查看到店签到与当天签到汇总',
-    icon: ClipboardCheck,
+    icon: gymIcons.checkin,
     path: '/gym/checkins',
   },
   {
     title: '合同记录',
     description: '查看合同原件、签署信息与未签提醒',
-    icon: FileCheck,
+    icon: gymIcons.contract,
     path: '/gym/contracts',
   },
   {
     title: '门店与员工业绩',
     description: '查询门店和员工的销售业绩汇总',
-    icon: ChartNoAxesCombined,
+    icon: gymIcons.performance,
     path: '/gym/reports/performance',
   },
 ];
@@ -264,7 +256,11 @@ const visibleScenarios = computed(() =>
                 {{ shortcut.description }}
               </p>
             </div>
-            <ArrowUpRight class="text-muted-foreground mt-1 size-4 shrink-0" aria-hidden="true" />
+            <component
+              :is="gymIcons.externalLink"
+              class="text-muted-foreground mt-1 size-4 shrink-0"
+              aria-hidden="true"
+            />
           </RouterLink>
         </div>
       </section>

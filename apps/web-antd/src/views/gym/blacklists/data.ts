@@ -28,7 +28,7 @@ const fields: Field[] = [
     default: true,
     required: true,
   },
-  { key: 'reason', label: '原因', type: 'textarea', required: true },
+  { key: 'reason', label: '原因', type: 'textarea' },
   { key: 'startsAt', label: '生效时间', type: 'datetime', required: true, immutable: true },
   { key: 'endsAt', label: '结束时间（留空长期有效）', type: 'datetime' },
 ];

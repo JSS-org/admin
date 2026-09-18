@@ -18,6 +18,7 @@ const formRef = ref<FormInstance>();
 
 defineExpose({ validate: () => formRef.value?.validate() });
 </script>
+
 <template>
   <Form ref="formRef" :model="form" layout="vertical">
     <FormItem
@@ -26,7 +27,7 @@ defineExpose({ validate: () => formRef.value?.validate() });
       :name="field.key"
       :label="field.label"
       :html-for="`resource-${field.key}`"
-      :rules="field.required ? [{ required: true, message: `请填写${field.label}` }] : []"
+      :rules="field.required && field.type !== 'textarea' ? [{ required: true, message: `请填写${field.label}` }] : []"
     >
       <Select
         v-if="field.source || field.type === 'select' || field.type === 'multi' || field.type === 'tags'"

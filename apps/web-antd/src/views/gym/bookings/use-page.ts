@@ -8,6 +8,7 @@ import { computed, onScopeDispose, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
 
 import { gymApi } from '../../../api/gym';
+import { textOrDash } from '../utils/display';
 
 export function usePage(page: Readonly<Ref<null | ResourcePageHandle>>) {
   const visible = ref(false);
@@ -176,7 +177,7 @@ export function usePage(page: Readonly<Ref<null | ResourcePageHandle>>) {
         sessionId: sessionId.value,
         memberId: memberId.value,
         [right.type]: right.value,
-        note: note.value,
+        note: textOrDash(note.value),
       });
       message.success('预约成功');
       visible.value = false;

@@ -17,8 +17,6 @@ const fields: Field[] = [
     label: '所属门店',
     type: 'multi',
     source: 'stores',
-    required: true,
-    immutable: true,
   },
   {
     key: 'status',

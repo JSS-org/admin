@@ -82,7 +82,7 @@ function downloadCodes() {
         <Button @click="downloadCodes">下载礼品码</Button>
       </template>
       <template v-else>
-        <Alert type="info" :message="`批次状态：${current?.status ?? '—'}`" class="mb-3" />
+        <Alert type="info" :message="`批次状态：${current?.status ?? '-'}`" class="mb-3" />
         <Table
           :data-source="items"
           row-key="id"

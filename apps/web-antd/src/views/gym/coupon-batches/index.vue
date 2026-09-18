@@ -162,7 +162,7 @@ async function submit() {
         <Button class="gym-form-add" type="dashed" @click="targets.push({ memberIds: [] })"> 增加发行门店 </Button>
       </Form>
       <template v-else>
-        <Alert type="info" :message="`批次状态：${current?.status ?? '—'}`" class="mb-3" />
+        <Alert type="info" :message="`批次状态：${current?.status ?? '-'}`" class="mb-3" />
         <Table
           :data-source="items"
           row-key="id"

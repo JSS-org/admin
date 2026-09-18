@@ -25,7 +25,7 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
   >([]);
   const password = ref('');
   const username = ref('');
-  const selectedStores = ref<string[]>([]);
+  const editorDetail = ref<GymRow>();
   const stores = ref<GymRow[]>([]);
   const salaryHistory = ref<GymRow[]>([]);
   const salaryStores = ref<{ label: string; value: string }[]>([]);
@@ -52,7 +52,7 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
           },
           {
             key: 'salaryStoreId',
-            label: '发薪门店',
+            label: '发薪门店（须属于所选门店）',
             type: 'select' as const,
             onlyEdit: true,
             required: true,
@@ -96,10 +96,9 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
       canGym('payroll:templates') ? gymApi.listAll('stores') : [],
     ]);
     if (request === detailRequest) {
+      editorDetail.value = detail;
       salaryHistory.value = history;
-      salaryStores.value = allStores
-        .filter((store) => detail.storeIds.includes(store.id))
-        .map((store) => ({ label: store.name, value: store.id }));
+      salaryStores.value = allStores.map((store) => ({ label: store.name, value: store.id }));
     }
     return { ...detail, salaryMode: 'keep', salaryStoreId: detail.storeIds[0] };
   }
@@ -113,12 +112,13 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
         effectiveFrom: salaryEffectiveFrom,
         effectiveTo: salaryEffectiveTo || null,
       };
-    if (!row)
-      data.storeAssignments = storeIds.map((storeId: string, i: number) => ({
+    const detail = editorDetail.value?.id === row?.id ? editorDetail.value : row;
+    if (!row || JSON.stringify(storeIds) !== JSON.stringify(detail?.storeIds))
+      data.storeAssignments = (storeIds ?? []).map((storeId: string, i: number) => ({
         storeId,
         isPrimary: i === 0,
-        isManager: false,
-        joinedOn: data.hiredOn,
+        isManager: detail?.storeAssignments?.find((item: GymRow) => item.storeId === storeId)?.isManager ?? false,
+        joinedOn: detail?.storeAssignments?.find((item: GymRow) => item.storeId === storeId)?.joinedOn ?? data.hiredOn,
       }));
     return data;
   }
@@ -126,17 +126,16 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
     if (saving.value) return;
     const request = ++actionRequest;
     const [detail, allRoles, assignments, allStores] = await Promise.all([
-      ['detail', 'stores'].includes(action) ? gymApi.get(`employees/${row.id}`) : row,
+      action === 'detail' ? gymApi.get(`employees/${row.id}`) : row,
       action === 'roles' ? gymApi.listAll('roles') : [],
       action === 'roles' ? gymApi.get<{ roleId?: string; storeId?: string }[]>(`accounts/${row.accountId}/roles`) : [],
-      ['detail', 'roles', 'stores'].includes(action) ? gymApi.listAll('stores') : [],
+      ['detail', 'roles'].includes(action) ? gymApi.listAll('stores') : [],
     ]);
     if (request !== actionRequest) return;
     current.value = detail;
     mode.value = action;
     password.value = '';
     username.value = '';
-    selectedStores.value = [...detail.storeIds];
     roles.value = allRoles;
     links.value = assignments;
     stores.value = allStores;
@@ -146,10 +145,6 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
     if (saving.value) return;
     const row = current.value;
     if (!row) return;
-    if (mode.value === 'stores' && selectedStores.value.length === 0) {
-      message.error('请至少选择一个所属门店');
-      return;
-    }
     if (
       mode.value === 'roles' &&
       links.value.some(
@@ -176,15 +171,6 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
             roles.value.find((r) => r.id === l.roleId)?.scopeType === 'hq' ? { roleId: l.roleId } : l,
           ),
         });
-      else if (mode.value === 'stores')
-        await gymApi.put(`employees/${row.id}/stores`, {
-          storeAssignments: selectedStores.value.map((storeId, i) => ({
-            storeId,
-            isPrimary: i === 0,
-            isManager: row.storeAssignments?.find((item: GymRow) => item.storeId === storeId)?.isManager ?? false,
-            joinedOn: row.storeAssignments?.find((item: GymRow) => item.storeId === storeId)?.joinedOn ?? row.hiredOn,
-          })),
-        });
       else if (mode.value === 'account')
         await gymApi.post(`employees/${row.id}/account`, {
           username: username.value,
@@ -204,7 +190,6 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
   const titles: Record<string, string> = {
     detail: '员工详情',
     roles: '角色与门店授权',
-    stores: '调整所属门店',
     account: '创建网页账号',
     password: '重置密码',
   };
@@ -220,7 +205,6 @@ export function usePage(view: Readonly<Ref<null | ResourcePageHandle>>) {
     links,
     password,
     username,
-    selectedStores,
     stores,
     prepare,
     open,

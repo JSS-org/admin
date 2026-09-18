@@ -7,6 +7,7 @@ import { Alert, Button, Form, FormItem, Input, message, Select, Space, Upload } 
 
 import { gymApi, openGymFile, uploadGymFile } from '#/api/gym';
 import Page from '#/views/gym/components/admin-page.vue';
+import { textOrDash } from '#/views/gym/utils/display';
 
 import { title } from './data';
 
@@ -44,13 +45,14 @@ async function save() {
   busy.value = true;
   try {
     let body: Record<string, any> = {};
-    for (const key of ['name', 'introduction', 'contactPhone', 'logoFileId', 'status']) body[key] = data.value[key];
+    for (const key of ['name', 'contactPhone', 'logoFileId', 'status']) body[key] = data.value[key];
+    body.introduction = textOrDash(data.value.introduction);
     body.models = data.value.models.map((m: GymRow) => ({
       modelCode: m.modelCode,
       name: m.name,
-      description: m.description,
+      description: textOrDash(m.description),
       areaSqm: m.areaSqm,
-      investmentDescription: m.investmentDescription,
+      investmentDescription: textOrDash(m.investmentDescription),
       fileIds: m.fileIds,
     }));
     await gymApi.put('franchise-brand', body);

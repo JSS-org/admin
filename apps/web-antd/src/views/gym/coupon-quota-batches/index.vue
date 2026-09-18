@@ -149,7 +149,7 @@ async function submit() {
         <Alert type="info" message="本操作只分配门店发券额度；实际发给会员时才消耗额度。" />
       </Form>
       <template v-else>
-        <Alert type="info" :message="`批次状态：${current?.status ?? '—'}`" class="mb-3" />
+        <Alert type="info" :message="`批次状态：${current?.status ?? '-'}`" class="mb-3" />
         <Table
           :data-source="items"
           row-key="id"

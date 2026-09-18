@@ -55,8 +55,8 @@
 | GET | /employees | H/S employees:read | storeId,status,keyword；任职及账号状态 |
 | POST | /employees | H employees:write | employeeNo,name,phone,jobTitle,hiredOn,storeAssignments；可附 username,password 建网页账号 |
 | GET | /employees/:id | H/S employees:read | 员工资料；门店只见本店任职 |
-| PATCH | /employees/:id | H employees:write | name,phone,jobTitle,avatarFileId,leftOn,status |
-| PUT | /employees/:id/stores | H employees:write | storeAssignments[{storeId,isPrimary,isManager,joinedOn,endedOn?}]；同步校验授权范围 |
+| PATCH | /employees/:id | H employees:write | name,phone,jobTitle,avatarFileId,hiredOn,leftOn,status,storeAssignments,salaryAssignment；资料、门店、工资配置原子保存 |
+| PUT | /employees/:id/stores | H employees:write | 兼容接口：storeAssignments[{storeId,isPrimary,isManager,joinedOn,endedOn?}]；同步校验授权范围 |
 | POST | /employees/:id/account | H accounts:write | username,password；仅无账号员工可建，重复409 |
 | PATCH | /accounts/:id | H accounts:write | status；停用撤销会话 |
 | PUT | /accounts/:id/password | H accounts:write | password；存 scrypt 摘要、撤销已有会话 |

@@ -3,8 +3,6 @@ import type { GymRow } from '#/api/gym';
 
 import { computed, onScopeDispose, ref } from 'vue';
 
-import { Building2, MapPin } from '@vben/icons';
-
 import {
   Alert,
   Button,
@@ -25,6 +23,7 @@ import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import EntityRecords from '#/views/gym/components/entity-records.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
+import { gymIcons } from '#/views/gym/icons';
 
 import { columns, fields } from './data';
 
@@ -189,7 +188,7 @@ async function upload(file: File) {
           preload="metadata"
         ></video>
         <div v-else class="store-cover-placeholder">
-          <Building2 class="size-12" /><span>门店环境展示</span
+          <component :is="gymIcons.store" class="size-12" /><span>门店环境展示</span
           ><span class="text-xs">上传门店环境照片，展示真实到店体验</span>
         </div>
       </div>
@@ -212,7 +211,7 @@ async function upload(file: File) {
             <Descriptions bordered :column="1">
               <DescriptionsItem label="门店位置"
                 ><div class="flex items-start gap-3">
-                  <MapPin class="size-5 shrink-0 text-primary" />
+                  <component :is="gymIcons.location" class="size-5 shrink-0 text-primary" />
                   <div>
                     <p>{{ selected?.address || '暂未填写地址' }}</p>
                     <a v-if="selected?.address" :href="mapUrl" target="_blank" rel="noopener noreferrer"
@@ -222,14 +221,14 @@ async function upload(file: File) {
                 </div></DescriptionsItem
               >
               <DescriptionsItem label="位置坐标"
-                >{{ selected?.longitude ?? '—' }}，{{ selected?.latitude ?? '—' }}</DescriptionsItem
+                >{{ selected?.longitude ?? '-' }}，{{ selected?.latitude ?? '-' }}</DescriptionsItem
               >
               <DescriptionsItem label="营业时间"
-                >{{ selected?.businessHours?.opens ?? '—' }} –
-                {{ selected?.businessHours?.closes ?? '—' }}</DescriptionsItem
+                >{{ selected?.businessHours?.opens ?? '-' }} –
+                {{ selected?.businessHours?.closes ?? '-' }}</DescriptionsItem
               >
-              <DescriptionsItem label="联系电话">{{ selected?.servicePhone || '—' }}</DescriptionsItem>
-              <DescriptionsItem label="客服微信">{{ selected?.serviceWechat || '—' }}</DescriptionsItem>
+              <DescriptionsItem label="联系电话">{{ selected?.servicePhone || '-' }}</DescriptionsItem>
+              <DescriptionsItem label="客服微信">{{ selected?.serviceWechat || '-' }}</DescriptionsItem>
             </Descriptions>
           </div>
         </TabPane>

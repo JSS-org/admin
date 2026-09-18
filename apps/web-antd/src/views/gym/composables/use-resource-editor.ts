@@ -9,6 +9,7 @@ import { computed, onScopeDispose, reactive, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
 
 import { gymApi } from '../../../api/gym';
+import { textOrDash } from '../utils/display';
 
 export function useResourceEditor(props: ResourcePageProps, onSaved: (row: GymRow) => Promise<void>) {
   const saving = ref(false);
@@ -55,8 +56,11 @@ export function useResourceEditor(props: ResourcePageProps, onSaved: (row: GymRo
         return;
       }
       const payload: Record<string, any> = {};
-      for (const f of visibleFields.value)
-        if (form[f.key] !== undefined && form[f.key] !== '') payload[f.key] = form[f.key];
+      for (const f of visibleFields.value) {
+        const value = form[f.key];
+        if (f.type === 'textarea') payload[f.key] = textOrDash(value);
+        else if (value !== undefined && value !== '') payload[f.key] = value;
+      }
       const data = props.prepare ? props.prepare(payload, current.value) : payload;
       const saved = await (current.value
         ? gymApi.patch(`${props.endpoint}/${current.value.id}`, data)

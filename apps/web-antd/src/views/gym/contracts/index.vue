@@ -18,6 +18,7 @@ import {
 } from 'ant-design-vue';
 
 import { canGym, gymApi, openGymFile } from '#/api/gym';
+import ApprovalCreate from '#/views/gym/approvals/create.vue';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
@@ -92,6 +93,13 @@ async function save() {
     >
       <template #actions="{ row }">
         <TableAction action="detail" @click="details(row)" />
+        <ApprovalCreate
+          v-if="row.status !== 'cancelled'"
+          business-type="contract"
+          source-type="contracts"
+          :record="row"
+          label="申请签约审批"
+        />
         <TableAction
           action="remind"
           v-if="['unsigned', 'sent', 'viewed'].includes(row.status) && canGym('contracts:remind')"
@@ -123,13 +131,13 @@ async function save() {
       <template v-else-if="current">
         <Descriptions :column="2" bordered>
           <DescriptionsItem v-for="column in columns" :key="column.dataIndex" :label="column.title">{{
-            current[column.dataIndex] ?? '—'
+            current[column.dataIndex] ?? '-'
           }}</DescriptionsItem>
         </Descriptions>
         <Descriptions :column="1" bordered class="mt-3">
           <DescriptionsItem label="签署IP">{{ current.signIp ?? '尚未签署' }}</DescriptionsItem>
-          <DescriptionsItem label="设备标识">{{ current.signDeviceUid ?? '—' }}</DescriptionsItem>
-          <DescriptionsItem label="签署设备信息">{{ current.signUserAgent ?? '—' }}</DescriptionsItem>
+          <DescriptionsItem label="设备标识">{{ current.signDeviceUid ?? '-' }}</DescriptionsItem>
+          <DescriptionsItem label="签署设备信息">{{ current.signUserAgent ?? '-' }}</DescriptionsItem>
         </Descriptions>
         <Space class="my-3">
           <Button v-if="current.unsignedFileId" @click="openGymFile(current.unsignedFileId)"> 合同原件 </Button>

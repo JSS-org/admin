@@ -17,10 +17,15 @@ const props = defineProps<{
 }>();
 const definition = computed(() => tableActions[props.action]);
 const title = computed(() => props.label ?? definition.value.label);
+
+function popupContainer(trigger: HTMLElement) {
+  // Keep drawer tooltips out of the document scroll area during positioning.
+  return trigger.closest<HTMLElement>('.ant-drawer') ?? document.body;
+}
 </script>
 
 <template>
-  <Tooltip :title="title">
+  <Tooltip :title="title" :get-popup-container="popupContainer">
     <span class="gym-table-action-wrap" :tabindex="disabled ? 0 : undefined" :aria-label="disabled ? title : undefined">
       <Button
         v-bind="$attrs"

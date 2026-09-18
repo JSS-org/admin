@@ -3,11 +3,10 @@ import type { UploadFile } from 'ant-design-vue';
 
 import { computed, ref } from 'vue';
 
-import { CloudUpload } from '@vben/icons';
-
 import { message, Upload } from 'ant-design-vue';
 
 import { openGymFile, uploadGymFile } from '#/api/gym';
+import { gymIcons } from '#/views/gym/icons';
 
 import FileMedia from './file-media.vue';
 
@@ -68,7 +67,7 @@ async function upload(file: File) {
         }
       "
     >
-      <CloudUpload class="mx-auto mb-3 size-8 text-primary" />
+      <component :is="gymIcons.upload" class="mx-auto mb-3 size-8 text-primary" />
       <p class="font-medium">{{ busy ? '正在上传…' : title || '点击或拖入文件' }}</p>
       <p class="mt-2 text-xs text-muted-foreground">
         {{

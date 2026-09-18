@@ -276,20 +276,37 @@ export function foundation(req: Request): unknown {
       publicEmployee(row, req);
       if (method === 'GET' && !child) return publicEmployee(row, req);
       if (method === 'PATCH' && !child) {
-        only(body, [...employeeFields.filter((f) => f !== 'employeeNo'), 'salaryAssignment']);
-        const { salaryAssignment, ...profile } = body;
+        only(body, [...employeeFields.filter((f) => f !== 'employeeNo'), 'salaryAssignment', 'storeAssignments']);
+        const { salaryAssignment, storeAssignments, ...profile } = body;
         const next = { ...row, ...profile };
         str(next.name, '姓名');
         phone(next.phone);
         date(next.hiredOn, '入职日期');
         active(next.status);
         if (next.leftOn && date(next.leftOn, '离职日期') < next.hiredOn) fail('离职早于入职');
+        if (storeAssignments !== undefined) {
+          const links = assignments(storeAssignments);
+          const storeIds = links.filter((a) => !a.endedOn).map((a) => a.storeId);
+          const account = rows('accounts').find((a) => a.employeeId === rid);
+          if (account?.assignments.some((a: Row) => a.storeId && !storeIds.includes(a.storeId)))
+            fail('请先移除离店员工的对应门店授权', 409);
+          Object.assign(next, { storeAssignments: links, storeIds });
+        }
         if (next.status !== 'active') {
           const account = rows('accounts').find((a) => a.employeeId === rid);
           if (account)
             keepAdministrator(rows('accounts').map((a) => (a.id === account.id ? { ...a, status: 'inactive' } : a)));
         }
-        if (salaryAssignment !== undefined) assignEmployeeSalary(req, rid, salaryAssignment);
+        if (salaryAssignment !== undefined) {
+          const previous = { storeIds: row.storeIds, storeAssignments: row.storeAssignments };
+          try {
+            // Salary validation must use the membership being saved in this same request.
+            Object.assign(row, { storeIds: next.storeIds, storeAssignments: next.storeAssignments });
+            assignEmployeeSalary(req, rid, salaryAssignment);
+          } finally {
+            Object.assign(row, previous);
+          }
+        }
         Object.assign(row, next, { updatedAt: now() });
         rows('accounts')
           .filter((a) => a.employeeId === rid)

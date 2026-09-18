@@ -10,6 +10,7 @@ import { canGym, gymApi } from '#/api/gym';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
 
+import { approvalBusinessTypes } from '../approvals/options';
 import { columns, fields, initial, isTemplate, prepare, title, writeCode } from './data';
 
 const page = useTemplateRef<ResourcePageHandle>('page');
@@ -37,6 +38,19 @@ async function newVersion(row: GymRow) {
       :initial="initial"
       :store-filter="false"
       :time-filter="false"
+      :filter-fields="[
+        { key: 'businessType', label: '审批类型', type: 'select', options: approvalBusinessTypes },
+        {
+          key: 'status',
+          label: '模板状态',
+          type: 'select',
+          options: [
+            { label: '草稿', value: 'draft' },
+            { label: '已发布', value: 'published' },
+            { label: '停用', value: 'inactive' },
+          ],
+        },
+      ]"
     >
       <template #actions="{ row, reload }">
         <template v-if="canGym(writeCode)">

@@ -6,6 +6,7 @@ import { onScopeDispose, ref } from 'vue';
 import { Descriptions, DescriptionsItem, Table, TabPane, Tabs, Tag } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
+import ApprovalCreate from '#/views/gym/approvals/create.vue';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import EntityRecords from '#/views/gym/components/entity-records.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
@@ -44,6 +45,7 @@ async function open(row: GymRow) {
     >
       <template #actions="{ row }">
         <TableAction action="detail" @click="open(row)" />
+        <ApprovalCreate business-type="card_opening" source-type="members" :record="row" label="申请开卡" />
       </template>
     </ResourcePage>
     <AdminDrawer v-model:open="visible" :title="detail?.name" :footer="null" :width="900">

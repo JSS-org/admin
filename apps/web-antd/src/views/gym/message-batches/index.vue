@@ -10,6 +10,7 @@ import { canGym, gymApi } from '#/api/gym';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
+import { textOrDash } from '#/views/gym/utils/display';
 
 import { canCreateBatch, config } from './data';
 
@@ -75,8 +76,8 @@ async function details(row: GymRow) {
 async function submit() {
   if (busy.value) return;
   const recipient = targets.value[0];
-  if (!recipient?.storeId || recipient.memberIds.length === 0 || !subject.value.trim() || !content.value.trim()) {
-    message.error('请选择门店、会员并填写消息标题和内容');
+  if (!recipient?.storeId || recipient.memberIds.length === 0 || !subject.value.trim()) {
+    message.error('请选择门店、会员并填写消息标题');
     return;
   }
   if (messageKind.value === 'private' && recipient.memberIds.length !== 1) {
@@ -91,7 +92,7 @@ async function submit() {
       kind: messageKind.value,
       channel: channel.value,
       title: subject.value,
-      content: content.value,
+      content: textOrDash(content.value),
       storeId: target?.storeId,
       memberIds: target?.memberIds ?? [],
     };
@@ -200,13 +201,13 @@ async function submit() {
         <FormItem label="标题" required>
           <Input v-model:value="subject" />
         </FormItem>
-        <FormItem label="内容" required>
+        <FormItem label="内容">
           <Input.TextArea v-model:value="content" :rows="4" />
         </FormItem>
         <Alert type="info" message="未配置真实渠道的消息会记录发送失败，不会发送到会员。" />
       </Form>
       <template v-else>
-        <Alert type="info" :message="`批次状态：${current?.status ?? '—'}`" class="mb-3" />
+        <Alert type="info" :message="`批次状态：${current?.status ?? '-'}`" class="mb-3" />
         <Table
           :data-source="items"
           row-key="id"

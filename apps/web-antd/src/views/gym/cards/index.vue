@@ -2,6 +2,7 @@
 import { message } from 'ant-design-vue';
 
 import { canGym, gymApi } from '#/api/gym';
+import ApprovalCreate from '#/views/gym/approvals/create.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
 
@@ -18,6 +19,13 @@ import { columns, fields } from './data';
       :editable="(row) => row.status === 'draft'"
     >
       <template #actions="{ row, reload }">
+        <ApprovalCreate
+          v-if="row.status === 'published'"
+          business-type="card_opening"
+          source-type="card-templates"
+          :record="row"
+          label="申请开卡"
+        />
         <template v-if="canGym('cards:write')">
           <TableAction
             action="version"

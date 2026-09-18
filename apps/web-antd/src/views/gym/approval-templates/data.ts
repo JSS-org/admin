@@ -1,6 +1,8 @@
 import type { GymRow } from '#/api/gym';
 import type { Field } from '#/views/gym/types';
 
+import { approvalBusinessTypes } from '../approvals/options';
+
 const isTemplate = true;
 
 const title = '审批模板';
@@ -14,16 +16,12 @@ const fields: Field[] = [
     label: '业务类型',
     type: 'select',
     required: true,
-    default: 'price_change',
-    options: [
-      { label: '改价', value: 'price_change' },
-      { label: '合同', value: 'contract' },
-      { label: '其他已配置审批', value: 'other_configured' },
-    ],
+    default: 'card_opening',
+    options: approvalBusinessTypes,
   },
   {
     key: 'approverEmployeeIds',
-    label: '审批员工（按选择顺序逐级审批）',
+    label: '审批员工',
     type: 'multi',
     source: 'employees',
     required: true,
@@ -32,12 +30,20 @@ const fields: Field[] = [
 
 const columns = [
   { title: '名称', dataIndex: 'name' },
+  { title: '审批类型', dataIndex: 'businessType' },
   { title: '版本', dataIndex: 'version' },
   { title: '状态', dataIndex: 'status' },
 ];
 
 function prepare(values: Record<string, any>) {
-  return values;
+  const { approverEmployeeIds = [], ...data } = values;
+  return {
+    ...data,
+    steps: approverEmployeeIds.map((approverEmployeeId: string, index: number) => ({
+      stepNo: index + 1,
+      approverEmployeeId,
+    })),
+  };
 }
 
 function initial(row: GymRow) {

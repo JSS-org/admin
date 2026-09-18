@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { Activity } from '@vben/icons';
-
 import { Alert, Button, Card, Form, FormItem, Input, Segmented, Select, Skeleton, Tag } from 'ant-design-vue';
 
 import Page from '#/views/gym/components/admin-page.vue';
@@ -9,6 +7,7 @@ import ConfigActions from '#/views/gym/components/config-actions.vue';
 import FileMedia from '#/views/gym/components/file-media.vue';
 import FileUpload from '#/views/gym/components/file-upload.vue';
 import RichContent from '#/views/gym/components/rich-content.vue';
+import { gymIcons } from '#/views/gym/icons';
 
 import { usePage } from './use-page';
 const { stores, storeId, platform, data, busy, loading, saving, uploading, error, dirty, load, save, restore } =
@@ -101,7 +100,9 @@ const { stores, storeId, platform, data, busy, loading, saving, uploading, error
             <div class="preview-title">{{ data.systemName || '门店名称' }}</div>
             <div class="preview-scroll" tabindex="0" aria-label="草稿预览内容">
               <FileMedia v-if="data.coverFileId" :file-id="data.coverFileId" alt="首页封面" />
-              <div v-else class="preview-hero"><Activity class="size-9" /><span>门店首页</span></div>
+              <div v-else class="preview-hero">
+                <component :is="gymIcons.appPreview" class="size-9" /><span>门店首页</span>
+              </div>
               <div class="preview-content">
                 <h3>{{ data.welcomeText || '欢迎来到门店' }}</h3>
                 <Tag v-if="!data.enabled">展示已关闭</Tag>

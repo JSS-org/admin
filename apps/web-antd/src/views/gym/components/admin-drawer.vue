@@ -12,9 +12,10 @@ const props = withDefaults(
     footer?: null;
     confirmLoading?: boolean;
     okButtonProps?: ButtonProps;
+    okText?: string;
     destroyOnClose?: boolean;
   }>(),
-  { title: undefined, width: 640, footer: undefined, okButtonProps: undefined },
+  { title: undefined, width: 640, footer: undefined, okButtonProps: undefined, okText: '确定' },
 );
 const emit = defineEmits<{ ok: [] }>();
 const open = defineModel<boolean>('open', { default: false });
@@ -44,7 +45,9 @@ function close() {
     <template v-if="footer !== null" #footer>
       <div class="gym-drawer-actions">
         <Button :disabled="confirmLoading" @click="close">取消</Button>
-        <Button v-bind="okButtonProps" type="primary" :loading="confirmLoading" @click="emit('ok')"> 确定 </Button>
+        <Button v-bind="okButtonProps" type="primary" :loading="confirmLoading" @click="emit('ok')">
+          {{ okText }}
+        </Button>
       </div>
     </template>
   </Drawer>

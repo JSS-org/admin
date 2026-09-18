@@ -28,7 +28,6 @@ const {
   links,
   password,
   username,
-  selectedStores,
   stores,
   prepare,
   open,
@@ -52,6 +51,7 @@ const {
       @detail="open($event, 'detail')"
     >
       <template #editor-extra="{ row, form }">
+        <p class="text-xs text-muted-foreground">所属门店与员工资料一起保存；保留原门店的负责人标记和入店日期。</p>
         <section v-if="row && canGym('payroll:read')" class="gym-stack">
           <Alert
             v-if="form.salaryMode === 'assign'"
@@ -82,7 +82,6 @@ const {
         </section>
       </template>
       <template #actions="{ row, reload }">
-        <TableAction action="stores" v-if="canGym('employees:write')" @click="open(row, 'stores')" />
         <template v-if="canGym('accounts:write')">
           <TableAction action="account" v-if="!row.accountId" @click="open(row, 'account')" />
           <template v-else>
@@ -116,12 +115,12 @@ const {
           <DescriptionsItem label="工号">{{ current.employeeNo }}</DescriptionsItem>
           <DescriptionsItem label="姓名">{{ current.name }}</DescriptionsItem>
           <DescriptionsItem label="手机号">{{ current.phone }}</DescriptionsItem>
-          <DescriptionsItem label="职位">{{ current.jobTitle || '—' }}</DescriptionsItem>
+          <DescriptionsItem label="职位">{{ current.jobTitle || '-' }}</DescriptionsItem>
           <DescriptionsItem label="入职日期">{{ current.hiredOn }}</DescriptionsItem>
           <DescriptionsItem label="状态">{{ current.status === 'active' ? '在职' : '停用 / 离职' }}</DescriptionsItem>
           <DescriptionsItem label="登录账号">{{ current.username || '未创建账号' }}</DescriptionsItem>
           <DescriptionsItem label="所属门店">{{
-            current.storeIds.map((id: string) => stores.find((store) => store.id === id)?.name ?? '—').join('、')
+            current.storeIds.map((id: string) => stores.find((store) => store.id === id)?.name ?? '-').join('、')
           }}</DescriptionsItem>
         </Descriptions>
         <template v-if="canGym('payroll:read')">
@@ -165,18 +164,6 @@ const {
           <Button danger @click="links.splice(index, 1)">移除</Button>
         </div>
         <Button class="gym-form-add" type="dashed" @click="links.push({})">增加授权</Button>
-      </Form>
-      <Form v-else-if="mode === 'stores'" layout="vertical" :disabled="saving">
-        <FormItem label="所属门店" required extra="第一项为主门店；保留门店的负责人标记和原入职日期。">
-          <Select
-            v-model:value="selectedStores"
-            mode="multiple"
-            :options="stores.map((s) => ({ label: s.name, value: s.id }))"
-            style="width: 100%"
-            show-search
-            option-filter-prop="label"
-          />
-        </FormItem>
       </Form>
       <Form v-else layout="vertical" :disabled="saving">
         <FormItem v-if="mode === 'account'" label="用户名" required>

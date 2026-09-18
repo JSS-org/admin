@@ -6,6 +6,7 @@ import { ref } from 'vue';
 import { Descriptions, DescriptionsItem, Table } from 'ant-design-vue';
 
 import { gymApi } from '#/api/gym';
+import ApprovalCreate from '#/views/gym/approvals/create.vue';
 import AdminDrawer from '#/views/gym/components/admin-drawer.vue';
 import ResourcePage from '#/views/gym/components/resource-page.vue';
 import TableAction from '#/views/gym/components/table-action.vue';
@@ -42,13 +43,20 @@ async function details(row: GymRow) {
     >
       <template #actions="{ row }">
         <TableAction action="detail" @click="details(row)" />
+        <ApprovalCreate
+          v-if="row.status !== 'cancelled'"
+          business-type="contract"
+          source-type="subscriptions"
+          :record="row"
+          label="申请签约审批"
+        />
       </template>
     </ResourcePage>
     <AdminDrawer v-model:open="visible" title="记录详情" :footer="null" :width="900">
       <template v-if="current">
         <Descriptions :column="2" bordered>
           <DescriptionsItem v-for="column in columns" :key="column.dataIndex" :label="column.title">{{
-            current[column.dataIndex] ?? '—'
+            current[column.dataIndex] ?? '-'
           }}</DescriptionsItem>
         </Descriptions>
         <Table
