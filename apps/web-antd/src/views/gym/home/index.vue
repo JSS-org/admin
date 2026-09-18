@@ -7,6 +7,7 @@ import { useAccessStore } from '@vben/stores';
 import { Alert, Button, Card, Empty, Segmented, Select, Skeleton, Statistic, Table } from 'ant-design-vue';
 
 import { canGym } from '#/api/gym';
+import { approvalBusinessTypes } from '#/views/gym/approvals/options';
 import AdminPage from '#/views/gym/components/admin-page.vue';
 import { gymIcons } from '#/views/gym/icons';
 import { displayValue } from '#/views/gym/utils/display';
@@ -213,23 +214,31 @@ const visibleScenarios = computed(() =>
               </div></Card
             >
           </div>
-          <Card v-if="canGym('courses:read')" title="接下来 7 天的课程"
-            ><template #extra><RouterLink to="/gym/course-sessions">查看课程安排</RouterLink></template
-            ><Table
-              :data-source="data.upcoming"
+          <Card v-if="canGym('approvals:read') && canGym('approvals:decide')" title="待审批"
+            ><template #extra><RouterLink to="/gym/approvals">查看审批记录</RouterLink></template
+            ><Empty
+              v-if="!data.pendingApprovals?.length"
+              :image="Empty.PRESENTED_IMAGE_SIMPLE"
+              description="暂无待审批事项"
+              class="py-8"
+            /><Table
+              v-else
+              :data-source="data.pendingApprovals"
               row-key="id"
               :pagination="false"
               size="small"
               :scroll="{ x: 'max-content' }"
               :columns="[
-                { title: '课程', dataIndex: 'courseName' },
+                { title: '申请事项', dataIndex: 'title' },
+                { title: '审批类型', dataIndex: 'businessType' },
                 { title: '门店', dataIndex: 'storeName' },
-                { title: '开始时间', dataIndex: 'startsAt' },
-                { title: '已预约 / 容量', dataIndex: 'capacity' },
+                { title: '申请人', dataIndex: 'applicantName' },
+                { title: '申请时间', dataIndex: 'submittedAt' },
               ]"
-              ><template #bodyCell="{ column, text, record }"
-                ><span v-if="column.dataIndex === 'capacity'">{{ record.reservedCount }} / {{ record.capacity }}</span
-                ><span v-else>{{ displayValue(text, String(column.dataIndex ?? ''), [], {}) }}</span></template
+              ><template #bodyCell="{ column, text }"
+                ><span>{{
+                  displayValue(text, String(column.dataIndex ?? ''), [], { businessType: approvalBusinessTypes })
+                }}</span></template
               ></Table
             ></Card
           >

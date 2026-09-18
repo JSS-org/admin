@@ -44,6 +44,35 @@ export function dashboard(req: Request): any {
     )
     .toSorted((a, b) => a.startsAt.localeCompare(b.startsAt));
   const names = (table: string, id: string) => rows(table).find((row) => row.id === id)?.name ?? '—';
+  const myEmployeeId = rows('accounts').find((account) => account.id === actor.id)?.employeeId;
+  const approvalActor = { ...actor };
+  const canDecideApprovals =
+    req.actor.codes.includes('approvals:read') && actor.globalCodes.includes('approvals:decide');
+  if (canDecideApprovals) allowed(approvalActor, 'approvals:read');
+  const pendingApprovals = canDecideApprovals
+    ? scopeRows(approvalActor, rows('approvals'))
+        .filter(
+          (row) =>
+            row.status === 'pending' &&
+            rows('approvalTasks').some(
+              (task) =>
+                task.instanceId === row.id &&
+                task.stepNo === row.currentStep &&
+                task.status === 'pending' &&
+                task.approverEmployeeId === myEmployeeId,
+            ),
+        )
+        .toSorted((a, b) => String(a.submittedAt).localeCompare(String(b.submittedAt)))
+        .slice(0, 5)
+        .map((row) => ({
+          id: row.id,
+          title: row.title,
+          businessType: row.businessType,
+          storeName: names('stores', row.storeId),
+          applicantName: rows('employees').find((employee) => employee.id === row.applicantEmployeeId)?.name,
+          submittedAt: row.submittedAt,
+        }))
+    : [];
   return {
     id: 'dashboard',
     from: buckets[0]?.date,
@@ -68,6 +97,7 @@ export function dashboard(req: Request): any {
       { name: '停用资料', value: members.filter((member) => member.status !== 'active').length },
     ],
     upcomingCount: upcoming.length,
+    pendingApprovals,
     upcoming: req.actor.codes.includes('courses:read')
       ? upcoming
           .filter(

@@ -36,6 +36,14 @@ it('buckets receipts and refunds by their actual date, including empty days', ()
   expect(data.trend[2].netAmount).toBe('0.00');
   expect(data.metrics.netAmount).toBe('150.00');
 });
+it('lists pending approvals that the current approver can decide', () => {
+  const data = get('hq');
+  expect(data.pendingApprovals).toHaveLength(5);
+  expect(
+    data.pendingApprovals.every((row: any) => row.title && row.businessType && row.storeName && row.submittedAt),
+  ).toBe(true);
+  expect(get('store1').pendingApprovals).toEqual([]);
+});
 it('does not double-count a member belonging to multiple stores', () => {
   const before = get().metrics.activeMembers;
   insert('memberStores', { memberId: seedId(101), storeId: seedId(2) });
