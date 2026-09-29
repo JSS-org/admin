@@ -39,6 +39,8 @@
 | `README.md` / `RELEASE-NOTES.md` | 文档引用 | 更新路径与说明 |
 
 > 其余 62 个页面仅用 `vue` + `ant-design-vue` + `vue-router` + `dayjs`，可原样迁移。
+>
+> 这 8 处依赖均为 vben 标准包（`Page` / `useTabs` / `useAccessStore` / `@vben/plugins` / `@vben/icons`），yudao-ui-admin-vben 同为 vben 5.7，预期直接可用；**唯一需要核对的是 `@vben/plugins/tiptap` 富文本与图标名**。因此**不需要**为移植做主动解耦改造，避免无谓改动。
 
 ## 4. 路由与菜单（关键差异）
 

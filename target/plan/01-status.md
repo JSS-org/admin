@@ -51,9 +51,10 @@
 
 ## 6. Git / 分支现状
 
-- `main`：领先 `origin/main` 1 个本地提交（`d7f6b1c fix: 恢复侧边栏角色权限入口`），未推送。
-- `feat/yudao-api-adapter`：`246d0bd feat: 增加 yudao 后端适配层（WIP）`，为“保留 vben 管理端对接 yudao”准备的适配层；后续取决于 D-01 决策，可能被复用或调整。
-- 已归档：`target/健身房合同_三附件签署稿/`（合同与三附件源文件）与 `target/contract/`（文本提取，便于检索）。
+- `main`：领先 `origin/main`，含 1 个权限修复提交与一批规划文档提交（`target/plan/`、`AGENTS.md`），**未推送**。
+- `feat/yudao-api-adapter`：yudao 后端适配层（WIP，含 `api/backend/*` 与权限码 `gym:` 前缀映射）；是否合入 `main` 取决于移植落地方式。
+- `target/健身房合同_三附件签署稿/` 与 `target/contract/` 已归档（合同与三附件的原文与文本提取）。
+- **本机非开发机**：yudao-server / MySQL / Redis 无法本地运行；可做纯前端与文档工作。
 
 ## 7. 风险与待决
 
