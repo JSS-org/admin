@@ -67,7 +67,7 @@ const routes: RouteRecordRaw[] = [
         name: 'GymRoles',
         path: '/gym/roles',
         component: () => import('#/views/gym/roles/index.vue'),
-        meta: { title: '角色权限', authority: ['hq'], hideInMenu: true, order: 1 },
+        meta: { title: '角色权限', authority: ['hq'], order: 1 },
       },
       {
         name: 'Gym-salary-templates',
