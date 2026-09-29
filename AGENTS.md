@@ -57,4 +57,6 @@
 
 ## 6. 决策状态
 
-重大架构决策记录在 `target/plan/05-decisions.md`。**其中有若干项待甲方/团队拍板**，当前**阻塞开工**的 3 项为：管理后台基座（D-01）、数据库（D-02）、现有超范围功能处置（D-03）。未拍板前按文档中“推荐方案”推进，但不得据此进行不可逆改造。
+重大架构决策记录在 `target/plan/05-decisions.md`。**2026-09-29 已拍板**：管理端采用 yudao-ui-admin-vben（D-01）、数据库 MySQL 8（D-02）、超范围功能隐藏冻结（D-03）、yudao 版本 JDK17/SB3.5（D-04）、整合端双 token（D-09）。
+
+当前**宏观阻塞**主要是环境而非技术：本机非开发机（yudao-server/MySQL/Redis 无法本地运行），以及 `yudao-ui-admin-vben` 等源码尚未纳入开发环境。前端移植方案见 `target/plan/07-frontend-port.md`。

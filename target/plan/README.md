@@ -20,6 +20,8 @@
 | `03-architecture.md` | yudao 全栈技术路线：模块选型、账号体系、数据权限、IoT、支付/核销、通知 | 架构与详细设计 |
 | `04-roadmap.md` | 里程碑（A/B/C）与敏捷迭代、提交/分支/验收证据计划 | 排期与迭代管理 |
 | `05-decisions.md` | 待确认决策（ADR）与已定决策、影响面 | 做技术选型时 |
+| `06-workflow.md` | 分支/提交/CI/DoD/周报/验收证据 | 日常开发 |
+| `07-frontend-port.md` | 现有 AntD 页面移植到 yudao-ui-admin-vben 的方案与宏观事项 | 前端移植 |
 
 ## 与其他文档的关系
 
