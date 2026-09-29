@@ -1,7 +1,7 @@
 import { expect, it } from 'vitest';
 
 import { fromYudaoPage, toYudaoPageParams } from './gym-adapter';
-import { deriveGymRoles, toGymCode, toGymPermissionCodes, toYudaoCode } from './permissions';
+import { deriveGymRoles, toGymCode, toGymPermissionCodes, toSystemCode, toYudaoCode } from './permissions';
 
 it('maps vben page params to yudao pageNo/pageSize', () => {
   expect(toYudaoPageParams({ page: 2, pageSize: 50, storeId: 's1' })).toEqual({
@@ -25,18 +25,20 @@ it('normalizes yudao list responses into the shared GymPage shape', () => {
 it('translates yudao system permission codes into business permission codes', () => {
   expect(toGymCode('system:user:query')).toBe('employees:read');
   expect(toGymCode('system:role:update')).toBe('roles:write');
-  // custom gym permissions are passed through untouched
+  // gym module codes: strip the `gym:` prefix
+  expect(toGymCode('gym:members:write')).toBe('members:write');
+  // custom gym permissions without a prefix are passed through untouched
   expect(toGymCode('members:write')).toBe('members:write');
-  expect(toGymPermissionCodes(['system:user:query', 'system:user:update', 'members:read', 'members:read'])).toEqual([
+  expect(toGymPermissionCodes(['system:user:query', 'gym:members:read', 'members:read'])).toEqual([
     'employees:read',
-    'employees:write',
     'members:read',
   ]);
 });
 
-it('maps business permission codes back to yudao codes', () => {
-  expect(toYudaoCode('roles:write')).toBe('system:role:update');
-  expect(toYudaoCode('members:write')).toBe('members:write');
+it('maps business permission codes back to backend codes', () => {
+  expect(toYudaoCode('roles:write')).toBe('gym:roles:write');
+  expect(toYudaoCode('members:write')).toBe('gym:members:write');
+  expect(toSystemCode('roles:write')).toBe('system:role:update');
 });
 
 it('derives hq/store scope from yudao roles and permissions', () => {

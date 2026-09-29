@@ -6,8 +6,8 @@
  *
  * 约定：
  * - 业务权限码形如 `resource:action`（一个冒号），如 `members:read`、`roles:write`。
- * - yudao 系统模块权限码形如 `system:user:query`（两个冒号）。
- * - 自定义 gym 模块若按业务权限码注册，则原样透传。
+ * - 后端 gym 模块权限码形如 `gym:resource:action`，如 `gym:members:read`（见 target/plan/09-permissions.md）。
+ * - yudao 系统模块权限码形如 `system:user:query`，可按别名映射到业务权限码。
  */
 
 /** yudao 系统模块权限码 -> 业务权限码。 */
@@ -32,8 +32,8 @@ const YUDAO_TO_GYM: Record<string, string> = {
   'system:dept:delete': 'stores:write',
 };
 
-/** 反向映射：业务权限码 -> yudao 权限码（用于写入 yudao 侧的场景）。 */
-const GYM_TO_YUDAO: Record<string, string> = {
+/** 反向映射：业务权限码 -> yudao 系统模块权限码（仅在复用 yudao system 页面时使用）。 */
+const GYM_TO_SYSTEM: Record<string, string> = {
   'employees:read': 'system:user:query',
   'employees:write': 'system:user:update',
   'roles:read': 'system:role:query',
@@ -42,13 +42,17 @@ const GYM_TO_YUDAO: Record<string, string> = {
   'stores:write': 'system:dept:update',
 };
 
-/** 是否已经是业务权限码（`resource:action`，仅一个冒号，用于区分 yudao 的 `system:user:query`）。 */
+/** 是否已经是业务权限码（`resource:action`，仅一个冒号，用于区分 `gym:` / `system:` 前缀码）。 */
 function isGymCode(code: string): boolean {
   return /^[a-z][\w-]*:[a-z][\w-]*$/.test(code);
 }
 
 /** 将单个 yudao 权限码转为业务权限码；无法识别时返回原值，保证自定义 gym 权限可用。 */
 export function toGymCode(code: string): string {
+  if (code.startsWith('gym:')) {
+    const stripped = code.slice(4);
+    if (stripped) return stripped;
+  }
   if (isGymCode(code)) return code;
   return YUDAO_TO_GYM[code] ?? code;
 }
@@ -58,9 +62,15 @@ export function toGymPermissionCodes(codes: readonly string[]): string[] {
   return [...new Set((codes ?? []).map((code) => toGymCode(code)))];
 }
 
-/** 将业务权限码转为 yudao 权限码（未配置映射时原样返回）。 */
+/** 将业务权限码转为后端权限码；gym 资源统一加 `gym:` 前缀。 */
 export function toYudaoCode(code: string): string {
-  return GYM_TO_YUDAO[code] ?? code;
+  if (isGymCode(code)) return `gym:${code}`;
+  return code;
+}
+
+/** 将业务权限码转为 yudao 系统模块权限码（仅复用 system 页面时使用）。 */
+export function toSystemCode(code: string): string {
+  return GYM_TO_SYSTEM[code] ?? code;
 }
 
 /** 明确只有总部才具备的业务权限码，用于推断账号范围。 */
