@@ -22,6 +22,8 @@
 | `05-decisions.md` | 待确认决策（ADR）与已定决策、影响面 | 做技术选型时 |
 | `06-workflow.md` | 分支/提交/CI/DoD/周报/验收证据 | 日常开发 |
 | `07-frontend-port.md` | 现有 AntD 页面移植到 yudao-ui-admin-vben 的方案与宏观事项 | 前端移植 |
+| `08-gym-api-contract.md` | `yudao-module-gym` 管理端 REST 契约（资源/端点/权限） | 后端与联调 |
+| `09-permissions.md` | 权限码规范、注册表、菜单树、角色与数据范围 | 权限/菜单配置 |
 
 ## 与其他文档的关系
 
