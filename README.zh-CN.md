@@ -1,5 +1,7 @@
 # JSS Admin · 健身树门店管理后台
 
+> 本仓库保留旧管理端原型。现行管理端为 [dashboard/apps/web-jss](../dashboard/apps/web-jss/README.md)，合同、现行计划及原 `target/` 资料已统一迁至 [dashboard/targets](../dashboard/targets/README.md)。
+
 [English](./README.md) | **中文**
 
 > **闭源商业项目，禁止外传。** 本仓库是健身树（JSS）的内部商业资产，**非开源项目**，不接受外部 Issue 与 Pull Request。授权条款见 [LICENSE](./LICENSE)。

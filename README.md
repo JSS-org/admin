@@ -1,5 +1,7 @@
 # JSS Admin · 健身树门店管理后台
 
+> This repository retains the legacy admin prototype. The current admin app is [dashboard/apps/web-jss](../dashboard/apps/web-jss/README.md). Contracts, current plans and the former `target/` assets have moved to [dashboard/targets](../dashboard/targets/README.md).
+
 **English** | [中文](./README.zh-CN.md)
 
 > **Proprietary & confidential.** This repository is an internal commercial asset of JSS (健身树). It is **not** open source, and external issues and pull requests are not accepted. See [LICENSE](./LICENSE).
